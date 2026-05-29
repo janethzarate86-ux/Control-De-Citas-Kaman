@@ -969,6 +969,22 @@ tbody tr:hover td{ background:#eef8ff !important; }
 }
 #availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
 #availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
+#availableUnitsBackdrop .available-unit-unavailable{
+  opacity:.86 !important;
+  background:#fff7f7 !important;
+  border-color:#f3c5c5 !important;
+  cursor:not-allowed !important;
+}
+#availableUnitsBackdrop .available-unit-badge.unavailable{
+  background:#fff1f1 !important;
+  color:#a52828 !important;
+  border-color:#efb3b3 !important;
+}
+#availableUnitsBackdrop .available-unit-reason{
+  color:#9a3412 !important;
+  font-weight:950 !important;
+}
+
 
 /* Historial: subir controles y tabla */
 #historyBackdrop .content{
@@ -5221,6 +5237,27 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
     };
   }
 
+  function getUnitAvailabilityInfo(unit){
+    const today = todayISO();
+    if(unitNoCirculaOn(unit, today)){
+      const days = parseNoCirculaDays(unit.noCirculaDays).join(", ") || "día configurado";
+      return {
+        ok:false,
+        type:"no-circula",
+        reason:`No circula hoy (${days}).`
+      };
+    }
+    const info = unidadEstaDisponible(unit.unidad);
+    if(!info.ok){
+      return {
+        ok:false,
+        type:"cita",
+        reason: info.reason || "Tiene cita programada pendiente."
+      };
+    }
+    return { ok:true, type:"disponible", reason: info.reason || "Sin citas pendientes" };
+  }
+
   function renderAvailableUnits(){
     const listEl = $("#availableUnitsList");
     const countEl = $("#availableUnitsCount");
@@ -5230,29 +5267,31 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
       .slice()
       .sort((a,b)=>normalize(a.unidad).localeCompare(normalize(b.unidad),"es",{sensitivity:"base"}));
 
-    const today = todayISO();
-    const available = units
-      .filter(u => !unitNoCirculaOn(u, today))
-      .map(u => ({ unit:u, info: unidadEstaDisponible(u.unidad) }))
-      .filter(x => x.info.ok);
+    const allUnits = units.map(u => ({ unit:u, info:getUnitAvailabilityInfo(u) }));
+    const availableCount = allUnits.filter(x => x.info.ok).length;
+    if(countEl) countEl.textContent = `${availableCount} disponible${availableCount===1?"":"s"} de ${allUnits.length}`;
 
-
-    if(!available.length){
+    if(!allUnits.length){
       listEl.innerHTML = `<div class="hint" style="padding:12px;border:1px dashed #b7d7f2;border-radius:14px;background:#f7fcff;">
-        No hay unidades disponibles por el momento.
+        No hay unidades registradas.
       </div>`;
       return;
     }
 
-    listEl.innerHTML = available.map(({unit, info}) => `
-      <button type="button" class="available-unit-card available-unit-select" data-unit="${escapeHTML(unit.unidad || "")}" type="button">
-        <div class="available-unit-title">🚚 ${escapeHTML(unit.unidad || "-")}</div>
-        <div class="available-unit-badge">Disponible</div>
-        <div class="available-unit-meta">Placas: ${escapeHTML(unit.placas || "-")} · Tonelaje: ${escapeHTML(unit.tonelaje || "-")} · Tarimas: ${escapeHTML(unit.tarimas || "-")}</div>
-        <div class="available-unit-meta">${escapeHTML(info.reason || "")}</div>
-        <div class="available-unit-meta"><strong>Tocar para crear cita con esta unidad</strong></div>
-      </button>
-    `).join("");
+    listEl.innerHTML = allUnits.map(({unit, info}) => {
+      const isOk = !!info.ok;
+      const badge = isOk ? "Disponible" : (info.type === "no-circula" ? "No circula" : "Ocupada");
+      const actionText = isOk ? "Tocar para crear cita con esta unidad" : "No disponible para nueva cita en este momento";
+      const classes = isOk ? "available-unit-card available-unit-select" : "available-unit-card available-unit-unavailable";
+      return `
+        <button type="button" class="${classes}" data-unit="${escapeHTML(unit.unidad || "")}" ${isOk ? "" : "disabled"}>
+          <div class="available-unit-title">🚚 ${escapeHTML(unit.unidad || "-")}</div>
+          <div class="available-unit-badge ${isOk ? "" : "unavailable"}">${escapeHTML(badge)}</div>
+          <div class="available-unit-meta">Placas: ${escapeHTML(unit.placas || "-")} · Tonelaje: ${escapeHTML(unit.tonelaje || "-")} · Tarimas: ${escapeHTML(unit.tarimas || "-")}</div>
+          <div class="available-unit-meta available-unit-reason">Motivo: ${escapeHTML(info.reason || "-")}</div>
+          <div class="available-unit-meta"><strong>${escapeHTML(actionText)}</strong></div>
+        </button>`;
+    }).join("");
 
     listEl.querySelectorAll(".available-unit-select").forEach(btn=>{
       btn.addEventListener("click", ()=>{
