@@ -2102,10 +2102,10 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         render();
         setFirebaseSignal("online", "Firebase conectado");
         setStatus("Citas cargadas desde Firebase.");
-      } else if(state.rows.length){
-        await pushCitasToFirebase(true);
-        setFirebaseSignal("online", "Firebase conectado");
       } else {
+        state.rows = [];
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+        render();
         setFirebaseSignal("online", "Firebase conectado");
         setStatus("Firebase conectado. Sin citas registradas.");
       }
@@ -2366,6 +2366,28 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       state.payroll.unshift({ id: uid(), workerId: w.id, fecha, monto: sueldo, citaId: row.id, origen: "CITA" });
     }
     savePayroll();
+  }
+
+  function citaFirma(row){
+    const data = row && row.data && typeof row.data === "object" ? row.data : {};
+    return COLS.map(c => normalize(data[c]).toLowerCase()).join("|");
+  }
+
+  function quitarCitaYNominaRelacionada(id){
+    const objetivo = state.rows.find(r => r.id === id);
+    if(!objetivo) return { eliminadas: [], firma: "" };
+    const firma = citaFirma(objetivo);
+    const eliminadas = [];
+
+    state.rows = state.rows.filter(r => {
+      const quitar = r.id === id || (firma && citaFirma(r) === firma);
+      if(quitar) eliminadas.push(r);
+      return !quitar;
+    });
+
+    const ids = new Set(eliminadas.map(r => r.id).filter(Boolean));
+    state.payroll = state.payroll.filter(p => !ids.has(p.citaId));
+    return { eliminadas, firma };
   }
 
   function noteStatus(note){
@@ -3011,14 +3033,23 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
   async function deleteRow(id){
     if(!confirm("¿Eliminar esta cita?")) return;
-    await withProcessing("Eliminando cita…", "Actualizando Firebase. Espera a que termine el proceso.", async ()=>{
-      state.rows = state.rows.filter(r=>r.id!==id);
-      state.payroll = state.payroll.filter(p => p.citaId !== id);
-      savePayroll();
-      save();
+    await withProcessing("Eliminando cita…", "Quitando la cita de pantalla, nómina y Firebase.", async ()=>{
+      const resultado = quitarCitaYNominaRelacionada(id);
+      if(!resultado.eliminadas.length){
+        setStatus("La cita ya no existe o ya fue eliminada.");
+        render();
+        return true;
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sortCitasByDateTime(state.rows)));
+      localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
       render();
+      if(typeof renderPayroll === "function") renderPayroll();
+
       await syncCitasNow(true);
-      setStatus("Cita eliminada.");
+      await syncConfigNow(true);
+      setStatus("Cita eliminada y registro del día actualizado.");
+      return true;
     });
   }
 
@@ -4376,17 +4407,21 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
     try{
       await withProcessing("Eliminando citas…", "Limpiando registros y confirmando Firebase.", async ()=>{
       state.rows = [];
+      state.payroll = state.payroll.filter(p => normalize(p.origen).toUpperCase() !== "CITA" && !p.citaId);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+      localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
       render();
+      if(typeof renderPayroll === "function") renderPayroll();
 
       if(citasFirebaseReady()){
         setFirebaseSignal("syncing", "Eliminando citas...");
-        const res = await fetch(FIREBASE_CITAS_ENDPOINT, { method: "DELETE" });
+        const res = await fetch(FIREBASE_CITAS_ENDPOINT, { method: "PUT", headers:{ "Content-Type":"application/json" }, body:"null" });
         if(!res.ok) throw new Error("HTTP " + res.status);
+        await syncConfigNow(true);
         setFirebaseSignal("online", "Firebase conectado");
       }
 
-      setStatus("Todas las citas fueron eliminadas.");
+      setStatus("Todas las citas y sus registros del día fueron eliminados.");
       });
       alert("✅ Todas las citas fueron eliminadas.");
     }catch(e){
