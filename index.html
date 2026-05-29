@@ -1019,43 +1019,8 @@ tbody tr:hover td{ background:#eef8ff !important; }
   }
 }
 </style>
-
-
-
-
-
-<style id="kaman-notas-main-fix">
-@media (max-width:768px){
-  #btnNotesMain{
-    width:48px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:19px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 48px !important;
-  }
-}
-@media (min-width:769px){
-  #btnNotesMain{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-</style>
-
-
 <style id="kaman-subir-tablas-modales">
-/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
+/* Subir tablas en Clientes, Destinos, Unidades y Nómina */
 #clientsBackdrop .content,
 #destinationsBackdrop .content,
 #unitsBackdrop .content,
@@ -1213,6 +1178,53 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 }
 </style>
 
+
+<style id="kaman-history-firebase-signal-css">
+#historyFirebaseSignal{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
+  border-radius:999px;
+  border:1px solid #bfdbfe;
+  background:#f8fbff;
+  font-size:12px;
+  font-weight:900;
+  color:#0f3c68;
+  white-space:nowrap;
+}
+#historyFirebaseSignal .antenna{font-size:14px;}
+#historyFirebaseSignal .signal-dot{
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  background:#94a3b8;
+  display:inline-block;
+}
+#historyFirebaseSignal.firebase-syncing .signal-dot,
+#historyFirebaseSignal.firebase-pending .signal-dot{
+  background:#f59e0b;
+  box-shadow:0 0 0 4px rgba(245,158,11,.18);
+  animation:pulseSignal 1.2s infinite;
+}
+#historyFirebaseSignal.firebase-online{
+  border-color:#86efac;
+  background:#f0fdf4;
+  color:#166534;
+}
+#historyFirebaseSignal.firebase-online .signal-dot{
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.18);
+  animation:pulseSignal 1.5s infinite;
+}
+#historyFirebaseSignal.firebase-offline{
+  border-color:#fecaca;
+  background:#fff7f7;
+  color:#991b1b;
+}
+#historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
+</style>
+
 </head>
 <body>
   <div id="processingOverlay" role="status" aria-live="polite" aria-hidden="true">
@@ -1237,7 +1249,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         <button class="primary" id="btnNew">+</button>
         <button id="btnConfig">⚙</button>
         <button type="button" id="btnPreviewCitas" title="Vista previa de citas">👁</button>
-        <button type="button" id="btnAvailableUnits" title="Unidades disponibles">🚚</button><button type="button" id="btnNotesMain" title="Notas">📝</button>
+        <button type="button" id="btnAvailableUnits" title="Unidades disponibles">🚚</button>
         <button id="btnExportPDF" style="display:none" aria-hidden="true" tabindex="-1">📄 PDF</button>
       </div>
     </header>
@@ -1783,7 +1795,14 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       </header>
       <div class="content" style="grid-template-columns:1fr;gap:12px;">
         <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
-          <div class="pill" id="historyCount">0 entregas</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+            <div class="pill" id="historyCount">0 entregas</div>
+            <div id="historyFirebaseSignal" class="firebase-signal firebase-pending" title="Historial Firebase: pendiente">
+              <span class="antenna" aria-hidden="true">📡</span>
+              <span class="signal-dot" aria-hidden="true"></span>
+              <span class="signal-text">Historial sin conectar</span>
+            </div>
+          </div>
           <button type="button" class="primary" id="btnExportHistoryExcel">⬇️ Exportar Excel</button>
           <button type="button" class="primary" id="btnExportPrevMonthExcel">📅 Mes anterior</button>
         </div>
@@ -1849,6 +1868,12 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   const FIREBASE_CONFIG_PATH = "configuracion";
   const FIREBASE_CONFIG_ENDPOINT = `${FIREBASE_DB_URL.replace(/\/$/, "")}/${FIREBASE_CONFIG_PATH}.json`;
 
+  // Firebase independiente para historial de entregas.
+  // Se consulta únicamente cuando se abre el Historial para reducir descarga de datos.
+  const FIREBASE_HISTORY_DB_URL = "https://respaldohistorialkaman-default-rtdb.firebaseio.com";
+  const FIREBASE_HISTORY_PATH = "historialEntregas";
+  const FIREBASE_HISTORY_ENDPOINT = `${FIREBASE_HISTORY_DB_URL.replace(/\/$/, "")}/${FIREBASE_HISTORY_PATH}.json`;
+
   const UNITS_KEY   = "control_transporte_unidades_v1";
   const WORKERS_KEY = "control_transporte_trabajadores_v1";
   const PAYROLL_KEY = "control_transporte_nomina_v1";
@@ -1887,6 +1912,51 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     editingClientId: null,
     editingDestinationId: null
   };
+
+  const pendingRemovedCitaIds = new Map();
+  const PENDING_REMOVE_TTL_MS = 2 * 60 * 1000;
+
+  function cleanupPendingRemovedCitas(){
+    const now = Date.now();
+    for(const [id, info] of pendingRemovedCitaIds.entries()){
+      if(!info || now - (info.at || 0) > PENDING_REMOVE_TTL_MS){
+        pendingRemovedCitaIds.delete(id);
+      }
+    }
+  }
+
+  function markCitaRemovedLocal(row){
+    if(!row || !row.id) return;
+    cleanupPendingRemovedCitas();
+    pendingRemovedCitaIds.set(row.id, { at: Date.now(), firma: citaFirma(row) });
+    const tr = document.querySelector(`tr[data-id="${CSS.escape(row.id)}"]`);
+    if(tr) tr.remove();
+    document.querySelectorAll(`.mobile-card[data-id="${CSS.escape(row.id)}"]`).forEach(el => el.remove());
+  }
+
+  function unmarkCitaRemovedLocal(row){
+    if(!row) return;
+    cleanupPendingRemovedCitas();
+    if(row.id) pendingRemovedCitaIds.delete(row.id);
+    const firma = citaFirma(row);
+    if(firma){
+      for(const [id, info] of pendingRemovedCitaIds.entries()){
+        if(info && info.firma === firma) pendingRemovedCitaIds.delete(id);
+      }
+    }
+  }
+
+  function citaEstaPendienteDeRetiro(row){
+    if(!row || !row.id) return false;
+    cleanupPendingRemovedCitas();
+    if(pendingRemovedCitaIds.has(row.id)) return true;
+    const firma = citaFirma(row);
+    if(!firma) return false;
+    for(const info of pendingRemovedCitaIds.values()){
+      if(info && info.firma && info.firma === firma) return true;
+    }
+    return false;
+  }
 
   const $ = (sel) => document.querySelector(sel);
   const $$ = (sel) => Array.from(document.querySelectorAll(sel));
@@ -1971,11 +2041,18 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   }
   let firebaseLoadingCitas = false;
   let firebaseLoadingConfig = false;
+  let firebaseLoadingHistory = false;
+  let historyLoadedFromFirebase = false;
   let firebaseSaveTimer = null;
   let firebaseConfigSaveTimer = null;
+  let firebaseHistorySaveTimer = null;
 
   function citasFirebaseReady(){
     return /^https:\/\/.+\.firebasedatabase\.app|^https:\/\/.+\.firebaseio\.com/.test(FIREBASE_DB_URL);
+  }
+
+  function historyFirebaseReady(){
+    return /^https:\/\/.+\.firebasedatabase\.app|^https:\/\/.+\.firebaseio\.com/.test(FIREBASE_HISTORY_DB_URL);
   }
 
   function setFirebaseSignal(status, text){
@@ -1986,6 +2063,16 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     const label = el.querySelector(".signal-text");
     if(label) label.textContent = text;
     el.title = "Firebase: " + text + " · " + FIREBASE_DB_URL.replace(/\/$/, "");
+  }
+
+  function setHistoryFirebaseSignal(status, text){
+    const el = $("#historyFirebaseSignal");
+    if(!el) return;
+    el.classList.remove("firebase-pending", "firebase-online", "firebase-syncing", "firebase-offline");
+    el.classList.add("firebase-" + status);
+    const label = el.querySelector(".signal-text");
+    if(label) label.textContent = text;
+    el.title = "Historial Firebase: " + text + " · " + FIREBASE_HISTORY_DB_URL.replace(/\/$/, "");
   }
 
   let processingDepth = 0;
@@ -2050,7 +2137,6 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     if(!res.ok) throw new Error("HTTP " + res.status);
     setFirebaseSignal("online", "Firebase conectado");
     if(!silent) setStatus("Citas guardadas en Firebase.");
-    programarActualizacionApp();
     return true;
   }
 
@@ -2066,7 +2152,22 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     if(!res.ok) throw new Error("HTTP " + res.status);
     setFirebaseSignal("online", "Firebase conectado");
     if(!silent) setStatus("Configuración guardada en Firebase.");
-    programarActualizacionApp();
+    return true;
+  }
+
+  async function syncHistoryNow(silent=true){
+    clearTimeout(firebaseHistorySaveTimer);
+    if(!historyFirebaseReady()) return true;
+    setHistoryFirebaseSignal("syncing", "Sincronizando historial...");
+    const res = await fetch(FIREBASE_HISTORY_ENDPOINT, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(historyPayload())
+    });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    setHistoryFirebaseSignal("online", "Historial conectado");
+    historyLoadedFromFirebase = true;
+    if(!silent) setStatus("Historial guardado en Firebase de respaldo.");
     return true;
   }
 
@@ -2089,15 +2190,15 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       const res = await fetch(FIREBASE_CITAS_ENDPOINT, { method:"GET", cache:"no-store" });
       if(!res.ok) throw new Error("HTTP " + res.status);
       const remote = normalizeRemoteRows(await res.json());
+      const mappedRemote = remote.map(r => ({
+        id: normalize(r.id) || uid(),
+        checked: !!r.checked,
+        createdAt: normalize(r.createdAt) || new Date().toISOString(),
+        data: r.data && typeof r.data === "object" ? r.data : {}
+      })).filter(r => !citaEstaPendienteDeRetiro(r));
 
-      if(remote.length){
-        state.rows = remote.map(r => ({
-          id: normalize(r.id) || uid(),
-          checked: !!r.checked,
-          createdAt: normalize(r.createdAt) || new Date().toISOString(),
-          data: r.data && typeof r.data === "object" ? r.data : {}
-        }));
-        state.rows = sortCitasByDateTime(state.rows);
+      if(mappedRemote.length){
+        state.rows = sortCitasByDateTime(mappedRemote);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
         render();
         setFirebaseSignal("online", "Firebase conectado");
@@ -2130,7 +2231,6 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       if(!res.ok) throw new Error("HTTP " + res.status);
       setFirebaseSignal("online", "Firebase conectado");
       if(!silent) setStatus("Cita guardada en Firebase.");
-      programarActualizacionApp();
     }catch(e){
       console.warn("No se pudo guardar en Firebase:", e);
       setFirebaseSignal("offline", "Firebase pendiente");
@@ -2153,7 +2253,6 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       notes: Array.isArray(state.notes) ? state.notes : [],
       clients: Array.isArray(state.clients) ? state.clients : [],
       destinations: Array.isArray(state.destinations) ? state.destinations : [],
-      deliveries: Array.isArray(state.deliveries) ? state.deliveries : [],
       updatedAt: new Date().toISOString()
     };
   }
@@ -2161,7 +2260,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   function applyRemoteConfig(cfg){
     if(!cfg || typeof cfg !== "object") return false;
 
-    const arrays = ["units","workers","payroll","notes","clients","destinations","deliveries"];
+    const arrays = ["units","workers","payroll","notes","clients","destinations"];
     let hasData = false;
     for(const key of arrays){
       if(Array.isArray(cfg[key]) && cfg[key].length){
@@ -2177,7 +2276,6 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     state.notes = Array.isArray(cfg.notes) ? cfg.notes : [];
     state.clients = Array.isArray(cfg.clients) ? cfg.clients : [];
     state.destinations = Array.isArray(cfg.destinations) ? cfg.destinations : [];
-    state.deliveries = Array.isArray(cfg.deliveries) ? cfg.deliveries : [];
 
     localStorage.setItem(UNITS_KEY, JSON.stringify(state.units));
     localStorage.setItem(WORKERS_KEY, JSON.stringify(state.workers));
@@ -2185,7 +2283,6 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes));
     localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients));
     localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations));
-    localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
 
     render();
     if(typeof renderClients === "function") renderClients();
@@ -2210,7 +2307,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         setStatus("⚙ cargada desde Firebase.");
       } else if(
         state.units.length || state.workers.length || state.payroll.length ||
-        state.notes.length || state.clients.length || state.destinations.length || state.deliveries.length
+        state.notes.length || state.clients.length || state.destinations.length
       ){
         await pushConfigToFirebase(true);
       }
@@ -2244,6 +2341,82 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     firebaseConfigSaveTimer = setTimeout(()=>pushConfigToFirebase(false), 350);
   }
 
+  function historyPayload(){
+    return (Array.isArray(state.deliveries) ? state.deliveries : []).map(r => ({
+      id: normalize(r.id) || uid(),
+      checked: true,
+      createdAt: normalize(r.createdAt) || new Date().toISOString(),
+      deliveredAt: normalize(r.deliveredAt) || new Date().toISOString(),
+      deliveredAtLocal: normalize(r.deliveredAtLocal) || "",
+      data: r.data && typeof r.data === "object" ? r.data : {}
+    }));
+  }
+
+  async function pushHistoryToFirebase(silent=true){
+    if(!historyFirebaseReady() || firebaseLoadingHistory) return true;
+    try{
+      const res = await fetch(FIREBASE_HISTORY_ENDPOINT, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(historyPayload())
+      });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      if(!silent) setStatus("Historial guardado en Firebase de respaldo.");
+      return true;
+    }catch(e){
+      console.warn("No se pudo guardar historial en Firebase de respaldo:", e);
+      if(!silent) setStatus("Historial local. Firebase de respaldo pendiente.");
+      return false;
+    }
+  }
+
+  function scheduleHistoryFirebaseSave(){
+    if(firebaseLoadingHistory) return;
+    clearTimeout(firebaseHistorySaveTimer);
+    firebaseHistorySaveTimer = setTimeout(()=>pushHistoryToFirebase(false), 350);
+  }
+
+  async function loadHistoryFromFirebase(force=false){
+    if(!historyFirebaseReady()){
+      setHistoryFirebaseSignal("offline", "Historial sin configurar");
+      return false;
+    }
+    if(historyLoadedFromFirebase && !force){
+      setHistoryFirebaseSignal("online", "Historial conectado");
+      return true;
+    }
+    firebaseLoadingHistory = true;
+    setHistoryFirebaseSignal("syncing", "Conectando historial...");
+    try{
+      const res = await fetch(FIREBASE_HISTORY_ENDPOINT, { method:"GET", cache:"no-store" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const remote = normalizeRemoteRows(await res.json());
+      if(remote.length){
+        state.deliveries = remote.map(r => ({
+          id: normalize(r.id) || uid(),
+          checked: true,
+          createdAt: normalize(r.createdAt) || new Date().toISOString(),
+          deliveredAt: normalize(r.deliveredAt) || "",
+          deliveredAtLocal: normalize(r.deliveredAtLocal) || "",
+          data: r.data && typeof r.data === "object" ? r.data : {}
+        }));
+        localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
+      } else if(Array.isArray(state.deliveries) && state.deliveries.length){
+        await pushHistoryToFirebase(true);
+      }
+      historyLoadedFromFirebase = true;
+      setHistoryFirebaseSignal("online", "Historial conectado");
+      return true;
+    }catch(e){
+      console.warn("Historial Firebase de respaldo no disponible:", e);
+      setHistoryFirebaseSignal("offline", "Historial sin conexión");
+      setStatus("Historial local. Revisa reglas o conexión del Firebase de respaldo.");
+      return false;
+    }finally{
+      firebaseLoadingHistory = false;
+    }
+  }
+
 
   function save(){
     state.rows = sortCitasByDateTime(state.rows);
@@ -2260,7 +2433,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   function saveDeliveries(){
     localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
     setStatus("Historial guardado.");
-    scheduleConfigFirebaseSave();
+    scheduleHistoryFirebaseSave();
   }
 
   function saveDestinations(){ localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations)); setStatus("Destinos guardados."); scheduleConfigFirebaseSave(); }
@@ -2286,6 +2459,81 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   function getUnitByName(name){
     const n = normalize(name).toLowerCase();
     return state.units.find(u => normalize(u.unidad).toLowerCase() === n);
+  }
+
+
+  function citaTimeWindow(data){
+    const start = timeToMinutes(data?.["horario de carga"]);
+    let end = timeToMinutes(data?.["horario de cita"]);
+
+    // La ocupación solo se valida cuando ambos horarios están capturados.
+    // Así se permite seleccionar la unidad y después elegir un horario libre.
+    if(start === 999999 || end === 999999) return null;
+
+    // Si la cita cruza medianoche, se considera la hora final del día siguiente.
+    if(end < start) end += 1440;
+
+    return { start, end };
+  }
+
+  function windowsOverlap(a, b){
+    // Sin ventana completa no se bloquea todavía; la validación final ocurre al guardar.
+    if(!a || !b) return false;
+
+    // Intervalos semiabiertos: [inicio, fin).
+    // Permite agendar justo al terminar una cita anterior, por ejemplo después de 20:00.
+    return a.start < b.end && b.start < a.end;
+  }
+
+  function formatSchedule(data){
+    return `Carga: ${normalize(data?.["horario de carga"]) || "sin hora"} · Cita: ${normalize(data?.["horario de cita"]) || "sin hora"}`;
+  }
+
+  function findUnitScheduleConflict(data, excludeId = null){
+    const unitName = normalize(data?.[UNIT_COL]).toLowerCase();
+    const dateISO = normalize(data?.[DATE_COL]);
+    if(!unitName || !dateISO) return null;
+
+    const proposedWindow = citaTimeWindow(data);
+    for(const row of state.rows){
+      if(excludeId && row.id === excludeId) continue;
+      const d = row.data || {};
+      if(normalize(d[UNIT_COL]).toLowerCase() !== unitName) continue;
+      if(normalize(d[DATE_COL]) !== dateISO) continue;
+
+      const currentWindow = citaTimeWindow(d);
+      if(!windowsOverlap(proposedWindow, currentWindow)) continue;
+
+      return {
+        row,
+        title: "Unidad ocupada",
+        message: `La unidad ${normalize(data[UNIT_COL])} ya está asignada dentro de ese rango de horario.\n\n` +
+          `Registro activo:\n` +
+          `Cliente: ${normalize(d["cliente"]) || "-"}\n` +
+          `Destino: ${normalize(d["destino"]) || "-"}\n` +
+          `${formatSchedule(d)}\n\n` +
+          `Puedes programarla en un horario fuera de ese rango. Para liberar la unidad antes, confirma la entrega con el check (✓) y envía la cita al historial.`
+      };
+    }
+    return null;
+  }
+
+  function validateUnitScheduleInForm({ silent=false, clearUnit=false } = {}){
+    const grid = $("#formGrid");
+    if(!grid) return true;
+    const data = getFormData();
+    if(!normalize(data[UNIT_COL]) || !normalize(data[DATE_COL])) return true;
+    const conflict = findUnitScheduleConflict(data, state.editingId);
+    if(!conflict) return true;
+    if(!silent){
+      speak(`Atención. La unidad ${normalize(data[UNIT_COL])} está ocupada. Confirma entrega para liberarla.`);
+      alert(`⚠️ ${conflict.title}\n\n${conflict.message}`);
+    }
+    if(clearUnit){
+      const unitSel = grid.querySelector('[data-col="'+UNIT_COL+'"]');
+      if(unitSel) unitSel.value = "";
+    }
+    return false;
   }
 
   function daysUntil(dateISO){
@@ -2381,7 +2629,10 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
     state.rows = state.rows.filter(r => {
       const quitar = r.id === id || (firma && citaFirma(r) === firma);
-      if(quitar) eliminadas.push(r);
+      if(quitar){
+        eliminadas.push(r);
+        markCitaRemovedLocal(r);
+      }
       return !quitar;
     });
 
@@ -2558,7 +2809,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   }
 
 
-  function moverCitaAHistorial(row){
+  async function moverCitaAHistorial(row){
     if(!row) return;
     const d = row.data || {};
     const resumen = `${normalize(d["cliente"]) || "Sin cliente"} - ${normalize(d["destino"]) || "Sin destino"} - ${normalize(d[DATE_COL]) || "Sin fecha"}`;
@@ -2569,21 +2820,31 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       return;
     }
 
-    const entrega = {
-      ...row,
-      checked: true,
-      deliveredAt: new Date().toISOString(),
-      deliveredAtLocal: new Date().toLocaleString("es-MX")
-    };
+    await withProcessing("Finalizando cita…", "Quitando la cita activa y enviándola al historial.", async ()=>{
+      const entrega = {
+        ...row,
+        checked: true,
+        deliveredAt: new Date().toISOString(),
+        deliveredAtLocal: new Date().toLocaleString("es-MX")
+      };
 
-    state.deliveries = Array.isArray(state.deliveries) ? state.deliveries : [];
-    state.deliveries.push(entrega);
-    state.rows = state.rows.filter(r => r.id !== row.id);
+      state.deliveries = Array.isArray(state.deliveries) ? state.deliveries : [];
+      state.deliveries = state.deliveries.filter(x => x.id !== row.id);
+      state.deliveries.push(entrega);
+      markCitaRemovedLocal(row);
+      state.rows = state.rows.filter(r => r.id !== row.id);
 
-    saveDeliveries();
-    save();
-    render();
-    setStatus("Cita enviada al historial de entregas.");
+      localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sortCitasByDateTime(state.rows)));
+      render();
+      if(typeof renderHistory === "function") renderHistory();
+
+      await syncCitasNow(true);
+      await syncHistoryNow(true);
+      render();
+      setStatus("Cita finalizada, quitada del listado y enviada al historial.");
+      return true;
+    });
   }
 
   function render(){
@@ -2600,9 +2861,9 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     const pill = $("#countPill");
     if(pill) pill.textContent = `${visible.length} cita${visible.length===1?"":"s"} (de ${state.rows.length})`;
 
-    function setChecked(row, checked){
+    async function setChecked(row, checked){
       if(checked){
-        moverCitaAHistorial(row);
+        await moverCitaAHistorial(row);
         return;
       }
       row.checked = false;
@@ -2615,6 +2876,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       const d = row.data || {};
       const card = document.createElement("div");
       card.className = "mobile-card";
+      card.dataset.id = row.id;
       card.dataset.id = row.id;
 
       const title = normalize(d["cliente"]) || "Sin cliente";
@@ -2749,6 +3011,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
               unitSel.value = "";
             }
           }
+          validateUnitScheduleInForm({ clearUnit:true });
         });
         continue;
       }
@@ -2838,6 +3101,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
             alert(`⚠️ La unidad "${normalize(u.unidad)}" NO CIRCULA en esa fecha. Selecciona otra unidad.`);
             sel.value = "";
           }
+          if(sel.value) validateUnitScheduleInForm({ clearUnit:true });
           updateUnitHint();
         });
 
@@ -2954,7 +3218,10 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
           <input id="${id}" data-col="${col}" list="timeOptions" placeholder="Ej. 08:30 AM" />
         `;
         grid.appendChild(field);
-        field.querySelector("input").value = val;
+        const timeInput = field.querySelector("input");
+        timeInput.value = val;
+        timeInput.addEventListener("change", ()=> validateUnitScheduleInForm({ clearUnit:false }));
+        timeInput.addEventListener("blur", ()=> validateUnitScheduleInForm({ clearUnit:false }));
         continue;
       }
 
@@ -2987,6 +3254,44 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     return data;
   }
 
+  function labelCampoCita(col){
+    const nombres = {
+      [DATE_COL]: "Fecha de cita",
+      "cliente": "Cliente",
+      "destino": "Destino",
+      "operador": "Operador",
+      [UNIT_COL]: "Unidad",
+      "horario de carga": "Horario de carga",
+      "horario de cita": "Horario de cita",
+      [CUSTODIO_COL]: "Custodio"
+    };
+    return nombres[col] || String(col || "Campo").replace(/\b\w/g, m => m.toUpperCase());
+  }
+
+  function validarCamposObligatoriosCita(data){
+    const opcionales = new Set([MANIOBRA_COL, "observaciones"]);
+    const faltantes = COLS.filter(col => !opcionales.has(col) && !normalize(data[col]));
+    if(!faltantes.length) return true;
+
+    const lista = faltantes.map(col => `• ${labelCampoCita(col)}`).join("\n");
+    speak("Atención. Faltan campos obligatorios para guardar la cita.");
+    alert(`⚠️ No se puede guardar la cita.
+
+Completa los siguientes campos obligatorios:
+
+${lista}
+
+Observaciones y maniobra pueden quedar vacíos.`);
+
+    const primerCampo = faltantes[0];
+    const el = $(`#formGrid [data-col="${CSS.escape(primerCampo)}"]`);
+    if(el){
+      el.focus();
+      if(typeof el.scrollIntoView === "function") el.scrollIntoView({ behavior:"smooth", block:"center" });
+    }
+    return false;
+  }
+
   function openNew(){
     state.editingId = null;
     const grid = $("#formGrid");
@@ -3004,14 +3309,22 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
   function upsertRow(){
     const data = getFormData();
+    if(!validarCamposObligatoriosCita(data)) return;
     const dateISO = normalize(data[DATE_COL]);
-    if(!dateISO){ alert("Selecciona FECHA DE CITA."); return; }
     const uName = normalize(data[UNIT_COL]);
-    if(!uName){ alert("Selecciona una UNIDAD para guardar la cita."); return; }
     const u = getUnitByName(uName);
     if(u && unitNoCirculaOn(u, dateISO)){
       speak(`Atención. No puedes guardar la cita. La unidad ${normalize(u.unidad)} no circula en la fecha seleccionada.`);
       alert(`⚠️ No puedes guardar: la unidad "${normalize(u.unidad)}" NO CIRCULA en esa fecha.`);
+      return;
+    }
+
+    const conflict = findUnitScheduleConflict(data, state.editingId);
+    if(conflict){
+      speak(`Atención. No puedes guardar. La unidad ${normalize(uName)} ya está ocupada en ese horario.`);
+      alert(`⚠️ ${conflict.title}
+
+${conflict.message}`);
       return;
     }
 
@@ -3832,377 +4145,51 @@ if(state.editingWorkerId){
         @media print{.page{padding:10mm}.cita{page-break-inside:avoid}.top{position:static}} @page{size:A4;margin:10mm}
       </style>
 
-
-
-
-
-
-<style id="kaman-ojo-preview-css">
-@media (max-width:768px){
-  header .toolbar{
-    display:flex !important;
-    flex-direction:row !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:8px !important;
-    margin-top:6px !important;
-  }
-  #btnNew,#btnConfig,#btnPreviewCitas{
-    width:50px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:21px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 50px !important;
-  }
-  #btnConfig{ font-size:20px !important; }
-  #btnPreviewCitas{ font-size:19px !important; }
-}
-@media (min-width:769px){
-  #btnPreviewCitas{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-</style>
-
-
-<style id="kaman-truck-button-css">
-@media (max-width:768px){
-  header .toolbar{
-    display:flex !important;
-    flex-direction:row !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:7px !important;
-    margin-top:6px !important;
-  }
-  #btnNew,#btnConfig,#btnPreviewCitas,#btnAvailableUnits{
-    width:48px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:20px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 48px !important;
-  }
-  #btnConfig{ font-size:20px !important; }
-  #btnPreviewCitas{ font-size:18px !important; }
-  #btnAvailableUnits{ font-size:19px !important; }
-}
-@media (min-width:769px){
-  #btnAvailableUnits{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-.available-unit-card{
-  border:1px solid #c5e0f6;
-  background:#f7fcff;
-  border-radius:14px;
-  padding:12px;
-  display:grid;
-  gap:6px;
-}
-.available-unit-title{
-  font-weight:950;
-  font-size:16px;
-  color:#12385f;
-}
-.available-unit-meta{
-  font-size:12px;
-  font-weight:800;
-  color:#55708c;
-}
-.available-unit-badge{
-  width:max-content;
-  padding:5px 9px;
+<style id="kaman-history-firebase-signal-css">
+#historyFirebaseSignal{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
   border-radius:999px;
-  background:#effdf4;
-  color:#176b38;
-  border:1px solid #b7e6c7;
-  font-size:11px;
-  font-weight:950;
+  border:1px solid #bfdbfe;
+  background:#f8fbff;
+  font-size:12px;
+  font-weight:900;
+  color:#0f3c68;
+  white-space:nowrap;
 }
+#historyFirebaseSignal .antenna{font-size:14px;}
+#historyFirebaseSignal .signal-dot{
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  background:#94a3b8;
+  display:inline-block;
+}
+#historyFirebaseSignal.firebase-syncing .signal-dot,
+#historyFirebaseSignal.firebase-pending .signal-dot{
+  background:#f59e0b;
+  box-shadow:0 0 0 4px rgba(245,158,11,.18);
+  animation:pulseSignal 1.2s infinite;
+}
+#historyFirebaseSignal.firebase-online{
+  border-color:#86efac;
+  background:#f0fdf4;
+  color:#166534;
+}
+#historyFirebaseSignal.firebase-online .signal-dot{
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.18);
+  animation:pulseSignal 1.5s infinite;
+}
+#historyFirebaseSignal.firebase-offline{
+  border-color:#fecaca;
+  background:#fff7f7;
+  color:#991b1b;
+}
+#historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
 </style>
-
-
-
-
-
-<style id="kaman-final-modal-spacing">
-/* ===== Limpieza final de modales en celular ===== */
-
-/* Unidades disponibles: sin contador ni burbuja, listado arriba */
-#availableUnitsBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#availableUnitsList{
-  margin:0 !important;
-  padding:0 !important;
-  display:grid !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#availableUnitsCount{ display:none !important; }
-
-/* Neutralizar cualquier botón vacío o burbuja heredada dentro del listado */
-#availableUnitsBackdrop .content > button:not(.available-unit-select),
-#availableUnitsBackdrop .content > .pill:empty,
-#availableUnitsBackdrop .content > div:empty{
-  display:none !important;
-  height:0 !important;
-  min-height:0 !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-}
-#availableUnitsBackdrop .available-unit-select,
-#availableUnitsBackdrop .available-unit-card{
-  width:100% !important;
-  height:auto !important;
-  min-height:0 !important;
-  margin:0 !important;
-  padding:10px 12px !important;
-  border-radius:14px !important;
-  display:grid !important;
-  gap:6px !important;
-  text-align:left !important;
-  background:#ffffff !important;
-  border:1px solid #c5e0f6 !important;
-  box-shadow:none !important;
-  flex:none !important;
-}
-#availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
-#availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
-
-/* Historial: subir controles y tabla */
-#historyBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#historyBackdrop .content > div:first-child{
-  margin:0 !important;
-  padding:0 !important;
-  align-items:center !important;
-}
-#historyBackdrop #historyCount{
-  margin:0 !important;
-}
-#historyBackdrop #btnExportHistoryExcel{
-  margin:0 !important;
-  min-height:42px !important;
-  height:42px !important;
-  padding:8px 14px !important;
-}
-#historyBackdrop .content table{
-  margin-top:0 !important;
-}
-#historyBackdrop .content [style*="max-height"]{
-  margin-top:0 !important;
-  max-height:calc(100vh - 220px) !important;
-}
-
-/* Eliminar huecos grandes causados por estilos inline/heredados */
-#historyBackdrop .content > div,
-#availableUnitsBackdrop .content > div{
-  transform:none !important;
-}
-@media(max-width:768px){
-  #historyBackdrop .modal header,
-  #availableUnitsBackdrop .modal header{
-    min-height:50px !important;
-    padding:7px 10px !important;
-  }
-  #historyBackdrop .modal h2,
-  #availableUnitsBackdrop .modal h2{
-    font-size:20px !important;
-  }
-  #historyBackdrop .actions,
-  #availableUnitsBackdrop .actions{
-    padding:8px 10px !important;
-  }
-}
-</style>
-
-
-
-
-
-<style id="kaman-notas-main-fix">
-@media (max-width:768px){
-  #btnNotesMain{
-    width:48px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:19px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 48px !important;
-  }
-}
-@media (min-width:769px){
-  #btnNotesMain{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-</style>
-
-
-<style id="kaman-subir-tablas-modales">
-/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
-#clientsBackdrop .content,
-#destinationsBackdrop .content,
-#unitsBackdrop .content,
-#notesBackdrop .content,
-#payrollBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-  justify-content:start !important;
-}
-
-#clientsBackdrop .content > div,
-#destinationsBackdrop .content > div,
-#unitsBackdrop .content > div,
-#notesBackdrop .content > div,
-#payrollBackdrop .content > div{
-  margin-top:0 !important;
-}
-
-/* Primera fila: contador + botón agregar pegados arriba */
-#clientsBackdrop .content > div:first-child,
-#destinationsBackdrop .content > div:first-child,
-#unitsBackdrop .content > div:first-child,
-#notesBackdrop .content > div:first-child,
-#payrollBackdrop .content > div:first-child{
-  margin:0 0 4px 0 !important;
-  padding:0 !important;
-  align-items:center !important;
-}
-
-/* Tablas/listados inmediatamente debajo */
-#clientsBackdrop .content [style*="border:1px"],
-#destinationsBackdrop .content [style*="border:1px"],
-#unitsBackdrop .content [style*="border:1px"],
-#notesBackdrop .content [style*="border:1px"],
-#payrollBackdrop .content [style*="border:1px"]{
-  margin-top:0 !important;
-}
-
-/* Quitar alturas/huecos exagerados */
-#clientsBackdrop .content [style*="max-height"],
-#destinationsBackdrop .content [style*="max-height"],
-#unitsBackdrop .content [style*="max-height"],
-#notesBackdrop .content [style*="max-height"],
-#payrollBackdrop .content [style*="max-height"]{
-  max-height:calc(100vh - 230px) !important;
-}
-
-#clientsBackdrop .hint,
-#destinationsBackdrop .hint,
-#unitsBackdrop .hint,
-#notesBackdrop .hint,
-#payrollBackdrop .hint{
-  margin-top:4px !important;
-  padding:0 !important;
-}
-
-/* Encabezados compactos */
-#clientsBackdrop .modal header,
-#destinationsBackdrop .modal header,
-#unitsBackdrop .modal header,
-#notesBackdrop .modal header,
-#payrollBackdrop .modal header{
-  min-height:50px !important;
-  padding:7px 10px !important;
-}
-
-/* Botones inferiores compactos */
-#clientsBackdrop .actions,
-#destinationsBackdrop .actions,
-#unitsBackdrop .actions,
-#notesBackdrop .actions,
-#payrollBackdrop .actions{
-  padding:8px 10px !important;
-}
-
-/* En móvil, tabla/listado debe iniciar arriba, no a media pantalla */
-@media(max-width:768px){
-  #clientsBackdrop .modal .content,
-  #destinationsBackdrop .modal .content,
-  #unitsBackdrop .modal .content,
-  #notesBackdrop .modal .content,
-  #payrollBackdrop .modal .content{
-    padding-top:8px !important;
-    grid-auto-rows:max-content !important;
-  }
-
-  #clientsBackdrop table th,
-  #clientsBackdrop table td,
-  #destinationsBackdrop table th,
-  #destinationsBackdrop table td,
-  #unitsBackdrop table th,
-  #unitsBackdrop table td,
-  #notesBackdrop table th,
-  #notesBackdrop table td,
-  #payrollBackdrop table th,
-  #payrollBackdrop table td{
-    padding:8px !important;
-  }
-
-  #clientsBackdrop button,
-  #destinationsBackdrop button,
-  #unitsBackdrop button,
-  #notesBackdrop button,
-  #payrollBackdrop button{
-    min-height:40px !important;
-  }
-}
-</style>
-
-
-<style id="kaman-auto-excel-mes-css">
-#btnExportPrevMonthExcel{
-  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
-  color:#fff !important;
-  border-color:#0f766e !important;
-}
-</style>
-
-
 
 </head><body><div class="page"><div class="top"><div><h1>Control de Transporte • Historial de citas</h1><div>${rows.length} cita(s)</div></div><div class="meta">Generado: ${fecha}<br>Firebase: conectado</div></div>${activeFilters.length ? `<div class="filters"><b>Filtros:</b> ${escapeHTML(activeFilters.join(" | "))}</div>` : ""}${cards}</div><script>window.onload=function(){setTimeout(function(){window.print();},250)}<\/script></body></html>`;
 
@@ -4570,378 +4557,51 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   }
 </style>
 
-
-
-
-
-
-
-<style id="kaman-ojo-preview-css">
-@media (max-width:768px){
-  header .toolbar{
-    display:flex !important;
-    flex-direction:row !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:8px !important;
-    margin-top:6px !important;
-  }
-  #btnNew,#btnConfig,#btnPreviewCitas{
-    width:50px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:21px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 50px !important;
-  }
-  #btnConfig{ font-size:20px !important; }
-  #btnPreviewCitas{ font-size:19px !important; }
-}
-@media (min-width:769px){
-  #btnPreviewCitas{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-</style>
-
-
-<style id="kaman-truck-button-css">
-@media (max-width:768px){
-  header .toolbar{
-    display:flex !important;
-    flex-direction:row !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:7px !important;
-    margin-top:6px !important;
-  }
-  #btnNew,#btnConfig,#btnPreviewCitas,#btnAvailableUnits{
-    width:48px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:20px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 48px !important;
-  }
-  #btnConfig{ font-size:20px !important; }
-  #btnPreviewCitas{ font-size:18px !important; }
-  #btnAvailableUnits{ font-size:19px !important; }
-}
-@media (min-width:769px){
-  #btnAvailableUnits{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-.available-unit-card{
-  border:1px solid #c5e0f6;
-  background:#f7fcff;
-  border-radius:14px;
-  padding:12px;
-  display:grid;
-  gap:6px;
-}
-.available-unit-title{
-  font-weight:950;
-  font-size:16px;
-  color:#12385f;
-}
-.available-unit-meta{
-  font-size:12px;
-  font-weight:800;
-  color:#55708c;
-}
-.available-unit-badge{
-  width:max-content;
-  padding:5px 9px;
+<style id="kaman-history-firebase-signal-css">
+#historyFirebaseSignal{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
   border-radius:999px;
-  background:#effdf4;
-  color:#176b38;
-  border:1px solid #b7e6c7;
-  font-size:11px;
-  font-weight:950;
+  border:1px solid #bfdbfe;
+  background:#f8fbff;
+  font-size:12px;
+  font-weight:900;
+  color:#0f3c68;
+  white-space:nowrap;
 }
+#historyFirebaseSignal .antenna{font-size:14px;}
+#historyFirebaseSignal .signal-dot{
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  background:#94a3b8;
+  display:inline-block;
+}
+#historyFirebaseSignal.firebase-syncing .signal-dot,
+#historyFirebaseSignal.firebase-pending .signal-dot{
+  background:#f59e0b;
+  box-shadow:0 0 0 4px rgba(245,158,11,.18);
+  animation:pulseSignal 1.2s infinite;
+}
+#historyFirebaseSignal.firebase-online{
+  border-color:#86efac;
+  background:#f0fdf4;
+  color:#166534;
+}
+#historyFirebaseSignal.firebase-online .signal-dot{
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.18);
+  animation:pulseSignal 1.5s infinite;
+}
+#historyFirebaseSignal.firebase-offline{
+  border-color:#fecaca;
+  background:#fff7f7;
+  color:#991b1b;
+}
+#historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
 </style>
-
-
-
-
-
-<style id="kaman-final-modal-spacing">
-/* ===== Limpieza final de modales en celular ===== */
-
-/* Unidades disponibles: sin contador ni burbuja, listado arriba */
-#availableUnitsBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#availableUnitsList{
-  margin:0 !important;
-  padding:0 !important;
-  display:grid !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#availableUnitsCount{ display:none !important; }
-
-/* Neutralizar cualquier botón vacío o burbuja heredada dentro del listado */
-#availableUnitsBackdrop .content > button:not(.available-unit-select),
-#availableUnitsBackdrop .content > .pill:empty,
-#availableUnitsBackdrop .content > div:empty{
-  display:none !important;
-  height:0 !important;
-  min-height:0 !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-}
-#availableUnitsBackdrop .available-unit-select,
-#availableUnitsBackdrop .available-unit-card{
-  width:100% !important;
-  height:auto !important;
-  min-height:0 !important;
-  margin:0 !important;
-  padding:10px 12px !important;
-  border-radius:14px !important;
-  display:grid !important;
-  gap:6px !important;
-  text-align:left !important;
-  background:#ffffff !important;
-  border:1px solid #c5e0f6 !important;
-  box-shadow:none !important;
-  flex:none !important;
-}
-#availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
-#availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
-
-/* Historial: subir controles y tabla */
-#historyBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#historyBackdrop .content > div:first-child{
-  margin:0 !important;
-  padding:0 !important;
-  align-items:center !important;
-}
-#historyBackdrop #historyCount{
-  margin:0 !important;
-}
-#historyBackdrop #btnExportHistoryExcel{
-  margin:0 !important;
-  min-height:42px !important;
-  height:42px !important;
-  padding:8px 14px !important;
-}
-#historyBackdrop .content table{
-  margin-top:0 !important;
-}
-#historyBackdrop .content [style*="max-height"]{
-  margin-top:0 !important;
-  max-height:calc(100vh - 220px) !important;
-}
-
-/* Eliminar huecos grandes causados por estilos inline/heredados */
-#historyBackdrop .content > div,
-#availableUnitsBackdrop .content > div{
-  transform:none !important;
-}
-@media(max-width:768px){
-  #historyBackdrop .modal header,
-  #availableUnitsBackdrop .modal header{
-    min-height:50px !important;
-    padding:7px 10px !important;
-  }
-  #historyBackdrop .modal h2,
-  #availableUnitsBackdrop .modal h2{
-    font-size:20px !important;
-  }
-  #historyBackdrop .actions,
-  #availableUnitsBackdrop .actions{
-    padding:8px 10px !important;
-  }
-}
-</style>
-
-
-
-
-
-<style id="kaman-notas-main-fix">
-@media (max-width:768px){
-  #btnNotesMain{
-    width:48px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:19px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 48px !important;
-  }
-}
-@media (min-width:769px){
-  #btnNotesMain{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-</style>
-
-
-<style id="kaman-subir-tablas-modales">
-/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
-#clientsBackdrop .content,
-#destinationsBackdrop .content,
-#unitsBackdrop .content,
-#notesBackdrop .content,
-#payrollBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-  justify-content:start !important;
-}
-
-#clientsBackdrop .content > div,
-#destinationsBackdrop .content > div,
-#unitsBackdrop .content > div,
-#notesBackdrop .content > div,
-#payrollBackdrop .content > div{
-  margin-top:0 !important;
-}
-
-/* Primera fila: contador + botón agregar pegados arriba */
-#clientsBackdrop .content > div:first-child,
-#destinationsBackdrop .content > div:first-child,
-#unitsBackdrop .content > div:first-child,
-#notesBackdrop .content > div:first-child,
-#payrollBackdrop .content > div:first-child{
-  margin:0 0 4px 0 !important;
-  padding:0 !important;
-  align-items:center !important;
-}
-
-/* Tablas/listados inmediatamente debajo */
-#clientsBackdrop .content [style*="border:1px"],
-#destinationsBackdrop .content [style*="border:1px"],
-#unitsBackdrop .content [style*="border:1px"],
-#notesBackdrop .content [style*="border:1px"],
-#payrollBackdrop .content [style*="border:1px"]{
-  margin-top:0 !important;
-}
-
-/* Quitar alturas/huecos exagerados */
-#clientsBackdrop .content [style*="max-height"],
-#destinationsBackdrop .content [style*="max-height"],
-#unitsBackdrop .content [style*="max-height"],
-#notesBackdrop .content [style*="max-height"],
-#payrollBackdrop .content [style*="max-height"]{
-  max-height:calc(100vh - 230px) !important;
-}
-
-#clientsBackdrop .hint,
-#destinationsBackdrop .hint,
-#unitsBackdrop .hint,
-#notesBackdrop .hint,
-#payrollBackdrop .hint{
-  margin-top:4px !important;
-  padding:0 !important;
-}
-
-/* Encabezados compactos */
-#clientsBackdrop .modal header,
-#destinationsBackdrop .modal header,
-#unitsBackdrop .modal header,
-#notesBackdrop .modal header,
-#payrollBackdrop .modal header{
-  min-height:50px !important;
-  padding:7px 10px !important;
-}
-
-/* Botones inferiores compactos */
-#clientsBackdrop .actions,
-#destinationsBackdrop .actions,
-#unitsBackdrop .actions,
-#notesBackdrop .actions,
-#payrollBackdrop .actions{
-  padding:8px 10px !important;
-}
-
-/* En móvil, tabla/listado debe iniciar arriba, no a media pantalla */
-@media(max-width:768px){
-  #clientsBackdrop .modal .content,
-  #destinationsBackdrop .modal .content,
-  #unitsBackdrop .modal .content,
-  #notesBackdrop .modal .content,
-  #payrollBackdrop .modal .content{
-    padding-top:8px !important;
-    grid-auto-rows:max-content !important;
-  }
-
-  #clientsBackdrop table th,
-  #clientsBackdrop table td,
-  #destinationsBackdrop table th,
-  #destinationsBackdrop table td,
-  #unitsBackdrop table th,
-  #unitsBackdrop table td,
-  #notesBackdrop table th,
-  #notesBackdrop table td,
-  #payrollBackdrop table th,
-  #payrollBackdrop table td{
-    padding:8px !important;
-  }
-
-  #clientsBackdrop button,
-  #destinationsBackdrop button,
-  #unitsBackdrop button,
-  #notesBackdrop button,
-  #payrollBackdrop button{
-    min-height:40px !important;
-  }
-}
-</style>
-
-
-<style id="kaman-auto-excel-mes-css">
-#btnExportPrevMonthExcel{
-  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
-  color:#fff !important;
-  border-color:#0f766e !important;
-}
-</style>
-
-
 
 </head>
 <body>
@@ -4997,8 +4657,10 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   // Sincronización automática de la app con Firebase
   let appSyncBusy = false;
   let lastAutoSyncAt = 0;
+  let suspendAutoSyncUntil = 0;
 
   async function actualizarAppDesdeFirebase(silent=false){
+    if(Date.now() < suspendAutoSyncUntil) return;
     if(appSyncBusy) return;
     if(!citasFirebaseReady()) return;
     appSyncBusy = true;
@@ -5201,332 +4863,51 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   }
 </style>
 
-<style id="kaman-truck-button-css">
-@media (max-width:768px){
-  header .toolbar{
-    display:flex !important;
-    flex-direction:row !important;
-    justify-content:center !important;
-    align-items:center !important;
-    gap:7px !important;
-    margin-top:6px !important;
-  }
-  #btnNew,#btnConfig,#btnPreviewCitas,#btnAvailableUnits{
-    width:48px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:20px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 48px !important;
-  }
-  #btnConfig{ font-size:20px !important; }
-  #btnPreviewCitas{ font-size:18px !important; }
-  #btnAvailableUnits{ font-size:19px !important; }
-}
-@media (min-width:769px){
-  #btnAvailableUnits{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-.available-unit-card{
-  border:1px solid #c5e0f6;
-  background:#f7fcff;
-  border-radius:14px;
-  padding:12px;
-  display:grid;
-  gap:6px;
-}
-.available-unit-title{
-  font-weight:950;
-  font-size:16px;
-  color:#12385f;
-}
-.available-unit-meta{
-  font-size:12px;
-  font-weight:800;
-  color:#55708c;
-}
-.available-unit-badge{
-  width:max-content;
-  padding:5px 9px;
+<style id="kaman-history-firebase-signal-css">
+#historyFirebaseSignal{
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  padding:7px 10px;
   border-radius:999px;
-  background:#effdf4;
-  color:#176b38;
-  border:1px solid #b7e6c7;
-  font-size:11px;
-  font-weight:950;
+  border:1px solid #bfdbfe;
+  background:#f8fbff;
+  font-size:12px;
+  font-weight:900;
+  color:#0f3c68;
+  white-space:nowrap;
 }
+#historyFirebaseSignal .antenna{font-size:14px;}
+#historyFirebaseSignal .signal-dot{
+  width:9px;
+  height:9px;
+  border-radius:999px;
+  background:#94a3b8;
+  display:inline-block;
+}
+#historyFirebaseSignal.firebase-syncing .signal-dot,
+#historyFirebaseSignal.firebase-pending .signal-dot{
+  background:#f59e0b;
+  box-shadow:0 0 0 4px rgba(245,158,11,.18);
+  animation:pulseSignal 1.2s infinite;
+}
+#historyFirebaseSignal.firebase-online{
+  border-color:#86efac;
+  background:#f0fdf4;
+  color:#166534;
+}
+#historyFirebaseSignal.firebase-online .signal-dot{
+  background:#22c55e;
+  box-shadow:0 0 0 4px rgba(34,197,94,.18);
+  animation:pulseSignal 1.5s infinite;
+}
+#historyFirebaseSignal.firebase-offline{
+  border-color:#fecaca;
+  background:#fff7f7;
+  color:#991b1b;
+}
+#historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
 </style>
-
-
-
-
-
-<style id="kaman-final-modal-spacing">
-/* ===== Limpieza final de modales en celular ===== */
-
-/* Unidades disponibles: sin contador ni burbuja, listado arriba */
-#availableUnitsBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#availableUnitsList{
-  margin:0 !important;
-  padding:0 !important;
-  display:grid !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#availableUnitsCount{ display:none !important; }
-
-/* Neutralizar cualquier botón vacío o burbuja heredada dentro del listado */
-#availableUnitsBackdrop .content > button:not(.available-unit-select),
-#availableUnitsBackdrop .content > .pill:empty,
-#availableUnitsBackdrop .content > div:empty{
-  display:none !important;
-  height:0 !important;
-  min-height:0 !important;
-  margin:0 !important;
-  padding:0 !important;
-  border:0 !important;
-}
-#availableUnitsBackdrop .available-unit-select,
-#availableUnitsBackdrop .available-unit-card{
-  width:100% !important;
-  height:auto !important;
-  min-height:0 !important;
-  margin:0 !important;
-  padding:10px 12px !important;
-  border-radius:14px !important;
-  display:grid !important;
-  gap:6px !important;
-  text-align:left !important;
-  background:#ffffff !important;
-  border:1px solid #c5e0f6 !important;
-  box-shadow:none !important;
-  flex:none !important;
-}
-#availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
-#availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
-
-/* Historial: subir controles y tabla */
-#historyBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-}
-#historyBackdrop .content > div:first-child{
-  margin:0 !important;
-  padding:0 !important;
-  align-items:center !important;
-}
-#historyBackdrop #historyCount{
-  margin:0 !important;
-}
-#historyBackdrop #btnExportHistoryExcel{
-  margin:0 !important;
-  min-height:42px !important;
-  height:42px !important;
-  padding:8px 14px !important;
-}
-#historyBackdrop .content table{
-  margin-top:0 !important;
-}
-#historyBackdrop .content [style*="max-height"]{
-  margin-top:0 !important;
-  max-height:calc(100vh - 220px) !important;
-}
-
-/* Eliminar huecos grandes causados por estilos inline/heredados */
-#historyBackdrop .content > div,
-#availableUnitsBackdrop .content > div{
-  transform:none !important;
-}
-@media(max-width:768px){
-  #historyBackdrop .modal header,
-  #availableUnitsBackdrop .modal header{
-    min-height:50px !important;
-    padding:7px 10px !important;
-  }
-  #historyBackdrop .modal h2,
-  #availableUnitsBackdrop .modal h2{
-    font-size:20px !important;
-  }
-  #historyBackdrop .actions,
-  #availableUnitsBackdrop .actions{
-    padding:8px 10px !important;
-  }
-}
-</style>
-
-
-
-
-
-<style id="kaman-notas-main-fix">
-@media (max-width:768px){
-  #btnNotesMain{
-    width:48px !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 !important;
-    border-radius:14px !important;
-    font-size:19px !important;
-    line-height:1 !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 48px !important;
-  }
-}
-@media (min-width:769px){
-  #btnNotesMain{
-    width:48px;
-    height:38px;
-    padding:0 !important;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    font-size:18px;
-  }
-}
-</style>
-
-
-<style id="kaman-subir-tablas-modales">
-/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
-#clientsBackdrop .content,
-#destinationsBackdrop .content,
-#unitsBackdrop .content,
-#notesBackdrop .content,
-#payrollBackdrop .content{
-  padding:8px 10px !important;
-  gap:8px !important;
-  align-content:start !important;
-  justify-content:start !important;
-}
-
-#clientsBackdrop .content > div,
-#destinationsBackdrop .content > div,
-#unitsBackdrop .content > div,
-#notesBackdrop .content > div,
-#payrollBackdrop .content > div{
-  margin-top:0 !important;
-}
-
-/* Primera fila: contador + botón agregar pegados arriba */
-#clientsBackdrop .content > div:first-child,
-#destinationsBackdrop .content > div:first-child,
-#unitsBackdrop .content > div:first-child,
-#notesBackdrop .content > div:first-child,
-#payrollBackdrop .content > div:first-child{
-  margin:0 0 4px 0 !important;
-  padding:0 !important;
-  align-items:center !important;
-}
-
-/* Tablas/listados inmediatamente debajo */
-#clientsBackdrop .content [style*="border:1px"],
-#destinationsBackdrop .content [style*="border:1px"],
-#unitsBackdrop .content [style*="border:1px"],
-#notesBackdrop .content [style*="border:1px"],
-#payrollBackdrop .content [style*="border:1px"]{
-  margin-top:0 !important;
-}
-
-/* Quitar alturas/huecos exagerados */
-#clientsBackdrop .content [style*="max-height"],
-#destinationsBackdrop .content [style*="max-height"],
-#unitsBackdrop .content [style*="max-height"],
-#notesBackdrop .content [style*="max-height"],
-#payrollBackdrop .content [style*="max-height"]{
-  max-height:calc(100vh - 230px) !important;
-}
-
-#clientsBackdrop .hint,
-#destinationsBackdrop .hint,
-#unitsBackdrop .hint,
-#notesBackdrop .hint,
-#payrollBackdrop .hint{
-  margin-top:4px !important;
-  padding:0 !important;
-}
-
-/* Encabezados compactos */
-#clientsBackdrop .modal header,
-#destinationsBackdrop .modal header,
-#unitsBackdrop .modal header,
-#notesBackdrop .modal header,
-#payrollBackdrop .modal header{
-  min-height:50px !important;
-  padding:7px 10px !important;
-}
-
-/* Botones inferiores compactos */
-#clientsBackdrop .actions,
-#destinationsBackdrop .actions,
-#unitsBackdrop .actions,
-#notesBackdrop .actions,
-#payrollBackdrop .actions{
-  padding:8px 10px !important;
-}
-
-/* En móvil, tabla/listado debe iniciar arriba, no a media pantalla */
-@media(max-width:768px){
-  #clientsBackdrop .modal .content,
-  #destinationsBackdrop .modal .content,
-  #unitsBackdrop .modal .content,
-  #notesBackdrop .modal .content,
-  #payrollBackdrop .modal .content{
-    padding-top:8px !important;
-    grid-auto-rows:max-content !important;
-  }
-
-  #clientsBackdrop table th,
-  #clientsBackdrop table td,
-  #destinationsBackdrop table th,
-  #destinationsBackdrop table td,
-  #unitsBackdrop table th,
-  #unitsBackdrop table td,
-  #notesBackdrop table th,
-  #notesBackdrop table td,
-  #payrollBackdrop table th,
-  #payrollBackdrop table td{
-    padding:8px !important;
-  }
-
-  #clientsBackdrop button,
-  #destinationsBackdrop button,
-  #unitsBackdrop button,
-  #notesBackdrop button,
-  #payrollBackdrop button{
-    min-height:40px !important;
-  }
-}
-</style>
-
-
-<style id="kaman-auto-excel-mes-css">
-#btnExportPrevMonthExcel{
-  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
-  color:#fff !important;
-  border-color:#0f766e !important;
-}
-</style>
-
-
 
 </head>
 <body>
@@ -5587,32 +4968,72 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
         </td>
       `;
       const btn = tr.querySelector("[data-restore]");
-      btn.addEventListener("click", ()=>{
+      btn.addEventListener("click", async ()=>{
         const ok = confirm("¿Regresar esta entrega al listado de citas activas?");
         if(!ok) return;
-        state.deliveries = state.deliveries.filter(x => x.id !== row.id);
-        row.checked = false;
-        delete row.deliveredAt;
-        delete row.deliveredAtLocal;
-        state.rows.push(row);
-        saveDeliveries();
-        save();
-        renderHistory();
-        render();
+        await withProcessing("Regresando cita…", "Restaurando la cita activa y actualizando Firebase.", async ()=>{
+          // Pausa breve de la sincronización automática para que no vuelva a cargar
+          // una versión anterior mientras se completa el regreso.
+          suspendAutoSyncUntil = Date.now() + 7000;
+
+          const restored = {
+            id: normalize(row.id) || uid(),
+            checked: false,
+            createdAt: normalize(row.createdAt) || new Date().toISOString(),
+            data: row.data && typeof row.data === "object" ? {...row.data} : {}
+          };
+          delete restored.deliveredAt;
+          delete restored.deliveredAtLocal;
+          delete restored.delivered;
+          delete restored.finalizado;
+
+          unmarkCitaRemovedLocal(restored);
+
+          // 1) Primero se restaura localmente y se pinta al momento.
+          state.rows = Array.isArray(state.rows) ? state.rows.filter(r => r.id !== restored.id) : [];
+          state.rows.push(restored);
+          state.rows = sortCitasByDateTime(state.rows);
+
+          // 2) Después se quita del historial local.
+          state.deliveries = Array.isArray(state.deliveries) ? state.deliveries.filter(x => x.id !== row.id) : [];
+
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+          localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
+          render();
+          renderHistory();
+
+          // 3) Se sube primero a citas activas y luego se actualiza historial.
+          await syncCitasNow(true);
+          await syncHistoryNow(true);
+
+          // 4) Forzar estado visual final sin recargar desde Firebase en este instante.
+          unmarkCitaRemovedLocal(restored);
+          state.rows = sortCitasByDateTime(state.rows.filter(r => r.id !== restored.id).concat([restored]));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+          render();
+          renderHistory();
+          setStatus("Entrega regresada al listado activo.");
+          return true;
+        });
       });
       body.appendChild(tr);
     }
   }
 
-  function openHistory(){
-    renderHistory();
+  async function openHistory(){
     const back = $("#historyBackdrop");
     if(back){ back.style.display = "flex"; back.setAttribute("aria-hidden","false"); }
+    setHistoryFirebaseSignal("pending", "Historial conectando...");
+    setStatus("Cargando historial de entregas...");
+    const ok = await loadHistoryFromFirebase(true);
+    renderHistory();
+    setStatus(ok ? "Historial actualizado." : "Historial local. Firebase de respaldo pendiente.");
   }
 
   function closeHistory(){
     const back = $("#historyBackdrop");
     if(back){ back.style.display = "none"; back.setAttribute("aria-hidden","true"); }
+    setHistoryFirebaseSignal("pending", "Historial sin conectar");
   }
 
   const btnOpenHistoryFromConfig = $("#btnOpenHistoryFromConfig");
@@ -5798,12 +5219,6 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   $("#btnCloseAvailableUnits")?.addEventListener("click", closeAvailableUnits);
   $("#btnAvailableUnitsDone")?.addEventListener("click", closeAvailableUnits);
   $("#availableUnitsBackdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="availableUnitsBackdrop") closeAvailableUnits(); });
-
-
-
-  const btnNotesMain = $("#btnNotesMain");
-
-
   function getPreviousMonthInfo(){
     const now = new Date();
     const firstThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -5917,7 +5332,10 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
         const base = FIREBASE_DB_URL.replace(/\/$/, "");
         const results = await Promise.all([
           fetch(`${base}/citas.json`, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" }),
-          fetch(`${base}/configuracion.json`, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" })
+          fetch(`${base}/configuracion.json`, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" }),
+          historyFirebaseReady()
+            ? fetch(FIREBASE_HISTORY_ENDPOINT, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" })
+            : Promise.resolve({ ok:true })
         ]);
         if(results.some(r => !r.ok)) throw new Error("Firebase no confirmó el reset total");
 
@@ -5988,12 +5406,6 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
       runOnceAction("exportPrevMonth", ()=>exportHistorialMesAnteriorAutomatico(true), 1000);
     }
 
-    if(target.id === "btnNotesMain"){
-      e.preventDefault();
-      e.stopPropagation();
-      runOnceAction("notesMain", openNotes, 500);
-    }
-
     if(target.id === "btnAvailableUnits"){
       e.preventDefault();
       e.stopPropagation();
@@ -6042,9 +5454,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   $("#btnCancelDestination")?.addEventListener("click", closeDestinationForm);
   $("#btnCloseDestinationForm")?.addEventListener("click", closeDestinationForm);
 
-  // Notas
-  setInterval(runNotesRemindersTick, 20000);
-  setTimeout(runNotesRemindersTick, 2000);
+  // Notas: sin botón en menú principal; se desactivan recordatorios periódicos para mejorar velocidad.
 
 })();
 </script>
