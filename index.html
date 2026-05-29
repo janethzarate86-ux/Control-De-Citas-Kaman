@@ -1667,6 +1667,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
                 <tr>
                   <th style="padding:10px; text-align:left;">FECHA</th>
                   <th style="padding:10px; text-align:left;">NOMBRE</th><th style="padding:10px; text-align:left;">MONTO</th>
+                  <th style="padding:10px; text-align:left;">ID CITA / VIAJE</th>
                   <th style="padding:10px; text-align:left;">ACCIONES</th>
                 </tr>
               </thead>
@@ -2288,6 +2289,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     if(typeof renderClients === "function") renderClients();
     if(typeof renderDestinations === "function") renderDestinations();
     if(typeof renderUnits === "function") renderUnits();
+    if(typeof cleanOrphanCitaPayroll === "function") cleanOrphanCitaPayroll();
     if(typeof renderPayroll === "function") renderPayroll();
     if(typeof renderNotes === "function") renderNotes();
 
@@ -2602,18 +2604,80 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     normalize(data?.[MANIOBRA_COL]).split(',').map(x=>normalize(x)).filter(Boolean).forEach(n=>names.push(n));
     return Array.from(new Set(names.map(n=>normalize(n)).filter(Boolean)));
   }
+  function citaPublicId(row){
+    const id = normalize(row?.id || "");
+    return id ? ("CITA-" + id.slice(-6).toUpperCase()) : "CITA-SINID";
+  }
+
+  function citaPayrollSummary(row){
+    const d = row?.data || {};
+    return [normalize(d["cliente"]), normalize(d["destino"]), normalize(d[DATE_COL]), normalize(d["horario de cita"])]
+      .filter(Boolean).join(" · ");
+  }
+
+  function removePayrollForCitaId(citaId){
+    const id = normalize(citaId);
+    if(!id) return 0;
+    const before = state.payroll.length;
+    state.payroll = state.payroll.filter(p => normalize(p.citaId) !== id);
+    return before - state.payroll.length;
+  }
+
+  function removePayrollForCitas(rows){
+    const ids = new Set((Array.isArray(rows) ? rows : []).map(r => normalize(r.id)).filter(Boolean));
+    if(!ids.size) return 0;
+    const before = state.payroll.length;
+    state.payroll = state.payroll.filter(p => !ids.has(normalize(p.citaId)));
+    return before - state.payroll.length;
+  }
+
   function syncPayrollForCita(row){
     if(!row || !row.id) return;
     const fecha = normalize(row.data?.[DATE_COL]) || todayISO();
-    state.payroll = state.payroll.filter(p => p.citaId !== row.id);
+    removePayrollForCitaId(row.id);
+
+    const publicId = citaPublicId(row);
+    const resumen = citaPayrollSummary(row);
     for(const name of citaWorkerNames(row.data)){
       const w = getWorkerByName(name);
       if(!w) continue;
       const sueldo = workerSalary(w);
       if(sueldo <= 0) continue;
-      state.payroll.unshift({ id: uid(), workerId: w.id, fecha, monto: sueldo, citaId: row.id, origen: "CITA" });
+      state.payroll.unshift({
+        id: uid(),
+        workerId: w.id,
+        fecha,
+        monto: sueldo,
+        citaId: row.id,
+        citaPublicId: publicId,
+        citaResumen: resumen,
+        origen: "CITA"
+      });
     }
     savePayroll();
+  }
+
+  function resyncPayrollFromActiveCitas(){
+    const manual = state.payroll.filter(p => normalize(p.origen) !== "CITA" && !normalize(p.citaId));
+    state.payroll = manual;
+    for(const row of state.rows){
+      if(row && !row.checked) syncPayrollForCita(row);
+    }
+    savePayroll();
+  }
+
+  function cleanOrphanCitaPayroll(){
+    const activeIds = new Set((Array.isArray(state.rows) ? state.rows : []).map(r => normalize(r.id)).filter(Boolean));
+    const before = state.payroll.length;
+    state.payroll = state.payroll.filter(p => {
+      const isCita = normalize(p.origen) === "CITA" || !!normalize(p.citaId);
+      if(!isCita) return true;
+      return activeIds.has(normalize(p.citaId));
+    });
+    if(state.payroll.length !== before){
+      localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
+      scheduleConfigFirebaseSave();
+    }
   }
 
   function citaFirma(row){
@@ -2636,8 +2700,8 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       return !quitar;
     });
 
-    const ids = new Set(eliminadas.map(r => r.id).filter(Boolean));
-    state.payroll = state.payroll.filter(p => !ids.has(p.citaId));
+    removePayrollForCitas(eliminadas);
+    savePayroll();
     return { eliminadas, firma };
   }
 
@@ -2833,9 +2897,11 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       state.deliveries.push(entrega);
       markCitaRemovedLocal(row);
       state.rows = state.rows.filter(r => r.id !== row.id);
+      removePayrollForCitaId(row.id);
 
       localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sortCitasByDateTime(state.rows)));
+      localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
       render();
       if(typeof renderHistory === "function") renderHistory();
 
@@ -3818,7 +3884,7 @@ ${conflict.message}`);
   }
 
   // === Nómina UI ===
-  function openPayroll(){ $("#payrollBackdrop").style.display="flex"; $("#payrollBackdrop").setAttribute("aria-hidden","false"); renderPayroll(); }
+  function openPayroll(){ $("#payrollBackdrop").style.display="flex"; $("#payrollBackdrop").setAttribute("aria-hidden","false"); cleanOrphanCitaPayroll(); renderPayroll(); }
   function closePayroll(){ $("#payrollBackdrop").style.display="none"; $("#payrollBackdrop").setAttribute("aria-hidden","true"); render(); }
 
   function openWorkerForm(title){ $("#workerFormTitle").textContent=title; $("#workerFormBackdrop").style.display="flex"; $("#workerFormBackdrop").setAttribute("aria-hidden","false"); }
@@ -3855,6 +3921,7 @@ if(state.editingWorkerId){
       setStatus("Trabajador agregado.");
     }
     saveWorkers();
+    resyncPayrollFromActiveCitas();
     closeWorkerForm();
     renderPayroll();
     render();
@@ -3978,7 +4045,8 @@ if(state.editingWorkerId){
       tr.innerHTML = `
         <td style="padding:10px;">${normalize(p.fecha)}</td>
         <td style="padding:10px; font-weight:900;">${normalize(w?.nombre)}</td>
-<td style="padding:10px; font-weight:900;">$${(Number(p.monto||0)||0).toFixed(2)}${p.origen === "CITA" ? " · CITA" : ""}</td>
+        <td style="padding:10px; font-weight:900;">$${(Number(p.monto||0)||0).toFixed(2)}${p.origen === "CITA" ? " · CITA" : ""}</td>
+        <td style="padding:10px; font-size:12px; font-weight:900; max-width:260px; overflow-wrap:anywhere;" title="${escapeHTML(normalize(p.citaResumen || ''))}">${p.origen === "CITA" ? escapeHTML(normalize(p.citaPublicId) || ("CITA-" + normalize(p.citaId).slice(-6).toUpperCase())) : "Manual"}</td>
         <td style="padding:10px; white-space:nowrap;">
           <button class="mini" data-act="e">✏️</button>
           <button class="mini danger" data-act="d">🗑️</button>
@@ -4997,6 +5065,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
           // 2) Después se quita del historial local.
           state.deliveries = Array.isArray(state.deliveries) ? state.deliveries.filter(x => x.id !== row.id) : [];
 
+          syncPayrollForCita(restored);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
           localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
           render();
