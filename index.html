@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Control de Transporte Móvil - Citas de Entrega</title>
+  <title>Control de Citas Kaman</title>
   <style>
     :root {
       --bg: #0b1220;
@@ -610,13 +610,623 @@ tbody tr:hover td{ background:#eef8ff !important; }
   border-color:#f3a9ba !important;
 }
 
+
+/* Reporte nómina */
+#btnPayrollReportPDF{
+  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
+  color:#ffffff !important;
+  border-color:#0f766e !important;
+}
+@media print{
+  body *{ visibility:hidden !important; }
+  #nominaPrintArea, #nominaPrintArea *{ visibility:visible !important; }
+  #nominaPrintArea{
+    position:absolute !important;
+    left:0 !important;
+    top:0 !important;
+    width:100% !important;
+    background:#fff !important;
+    color:#111 !important;
+  }
+}
+
+
+/* ===== Compactación móvil solicitada: más espacio para citas ===== */
+@media (max-width:768px){
+  header{
+    padding:8px 10px !important;
+    gap:6px !important;
+    margin-bottom:6px !important;
+    border-radius:16px !important;
+  }
+  h1{
+    font-size:18px !important;
+    line-height:1.12 !important;
+    margin:0 !important;
+  }
+  .title{
+    gap:4px !important;
+  }
+  .firebase-signal{
+    padding:4px 7px !important;
+    gap:5px !important;
+    min-height:26px !important;
+  }
+  .firebase-signal .signal-text{
+    display:none !important;
+  }
+  .firebase-signal .antenna{
+    font-size:14px !important;
+  }
+  .firebase-signal .signal-dot{
+    width:9px !important;
+    height:9px !important;
+  }
+  .toolbar{
+    width:100% !important;
+    display:grid !important;
+    grid-template-columns:1fr !important;
+    gap:6px !important;
+  }
+  #btnNew{
+    min-height:38px !important;
+    height:38px !important;
+    padding:6px 10px !important;
+    font-size:13px !important;
+    border-radius:14px !important;
+  }
+  #btnConfig{
+    min-height:36px !important;
+    height:36px !important;
+    padding:6px 10px !important;
+    font-size:13px !important;
+    border-radius:14px !important;
+  }
+  .wrap{
+    padding:6px !important;
+  }
+  .card{
+    margin-top:6px !important;
+    border-radius:16px !important;
+  }
+  .toprow{
+    padding:7px !important;
+    gap:7px !important;
+  }
+  .pill{
+    padding:5px 8px !important;
+    font-size:11px !important;
+  }
+  .search{
+    padding:6px 8px !important;
+    border-radius:12px !important;
+  }
+  .search input{
+    font-size:14px !important;
+  }
+  .clear-filter-btn{
+    min-height:36px !important;
+    height:36px !important;
+    padding:6px 9px !important;
+    font-size:12px !important;
+    border-radius:12px !important;
+  }
+  .mobile-cards{
+    max-height:calc(100vh - 145px) !important;
+  }
+}
+
+
+@media (max-width:768px){
+  #btnNotes, #btnExportPDF{ display:none !important; }
+}
+
+
+/* ===== Tarjeta móvil: destino grande y horarios juntos ===== */
+.mobile-card .mc-destino{
+  color:#12385f !important;
+  font-size:17px !important;
+  font-weight:950 !important;
+  line-height:1.18 !important;
+  margin-top:2px !important;
+  overflow-wrap:anywhere !important;
+}
+@media (max-width:768px){
+  .mobile-card .mc-title{
+    font-size:18px !important;
+    line-height:1.12 !important;
+  }
+  .mobile-card .mc-destino{
+    font-size:17px !important;
+  }
+  .mobile-card .mc-sub{
+    font-size:13px !important;
+  }
+  .mobile-card .mc-value{
+    font-size:14px !important;
+  }
+}
+
+
+/* Historial de entregas */
+#btnOpenHistoryFromConfig{
+  background:linear-gradient(135deg,#2563eb,#38bdf8) !important;
+  color:#fff !important;
+}
+
+
+/* Exportar historial a Excel */
+#btnExportHistoryExcel{
+  background:linear-gradient(135deg,#15803d,#22c55e) !important;
+  color:#fff !important;
+  border-color:#15803d !important;
+}
+
+
+/* Historial más compacto: tabla más arriba */
+#historyBackdrop .modal .content{
+  padding-top:8px !important;
+  gap:8px !important;
+}
+#historyBackdrop .modal header{
+  min-height:52px !important;
+  padding:8px 12px !important;
+}
+#historyBackdrop .modal .actions{
+  padding:8px 12px !important;
+}
+@media(max-width:768px){
+  #historyBackdrop .modal .content{
+    padding:8px 10px !important;
+    gap:8px !important;
+  }
+  #historyBackdrop [style*="justify-content:space-between"]{
+    margin-bottom:4px !important;
+  }
+  #historyBackdrop table th,
+  #historyBackdrop table td{
+    padding:8px !important;
+  }
+}
+
+
+/* Selección de unidades disponibles */
+.available-unit-select{
+  text-align:left !important;
+  width:100% !important;
+  cursor:pointer !important;
+  box-shadow:none !important;
+}
+.available-unit-select:hover{
+  background:#eaf6ff !important;
+  border-color:#78b9ef !important;
+}
+
 </style>
+
+
+
+
+
+
+
+<style id="kaman-ojo-preview-css">
+@media (max-width:768px){
+  header .toolbar{
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:8px !important;
+    margin-top:6px !important;
+  }
+  #btnNew,#btnConfig,#btnPreviewCitas{
+    width:50px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:21px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 50px !important;
+  }
+  #btnConfig{ font-size:20px !important; }
+  #btnPreviewCitas{ font-size:19px !important; }
+}
+@media (min-width:769px){
+  #btnPreviewCitas{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style id="kaman-truck-button-css">
+@media (max-width:768px){
+  header .toolbar{
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:7px !important;
+    margin-top:6px !important;
+  }
+  #btnNew,#btnConfig,#btnPreviewCitas,#btnAvailableUnits{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:20px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+  #btnConfig{ font-size:20px !important; }
+  #btnPreviewCitas{ font-size:18px !important; }
+  #btnAvailableUnits{ font-size:19px !important; }
+}
+@media (min-width:769px){
+  #btnAvailableUnits{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+.available-unit-card{
+  border:1px solid #c5e0f6;
+  background:#f7fcff;
+  border-radius:14px;
+  padding:12px;
+  display:grid;
+  gap:6px;
+}
+.available-unit-title{
+  font-weight:950;
+  font-size:16px;
+  color:#12385f;
+}
+.available-unit-meta{
+  font-size:12px;
+  font-weight:800;
+  color:#55708c;
+}
+.available-unit-badge{
+  width:max-content;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#effdf4;
+  color:#176b38;
+  border:1px solid #b7e6c7;
+  font-size:11px;
+  font-weight:950;
+}
+</style>
+
+
+
+
+
+<style id="kaman-final-modal-spacing">
+/* ===== Limpieza final de modales en celular ===== */
+
+/* Unidades disponibles: sin contador ni burbuja, listado arriba */
+#availableUnitsBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsList{
+  margin:0 !important;
+  padding:0 !important;
+  display:grid !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsCount{ display:none !important; }
+
+/* Neutralizar cualquier botón vacío o burbuja heredada dentro del listado */
+#availableUnitsBackdrop .content > button:not(.available-unit-select),
+#availableUnitsBackdrop .content > .pill:empty,
+#availableUnitsBackdrop .content > div:empty{
+  display:none !important;
+  height:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+}
+#availableUnitsBackdrop .available-unit-select,
+#availableUnitsBackdrop .available-unit-card{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:10px 12px !important;
+  border-radius:14px !important;
+  display:grid !important;
+  gap:6px !important;
+  text-align:left !important;
+  background:#ffffff !important;
+  border:1px solid #c5e0f6 !important;
+  box-shadow:none !important;
+  flex:none !important;
+}
+#availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
+#availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
+
+/* Historial: subir controles y tabla */
+#historyBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#historyBackdrop .content > div:first-child{
+  margin:0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+#historyBackdrop #historyCount{
+  margin:0 !important;
+}
+#historyBackdrop #btnExportHistoryExcel{
+  margin:0 !important;
+  min-height:42px !important;
+  height:42px !important;
+  padding:8px 14px !important;
+}
+#historyBackdrop .content table{
+  margin-top:0 !important;
+}
+#historyBackdrop .content [style*="max-height"]{
+  margin-top:0 !important;
+  max-height:calc(100vh - 220px) !important;
+}
+
+/* Eliminar huecos grandes causados por estilos inline/heredados */
+#historyBackdrop .content > div,
+#availableUnitsBackdrop .content > div{
+  transform:none !important;
+}
+@media(max-width:768px){
+  #historyBackdrop .modal header,
+  #availableUnitsBackdrop .modal header{
+    min-height:50px !important;
+    padding:7px 10px !important;
+  }
+  #historyBackdrop .modal h2,
+  #availableUnitsBackdrop .modal h2{
+    font-size:20px !important;
+  }
+  #historyBackdrop .actions,
+  #availableUnitsBackdrop .actions{
+    padding:8px 10px !important;
+  }
+}
+</style>
+
+
+
+
+
+<style id="kaman-notas-main-fix">
+@media (max-width:768px){
+  #btnNotesMain{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:19px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+}
+@media (min-width:769px){
+  #btnNotesMain{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style id="kaman-subir-tablas-modales">
+/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
+#clientsBackdrop .content,
+#destinationsBackdrop .content,
+#unitsBackdrop .content,
+#notesBackdrop .content,
+#payrollBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+  justify-content:start !important;
+}
+
+#clientsBackdrop .content > div,
+#destinationsBackdrop .content > div,
+#unitsBackdrop .content > div,
+#notesBackdrop .content > div,
+#payrollBackdrop .content > div{
+  margin-top:0 !important;
+}
+
+/* Primera fila: contador + botón agregar pegados arriba */
+#clientsBackdrop .content > div:first-child,
+#destinationsBackdrop .content > div:first-child,
+#unitsBackdrop .content > div:first-child,
+#notesBackdrop .content > div:first-child,
+#payrollBackdrop .content > div:first-child{
+  margin:0 0 4px 0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+
+/* Tablas/listados inmediatamente debajo */
+#clientsBackdrop .content [style*="border:1px"],
+#destinationsBackdrop .content [style*="border:1px"],
+#unitsBackdrop .content [style*="border:1px"],
+#notesBackdrop .content [style*="border:1px"],
+#payrollBackdrop .content [style*="border:1px"]{
+  margin-top:0 !important;
+}
+
+/* Quitar alturas/huecos exagerados */
+#clientsBackdrop .content [style*="max-height"],
+#destinationsBackdrop .content [style*="max-height"],
+#unitsBackdrop .content [style*="max-height"],
+#notesBackdrop .content [style*="max-height"],
+#payrollBackdrop .content [style*="max-height"]{
+  max-height:calc(100vh - 230px) !important;
+}
+
+#clientsBackdrop .hint,
+#destinationsBackdrop .hint,
+#unitsBackdrop .hint,
+#notesBackdrop .hint,
+#payrollBackdrop .hint{
+  margin-top:4px !important;
+  padding:0 !important;
+}
+
+/* Encabezados compactos */
+#clientsBackdrop .modal header,
+#destinationsBackdrop .modal header,
+#unitsBackdrop .modal header,
+#notesBackdrop .modal header,
+#payrollBackdrop .modal header{
+  min-height:50px !important;
+  padding:7px 10px !important;
+}
+
+/* Botones inferiores compactos */
+#clientsBackdrop .actions,
+#destinationsBackdrop .actions,
+#unitsBackdrop .actions,
+#notesBackdrop .actions,
+#payrollBackdrop .actions{
+  padding:8px 10px !important;
+}
+
+/* En móvil, tabla/listado debe iniciar arriba, no a media pantalla */
+@media(max-width:768px){
+  #clientsBackdrop .modal .content,
+  #destinationsBackdrop .modal .content,
+  #unitsBackdrop .modal .content,
+  #notesBackdrop .modal .content,
+  #payrollBackdrop .modal .content{
+    padding-top:8px !important;
+    grid-auto-rows:max-content !important;
+  }
+
+  #clientsBackdrop table th,
+  #clientsBackdrop table td,
+  #destinationsBackdrop table th,
+  #destinationsBackdrop table td,
+  #unitsBackdrop table th,
+  #unitsBackdrop table td,
+  #notesBackdrop table th,
+  #notesBackdrop table td,
+  #payrollBackdrop table th,
+  #payrollBackdrop table td{
+    padding:8px !important;
+  }
+
+  #clientsBackdrop button,
+  #destinationsBackdrop button,
+  #unitsBackdrop button,
+  #notesBackdrop button,
+  #payrollBackdrop button{
+    min-height:40px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-auto-excel-mes-css">
+#btnExportPrevMonthExcel{
+  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
+  color:#fff !important;
+  border-color:#0f766e !important;
+}
+</style>
+
+
+
+<style id="kaman-processing-css">
+#processingOverlay{
+  position:fixed; inset:0; z-index:99999; display:none;
+  align-items:center; justify-content:center; padding:18px;
+  background:rgba(15,23,42,.34); backdrop-filter:blur(2px);
+}
+#processingOverlay.is-active{ display:flex; }
+.processing-card{
+  width:min(340px,92vw); border-radius:20px; padding:22px 18px;
+  background:#ffffff; border:1px solid rgba(148,163,184,.45);
+  box-shadow:0 22px 60px rgba(15,23,42,.22); text-align:center;
+  color:#0f172a; font-weight:900;
+}
+.processing-spinner{
+  width:42px; height:42px; margin:0 auto 12px; border-radius:999px;
+  border:4px solid #dbeafe; border-top-color:#2563eb;
+  animation:kamanSpin .8s linear infinite;
+}
+.processing-title{ font-size:18px; margin-bottom:6px; }
+.processing-text{ font-size:13px; font-weight:700; color:#475569; line-height:1.35; }
+body.is-processing{ cursor:wait; }
+body.is-processing button, body.is-processing input, body.is-processing select, body.is-processing textarea{ pointer-events:none; }
+#processingOverlay, #processingOverlay *{ pointer-events:auto; }
+@keyframes kamanSpin{ to{ transform:rotate(360deg); } }
+</style>
+
+<style id="kaman-reset-total-css">
+#btnResetTotalConfig{
+  grid-column:1 / -1;
+  background:#fff0f0 !important;
+  color:#991b1b !important;
+  border-color:#ef9a9a !important;
+  font-weight:950 !important;
+}
+</style>
+
 </head>
 <body>
+  <div id="processingOverlay" role="status" aria-live="polite" aria-hidden="true">
+    <div class="processing-card">
+      <div class="processing-spinner"></div>
+      <div class="processing-title" id="processingTitle">Procesando…</div>
+      <div class="processing-text" id="processingText">Conectando con Firebase. No cierres ni cambies de pantalla.</div>
+    </div>
+  </div>
+
   <div class="wrap">
     <header>
       <div class="title">
-        <h1>Control de Transporte • Citas de Entrega</h1>
+        <h1>Control de Citas Kaman</h1>
         <div id="firebaseSignal" class="firebase-signal firebase-pending" title="Firebase: verificando conexión">
           <span class="antenna" aria-hidden="true">📡</span>
           <span class="signal-dot" aria-hidden="true"></span>
@@ -624,10 +1234,10 @@ tbody tr:hover td{ background:#eef8ff !important; }
         </div>
       </div>
       <div class="toolbar">
-        <button class="primary" id="btnNew">➕ Nueva cita</button>
-        <button id="btnConfig">⚙️ Configuración</button>
-
-        <button id="btnNotes" style="display:none" aria-hidden="true" tabindex="-1">📝 Notas</button>
+        <button class="primary" id="btnNew">+</button>
+        <button id="btnConfig">⚙</button>
+        <button type="button" id="btnPreviewCitas" title="Vista previa de citas">👁</button>
+        <button type="button" id="btnAvailableUnits" title="Unidades disponibles">🚚</button><button type="button" id="btnNotesMain" title="Notas">📝</button>
         <button id="btnExportPDF" style="display:none" aria-hidden="true" tabindex="-1">📄 PDF</button>
       </div>
     </header>
@@ -669,7 +1279,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
   <div class="modal-backdrop" id="modalBackdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <header>
-        <h2 id="modalTitle">Nueva cita</h2>
+        <h2 id="modalTitle">+</h2>
         <div style="flex:1"></div>
         <button id="btnCloseModal" class="ghost" title="Cerrar (Esc)">✖</button>
       </header>
@@ -783,26 +1393,27 @@ tbody tr:hover td{ background:#eef8ff !important; }
 
 
 
-  <!-- Modal Configuración -->
+  <!-- Modal ⚙ -->
   <div class="modal-backdrop" id="configBackdrop" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="configTitle">
       <header>
-        <h2 id="configTitle">Configuración</h2>
+        <h2 id="configTitle">⚙</h2>
         <div style="flex:1"></div>
         <button id="btnCloseConfig" class="ghost" title="Cerrar">✖</button>
       </header>
 
       <div class="content" style="grid-template-columns: 1fr; gap: 12px;">
-        <div class="hint" style="padding:0;">Administra catálogos para que aparezcan en “Nueva cita”. Los catálogos se sincronizan con Firebase para usarlos en otros dispositivos.</div>
+        <div class="hint" style="padding:0;">Administra catálogos para que aparezcan en “+”. Los catálogos se sincronizan y actualizan con Firebase para usarlos en otros dispositivos.</div>
 
         <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px;">
           <button class="primary" id="btnOpenUnitsFromConfig">🚚 Unidades</button>
           <button class="primary" id="btnOpenPayrollFromConfig">💵 Nómina</button>
           <button class="primary" id="btnOpenClientsFromConfig">👥 Clientes</button>
           <button class="primary" id="btnOpenDestinationsFromConfig">📍 Destinos</button>
-          <button class="primary" id="btnNotesFromConfig">📝 Notas</button>
           <button class="primary" id="btnPDFfromConfig">📄 PDF</button>
-          <button class="danger" id="btnDeleteAllCitasConfig">🗑️ Eliminar todas las citas</button>
+          <button class="primary" id="btnOpenHistoryFromConfig">📚 Historial</button>
+          <button type="button" class="danger" id="btnDeleteAllCitasConfig">🗑️ Eliminar todas las citas</button>
+          <button type="button" class="danger" id="btnResetTotalConfig">🧨 Reset total</button>
         </div>
 
         <div class="hint" style="padding:0;">
@@ -833,7 +1444,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
 
         <div style="border:1px solid rgba(255,255,255,.14); border-radius:14px; overflow:hidden;">
           <div style="padding:10px; border-bottom:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.10); font-weight:900;">Listado</div>
-          <div style="overflow:auto; max-height: 62vh;">
+          <div style="overflow:auto; max-height: calc(100vh - 230px);">
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr>
@@ -846,7 +1457,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
           </div>
         </div>
 
-        <div class="hint" style="padding:0;">Estos clientes aparecen en “Nueva cita” y en los filtros.</div>
+        <div class="hint" style="padding:0;">Estos clientes aparecen en “+” y en los filtros.</div>
       </div>
 
       <div class="actions">
@@ -890,7 +1501,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
 
         <div style="border:1px solid rgba(255,255,255,.14); border-radius:14px; overflow:hidden;">
           <div style="padding:10px; border-bottom:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.10); font-weight:900;">Listado</div>
-          <div style="overflow:auto; max-height: 62vh;">
+          <div style="overflow:auto; max-height: calc(100vh - 230px);">
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr>
@@ -903,7 +1514,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
           </div>
         </div>
 
-        <div class="hint" style="padding:0;">Estos destinos aparecen en “Nueva cita” y en los filtros.</div>
+        <div class="hint" style="padding:0;">Estos destinos aparecen en “+” y en los filtros.</div>
       </div>
 
       <div class="actions">
@@ -1014,12 +1625,13 @@ tbody tr:hover td{ background:#eef8ff !important; }
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
             <button class="primary" id="btnAddWorker">➕ Trabajador</button>
             <button class="primary" id="btnAddPayroll">➕ Registro día</button>
+            <button class="primary" id="btnPayrollReportPDF">📄 Reporte nómina PDF</button>
           </div>
         </div>
 
         <div style="border:1px solid rgba(255,255,255,.14); border-radius:14px; overflow:hidden;">
           <div style="padding:10px; border-bottom:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.10); font-weight:900;">Trabajadores</div>
-          <div style="overflow:auto; max-height: 28vh;">
+          <div style="overflow:auto; max-height: calc(45vh);">
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr>
@@ -1035,7 +1647,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
 
         <div style="border:1px solid rgba(255,255,255,.14); border-radius:14px; overflow:hidden;">
           <div style="padding:10px; border-bottom:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.10); font-weight:900;">Registros (día laborado)</div>
-          <div style="overflow:auto; max-height: 32vh;">
+          <div style="overflow:auto; max-height: calc(45vh);">
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr>
@@ -1113,7 +1725,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
 
         <div style="border:1px solid rgba(255,255,255,.14); border-radius:14px; overflow:hidden;">
           <div style="padding:10px; border-bottom:1px solid rgba(255,255,255,.10); background: rgba(0,0,0,.10); font-weight:900;">Historial de notas</div>
-          <div style="overflow:auto; max-height: 62vh;">
+          <div style="overflow:auto; max-height: calc(100vh - 230px);">
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr>
@@ -1158,6 +1770,66 @@ tbody tr:hover td{ background:#eef8ff !important; }
   </div>
 
 
+
+  <!-- Modal Historial de Entregas -->
+  <div class="modal-backdrop" id="historyBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+      <header>
+        <h2 id="historyTitle">Historial de entregas</h2>
+        <div style="flex:1"></div>
+        <button id="btnCloseHistory" class="ghost" title="Cerrar">✖</button>
+      </header>
+      <div class="content" style="grid-template-columns:1fr;gap:12px;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;">
+          <div class="pill" id="historyCount">0 entregas</div>
+          <button type="button" class="primary" id="btnExportHistoryExcel">⬇️ Exportar Excel</button>
+          <button type="button" class="primary" id="btnExportPrevMonthExcel">📅 Mes anterior</button>
+        </div>
+        <div style="overflow:auto;max-height: calc(100vh - 230px);border:1px solid #c5e0f6;border-radius:14px;">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead>
+              <tr>
+                <th style="padding:10px;text-align:left;">FECHA CITA</th>
+                <th style="padding:10px;text-align:left;">CLIENTE</th>
+                <th style="padding:10px;text-align:left;">DESTINO</th>
+                <th style="padding:10px;text-align:left;">HORARIO</th>
+                <th style="padding:10px;text-align:left;">ENTREGADA</th>
+                <th style="padding:10px;text-align:left;">ACCIONES</th>
+              </tr>
+            </thead>
+            <tbody id="historyBody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btnHistoryDone" class="primary">✅ Listo</button>
+      </div>
+    </div>
+  </div>
+
+
+
+  <!-- Modal Unidades Disponibles -->
+  <div class="modal-backdrop" id="availableUnitsBackdrop" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="availableUnitsTitle">
+      <header>
+        <h2 id="availableUnitsTitle">Unidades disponibles</h2>
+        <div style="flex:1"></div>
+        <button id="btnCloseAvailableUnits" class="ghost" title="Cerrar">✖</button>
+      </header>
+      <div class="content" style="grid-template-columns:1fr;gap:10px;">
+<div id="availableUnitsList" style="display:grid;gap:8px;margin:0;padding:0;"></div>
+        <div class="hint" style="padding:0;margin-top:2px;">
+          Se muestran unidades disponibles que sí circulan hoy y no tienen cita pendiente que interfiera por fecha/hora.
+        </div>
+      </div>
+      <div class="actions">
+        <button id="btnAvailableUnitsDone" class="primary">✅ Listo</button>
+      </div>
+    </div>
+  </div>
+
+
   <!-- SheetJS para Excel -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
@@ -1181,6 +1853,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
   const NOTES_KEY   = "control_transporte_notas_v1";
   const CLIENTS_KEY = "control_transporte_clientes_v1";
   const DESTS_KEY   = "control_transporte_destinos_v1";
+  const DELIVERIES_KEY = "control_transporte_historial_entregas_v1";
 
   const COLS = ["fecha de cita","cliente","destino","operador","maniobra","unidad","horario de carga","horario de cita","custodio","observaciones"];
   const TIME_COLS = new Set(["horario de carga","horario de cita"]);
@@ -1198,6 +1871,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
     notes: [],
     clients: [],
     destinations: [],
+    deliveries: [],
 
     filters: Object.fromEntries(COLS.map(c => [c, ""])),
     checkedFilter: "",
@@ -1291,6 +1965,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
     try{ const raw = localStorage.getItem(NOTES_KEY); if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)) state.notes=p; } }catch(e){}
     try{ const raw = localStorage.getItem(CLIENTS_KEY); if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)) state.clients=p; } }catch(e){}
     try{ const raw = localStorage.getItem(DESTS_KEY); if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)) state.destinations=p; } }catch(e){}
+    try{ const raw = localStorage.getItem(DELIVERIES_KEY); if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)) state.deliveries=p; } }catch(e){}
   }
   let firebaseLoadingCitas = false;
   let firebaseLoadingConfig = false;
@@ -1309,6 +1984,88 @@ tbody tr:hover td{ background:#eef8ff !important; }
     const label = el.querySelector(".signal-text");
     if(label) label.textContent = text;
     el.title = "Firebase: " + text + " · " + FIREBASE_DB_URL.replace(/\/$/, "");
+  }
+
+  let processingDepth = 0;
+  function showProcessing(title="Procesando…", text="Conectando con Firebase. No cierres ni cambies de pantalla."){
+    processingDepth++;
+    const overlay = $("#processingOverlay");
+    const titleEl = $("#processingTitle");
+    const textEl = $("#processingText");
+    if(titleEl) titleEl.textContent = title;
+    if(textEl) textEl.textContent = text;
+    if(overlay){
+      overlay.classList.add("is-active");
+      overlay.setAttribute("aria-hidden", "false");
+    }
+    document.body.classList.add("is-processing");
+  }
+
+  function hideProcessing(){
+    processingDepth = Math.max(0, processingDepth - 1);
+    if(processingDepth > 0) return;
+    const overlay = $("#processingOverlay");
+    if(overlay){
+      overlay.classList.remove("is-active");
+      overlay.setAttribute("aria-hidden", "true");
+    }
+    document.body.classList.remove("is-processing");
+  }
+
+  async function withProcessing(title, text, task){
+    showProcessing(title, text);
+    try{
+      return await task();
+    }catch(e){
+      console.error("Acción pendiente por Firebase:", e);
+      setFirebaseSignal("offline", "Firebase pendiente");
+      setStatus("Firebase pendiente. Revisa conexión.");
+      alert("⚠️ La acción quedó local, pero Firebase no confirmó el cambio. Revisa conexión y vuelve a sincronizar.");
+      return false;
+    }finally{
+      hideProcessing();
+    }
+  }
+
+  function citasPayload(){
+    return state.rows.map(r => ({
+      id: normalize(r.id) || uid(),
+      checked: !!r.checked,
+      createdAt: normalize(r.createdAt) || new Date().toISOString(),
+      data: r.data && typeof r.data === "object" ? r.data : {}
+    }));
+  }
+
+  async function syncCitasNow(silent=true){
+    clearTimeout(firebaseSaveTimer);
+    if(!citasFirebaseReady()) return true;
+    setFirebaseSignal("syncing", "Sincronizando Firebase...");
+    const res = await fetch(FIREBASE_CITAS_ENDPOINT, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(citasPayload())
+    });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    setFirebaseSignal("online", "Firebase conectado");
+    if(!silent) setStatus("Citas guardadas en Firebase.");
+    programarActualizacionApp();
+    return true;
+  }
+
+  async function syncConfigNow(silent=true){
+    clearTimeout(firebaseConfigSaveTimer);
+    if(!citasFirebaseReady()) return true;
+    setFirebaseSignal("syncing", "Sincronizando configuración...");
+    const res = await fetch(FIREBASE_CONFIG_ENDPOINT, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(configPayload())
+    });
+    if(!res.ok) throw new Error("HTTP " + res.status);
+    setFirebaseSignal("online", "Firebase conectado");
+    if(!silent) setStatus("Configuración guardada en Firebase.");
+    programarActualizacionApp();
+    return true;
   }
 
   function normalizeRemoteRows(value){
@@ -1338,6 +2095,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
           createdAt: normalize(r.createdAt) || new Date().toISOString(),
           data: r.data && typeof r.data === "object" ? r.data : {}
         }));
+        state.rows = sortCitasByDateTime(state.rows);
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
         render();
         setFirebaseSignal("online", "Firebase conectado");
@@ -1362,20 +2120,15 @@ tbody tr:hover td{ background:#eef8ff !important; }
     if(!citasFirebaseReady() || firebaseLoadingCitas) return;
     setFirebaseSignal("syncing", "Sincronizando Firebase...");
     try{
-      const payload = state.rows.map(r => ({
-        id: normalize(r.id) || uid(),
-        checked: !!r.checked,
-        createdAt: normalize(r.createdAt) || new Date().toISOString(),
-        data: r.data && typeof r.data === "object" ? r.data : {}
-      }));
       const res = await fetch(FIREBASE_CITAS_ENDPOINT, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(citasPayload())
       });
       if(!res.ok) throw new Error("HTTP " + res.status);
       setFirebaseSignal("online", "Firebase conectado");
       if(!silent) setStatus("Cita guardada en Firebase.");
+      programarActualizacionApp();
     }catch(e){
       console.warn("No se pudo guardar en Firebase:", e);
       setFirebaseSignal("offline", "Firebase pendiente");
@@ -1398,6 +2151,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
       notes: Array.isArray(state.notes) ? state.notes : [],
       clients: Array.isArray(state.clients) ? state.clients : [],
       destinations: Array.isArray(state.destinations) ? state.destinations : [],
+      deliveries: Array.isArray(state.deliveries) ? state.deliveries : [],
       updatedAt: new Date().toISOString()
     };
   }
@@ -1405,7 +2159,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
   function applyRemoteConfig(cfg){
     if(!cfg || typeof cfg !== "object") return false;
 
-    const arrays = ["units","workers","payroll","notes","clients","destinations"];
+    const arrays = ["units","workers","payroll","notes","clients","destinations","deliveries"];
     let hasData = false;
     for(const key of arrays){
       if(Array.isArray(cfg[key]) && cfg[key].length){
@@ -1421,6 +2175,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
     state.notes = Array.isArray(cfg.notes) ? cfg.notes : [];
     state.clients = Array.isArray(cfg.clients) ? cfg.clients : [];
     state.destinations = Array.isArray(cfg.destinations) ? cfg.destinations : [];
+    state.deliveries = Array.isArray(cfg.deliveries) ? cfg.deliveries : [];
 
     localStorage.setItem(UNITS_KEY, JSON.stringify(state.units));
     localStorage.setItem(WORKERS_KEY, JSON.stringify(state.workers));
@@ -1428,6 +2183,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
     localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes));
     localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients));
     localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations));
+    localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
 
     render();
     if(typeof renderClients === "function") renderClients();
@@ -1449,15 +2205,15 @@ tbody tr:hover td{ background:#eef8ff !important; }
       const applied = applyRemoteConfig(cfg);
 
       if(applied){
-        setStatus("Configuración cargada desde Firebase.");
+        setStatus("⚙ cargada desde Firebase.");
       } else if(
         state.units.length || state.workers.length || state.payroll.length ||
-        state.notes.length || state.clients.length || state.destinations.length
+        state.notes.length || state.clients.length || state.destinations.length || state.deliveries.length
       ){
         await pushConfigToFirebase(true);
       }
     }catch(e){
-      console.warn("Configuración Firebase no disponible:", e);
+      console.warn("⚙ Firebase no disponible:", e);
     }finally{
       firebaseLoadingConfig = false;
     }
@@ -1472,10 +2228,11 @@ tbody tr:hover td{ background:#eef8ff !important; }
         body: JSON.stringify(configPayload())
       });
       if(!res.ok) throw new Error("HTTP " + res.status);
-      if(!silent) setStatus("Configuración guardada en Firebase.");
+      if(!silent) setStatus("⚙ guardada en Firebase.");
+      programarActualizacionApp();
     }catch(e){
       console.warn("No se pudo guardar configuración en Firebase:", e);
-      if(!silent) setStatus("Configuración guardada local. Firebase pendiente.");
+      if(!silent) setStatus("⚙ guardada local. Firebase pendiente.");
     }
   }
 
@@ -1487,6 +2244,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
 
 
   function save(){
+    state.rows = sortCitasByDateTime(state.rows);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
     setStatus("Guardado local.");
     scheduleFirebaseSave();
@@ -1496,6 +2254,13 @@ tbody tr:hover td{ background:#eef8ff !important; }
   function savePayroll(){ localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll)); setStatus("Nómina guardada."); scheduleConfigFirebaseSave(); }
   function saveNotes(){ localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes)); setStatus("Notas guardadas."); scheduleConfigFirebaseSave(); }
   function saveClients(){ localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients)); setStatus("Clientes guardados."); scheduleConfigFirebaseSave(); }
+
+  function saveDeliveries(){
+    localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
+    setStatus("Historial guardado.");
+    scheduleConfigFirebaseSave();
+  }
+
   function saveDestinations(){ localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations)); setStatus("Destinos guardados."); scheduleConfigFirebaseSave(); }
 
   function parseNoCirculaDays(value){
@@ -1698,6 +2463,30 @@ tbody tr:hover td{ background:#eef8ff !important; }
     });
   }
 
+
+  function timeToMinutes(value){
+    const s = normalize(value).toUpperCase();
+    if(!s) return 999999;
+    const m = s.match(/(\d{1,2}):(\d{2})\s*(AM|PM)?/);
+    if(!m) return 999999;
+    let h = Number(m[1] || 0);
+    const min = Number(m[2] || 0);
+    const ap = m[3] || "";
+    if(ap === "AM" && h === 12) h = 0;
+    if(ap === "PM" && h < 12) h += 12;
+    return h * 60 + min;
+  }
+
+  function sortCitasByDateTime(list){
+    return (Array.isArray(list) ? list : []).slice().sort((a,b)=>{
+      const da = normalize(a.data?.[DATE_COL]);
+      const db = normalize(b.data?.[DATE_COL]);
+      const cmpDate = da.localeCompare(db);
+      if(cmpDate) return cmpDate;
+      return timeToMinutes(a.data?.["horario de cita"]) - timeToMinutes(b.data?.["horario de cita"]);
+    });
+  }
+
   function passesFilters(row){
     const chk = (state.checkedFilter || "").trim().toLowerCase();
     if(chk === "si" && !row.checked) return false;
@@ -1718,6 +2507,35 @@ tbody tr:hover td{ background:#eef8ff !important; }
     return true;
   }
 
+
+  function moverCitaAHistorial(row){
+    if(!row) return;
+    const d = row.data || {};
+    const resumen = `${normalize(d["cliente"]) || "Sin cliente"} - ${normalize(d["destino"]) || "Sin destino"} - ${normalize(d[DATE_COL]) || "Sin fecha"}`;
+    const ok = confirm(`¿Confirmas que esta cita fue entregada y deseas enviarla al historial?\n\n${resumen}`);
+    if(!ok){
+      row.checked = false;
+      render();
+      return;
+    }
+
+    const entrega = {
+      ...row,
+      checked: true,
+      deliveredAt: new Date().toISOString(),
+      deliveredAtLocal: new Date().toLocaleString("es-MX")
+    };
+
+    state.deliveries = Array.isArray(state.deliveries) ? state.deliveries : [];
+    state.deliveries.push(entrega);
+    state.rows = state.rows.filter(r => r.id !== row.id);
+
+    saveDeliveries();
+    save();
+    render();
+    setStatus("Cita enviada al historial de entregas.");
+  }
+
   function render(){
     refreshHeaderFilterOptions();
 
@@ -1728,12 +2546,16 @@ tbody tr:hover td{ background:#eef8ff !important; }
     const cards = $("#mobileCards");
     if(cards) cards.innerHTML = "";
 
-    const visible = state.rows.filter(passesFilters);
+    const visible = sortCitasByDateTime(state.rows.filter(passesFilters));
     const pill = $("#countPill");
     if(pill) pill.textContent = `${visible.length} cita${visible.length===1?"":"s"} (de ${state.rows.length})`;
 
     function setChecked(row, checked){
-      row.checked = checked;
+      if(checked){
+        moverCitaAHistorial(row);
+        return;
+      }
+      row.checked = false;
       save();
       render();
     }
@@ -1746,12 +2568,15 @@ tbody tr:hover td{ background:#eef8ff !important; }
       card.dataset.id = row.id;
 
       const title = normalize(d["cliente"]) || "Sin cliente";
-      const sub = [normalize(d[DATE_COL]), normalize(d["horario de cita"]), normalize(d["destino"])]
-        .filter(Boolean).join(" • ") || "Sin datos principales";
+      const destinoPrincipal = normalize(d["destino"]);
+      const sub = [normalize(d[DATE_COL])]
+        .filter(Boolean).join(" • ") || "Sin fecha";
       const unit = normalize(d[UNIT_COL]) || "-";
       const op = normalize(d[OPERADOR_COL]) || "-";
       const maniobra = normalize(d[MANIOBRA_COL]) || "-";
       const carga = normalize(d["horario de carga"]) || "-";
+      const cita = normalize(d["horario de cita"]) || "-";
+      const horarios = `Carga: ${carga} · Cita: ${cita}`;
       const custodio = normalize(d[CUSTODIO_COL]) || "-";
       const obs = normalize(d["observaciones"]) || "-";
 
@@ -1759,6 +2584,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
         <div class="mc-head">
           <div>
             <div class="mc-title">${escapeHTML(title)}</div>
+            <div class="mc-destino">${escapeHTML(destinoPrincipal || "-")}</div>
             <div class="mc-sub">${escapeHTML(sub)}</div>
           </div>
           <label class="mc-check"><input type="checkbox" ${row.checked ? "checked":""}> OK</label>
@@ -1767,7 +2593,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
           <div class="mc-item"><span class="mc-label">Unidad</span><span class="mc-value">${escapeHTML(unit)}</span></div>
           <div class="mc-item"><span class="mc-label">Operador</span><span class="mc-value">${escapeHTML(op)}</span></div>
           <div class="mc-item"><span class="mc-label">Maniobra</span><span class="mc-value">${escapeHTML(maniobra)}</span></div>
-          <div class="mc-item"><span class="mc-label">Carga</span><span class="mc-value">${escapeHTML(carga)}</span></div>
+          <div class="mc-item"><span class="mc-label">Horarios</span><span class="mc-value">${escapeHTML(horarios)}</span></div>
           <div class="mc-item"><span class="mc-label">Custodio</span><span class="mc-value">${escapeHTML(custodio)}</span></div>
           <div class="mc-item"><span class="mc-label">Observaciones</span><span class="mc-value">${escapeHTML(obs)}</span></div>
         </div>
@@ -2116,7 +2942,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
     const grid = $("#formGrid");
     if(grid) grid.innerHTML = "";
     buildForm({});
-    openModal("Nueva cita");
+    openModal("+");
   }
   function openEdit(id){
     const row = state.rows.find(r=>r.id===id);
@@ -2153,11 +2979,15 @@ tbody tr:hover td{ background:#eef8ff !important; }
     hideMobileMenuAfterCita();
   }
 
-  function deleteRow(id){
+  async function deleteRow(id){
     if(!confirm("¿Eliminar esta cita?")) return;
-    state.rows = state.rows.filter(r=>r.id!==id);
-    save();
-    render();
+    await withProcessing("Eliminando cita…", "Actualizando Firebase. Espera a que termine el proceso.", async ()=>{
+      state.rows = state.rows.filter(r=>r.id!==id);
+      save();
+      render();
+      await syncCitasNow(true);
+      setStatus("Cita eliminada.");
+    });
   }
 
   function clearFilters(){
@@ -2349,7 +3179,7 @@ tbody tr:hover td{ background:#eef8ff !important; }
   }
 
   
-  // === Configuración UI ===
+  // === ⚙ UI ===
   function openConfig(){
     $("#configBackdrop").style.display="flex";
     $("#configBackdrop").setAttribute("aria-hidden","false");
@@ -2399,13 +3229,17 @@ tbody tr:hover td{ background:#eef8ff !important; }
     render();
   }
 
-  function deleteClient(id){
+  async function deleteClient(id){
     const c = state.clients.find(x=>x.id===id); if(!c) return;
     if(!confirm(`¿Eliminar el cliente "${normalize(c.nombre)}"?`)) return;
-    state.clients = state.clients.filter(x=>x.id!==id);
-    saveClients();
-    renderClients();
-    render();
+    await withProcessing("Eliminando cliente…", "Guardando cambios en Firebase.", async ()=>{
+      state.clients = state.clients.filter(x=>x.id!==id);
+      saveClients();
+      renderClients();
+      render();
+      await syncConfigNow(true);
+      setStatus("Cliente eliminado.");
+    });
   }
 
   function renderClients(){
@@ -2467,13 +3301,17 @@ tbody tr:hover td{ background:#eef8ff !important; }
     render();
   }
 
-  function deleteDestination(id){
+  async function deleteDestination(id){
     const d = state.destinations.find(x=>x.id===id); if(!d) return;
     if(!confirm(`¿Eliminar el destino "${normalize(d.nombre)}"?`)) return;
-    state.destinations = state.destinations.filter(x=>x.id!==id);
-    saveDestinations();
-    renderDestinations();
-    render();
+    await withProcessing("Eliminando destino…", "Guardando cambios en Firebase.", async ()=>{
+      state.destinations = state.destinations.filter(x=>x.id!==id);
+      saveDestinations();
+      renderDestinations();
+      render();
+      await syncConfigNow(true);
+      setStatus("Destino eliminado.");
+    });
   }
 
   function renderDestinations(){
@@ -2563,13 +3401,17 @@ tbody tr:hover td{ background:#eef8ff !important; }
     render();
   }
 
-  function deleteUnit(id){
+  async function deleteUnit(id){
     const u = state.units.find(x=>x.id===id); if(!u) return;
     if(!confirm(`¿Eliminar la unidad "${normalize(u.unidad)}"?`)) return;
-    state.units = state.units.filter(x=>x.id!==id);
-    saveUnits();
-    renderUnits();
-    render();
+    await withProcessing("Eliminando unidad…", "Guardando cambios en Firebase.", async ()=>{
+      state.units = state.units.filter(x=>x.id!==id);
+      saveUnits();
+      renderUnits();
+      render();
+      await syncConfigNow(true);
+      setStatus("Unidad eliminada.");
+    });
   }
 
   function renderUnits(){
@@ -2635,14 +3477,18 @@ if(state.editingWorkerId){
     render();
   }
 
-  function deleteWorker(id){
+  async function deleteWorker(id){
     const w = state.workers.find(x=>x.id===id); if(!w) return;
     if(!confirm(`¿Eliminar trabajador "${normalize(w.nombre)}"?`)) return;
-    state.payroll = state.payroll.filter(p => p.workerId !== id);
-    state.workers = state.workers.filter(x=>x.id!==id);
-    saveWorkers(); savePayroll();
-    renderPayroll();
-    render();
+    await withProcessing("Eliminando trabajador…", "Guardando cambios en Firebase.", async ()=>{
+      state.payroll = state.payroll.filter(p => p.workerId !== id);
+      state.workers = state.workers.filter(x=>x.id!==id);
+      saveWorkers(); savePayroll();
+      renderPayroll();
+      render();
+      await syncConfigNow(true);
+      setStatus("Trabajador eliminado.");
+    });
   }
 
   function openPayrollForm(title){ $("#payrollFormTitle").textContent=title; $("#payrollFormBackdrop").style.display="flex"; $("#payrollFormBackdrop").setAttribute("aria-hidden","false"); }
@@ -2699,11 +3545,15 @@ if(state.editingWorkerId){
     renderPayroll();
   }
 
-  function deletePayroll(id){
+  async function deletePayroll(id){
     if(!confirm("¿Eliminar este registro?")) return;
-    state.payroll = state.payroll.filter(x=>x.id!==id);
-    savePayroll();
-    renderPayroll();
+    await withProcessing("Eliminando registro…", "Guardando cambios en Firebase.", async ()=>{
+      state.payroll = state.payroll.filter(x=>x.id!==id);
+      savePayroll();
+      renderPayroll();
+      await syncConfigNow(true);
+      setStatus("Registro eliminado.");
+    });
   }
 
   function renderPayroll(){
@@ -2802,11 +3652,15 @@ if(state.editingWorkerId){
     renderNotes();
   }
 
-  function deleteNote(id){
+  async function deleteNote(id){
     if(!confirm("¿Eliminar esta nota?")) return;
-    state.notes = state.notes.filter(x=>x.id!==id);
-    saveNotes();
-    renderNotes();
+    await withProcessing("Eliminando nota…", "Guardando cambios en Firebase.", async ()=>{
+      state.notes = state.notes.filter(x=>x.id!==id);
+      saveNotes();
+      renderNotes();
+      await syncConfigNow(true);
+      setStatus("Nota eliminada.");
+    });
   }
 
   function toggleDoneNote(id){
@@ -2899,7 +3753,381 @@ if(state.editingWorkerId){
         .cita{break-inside:avoid;border:1px solid #c5e0f6;border-radius:14px;margin:0 0 12px;padding:14px;background:#fbfdff}.cita-head{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #d9edf9;padding-bottom:10px;margin-bottom:10px}
         .folio{font-size:11px;font-weight:700;color:#1d74d8;letter-spacing:.5px} h2{margin:4px 0 3px;font-size:18px;color:#0f3156}.cita p{margin:0;color:#55708c;font-weight:700}.ok{font-size:11px;font-weight:800;color:#0f7a3d;background:#e9f9ef;border:1px solid #9ee6b8;border-radius:999px;padding:7px 10px;height:max-content;white-space:nowrap}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid div{border:1px solid #d9edf9;background:#f2f9ff;border-radius:10px;padding:9px;min-height:54px}.grid b{display:block;font-size:10px;color:#607d98;text-transform:uppercase;letter-spacing:.3px}.grid span{display:block;margin-top:4px;font-size:13px;font-weight:700;color:#12385f;overflow-wrap:anywhere}
         @media print{.page{padding:10mm}.cita{page-break-inside:avoid}.top{position:static}} @page{size:A4;margin:10mm}
-      </style></head><body><div class="page"><div class="top"><div><h1>Control de Transporte • Historial de citas</h1><div>${rows.length} cita(s)</div></div><div class="meta">Generado: ${fecha}<br>Firebase: conectado</div></div>${activeFilters.length ? `<div class="filters"><b>Filtros:</b> ${escapeHTML(activeFilters.join(" | "))}</div>` : ""}${cards}</div><script>window.onload=function(){setTimeout(function(){window.print();},250)}<\/script></body></html>`;
+      </style>
+
+
+
+
+
+
+<style id="kaman-ojo-preview-css">
+@media (max-width:768px){
+  header .toolbar{
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:8px !important;
+    margin-top:6px !important;
+  }
+  #btnNew,#btnConfig,#btnPreviewCitas{
+    width:50px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:21px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 50px !important;
+  }
+  #btnConfig{ font-size:20px !important; }
+  #btnPreviewCitas{ font-size:19px !important; }
+}
+@media (min-width:769px){
+  #btnPreviewCitas{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style id="kaman-truck-button-css">
+@media (max-width:768px){
+  header .toolbar{
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:7px !important;
+    margin-top:6px !important;
+  }
+  #btnNew,#btnConfig,#btnPreviewCitas,#btnAvailableUnits{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:20px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+  #btnConfig{ font-size:20px !important; }
+  #btnPreviewCitas{ font-size:18px !important; }
+  #btnAvailableUnits{ font-size:19px !important; }
+}
+@media (min-width:769px){
+  #btnAvailableUnits{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+.available-unit-card{
+  border:1px solid #c5e0f6;
+  background:#f7fcff;
+  border-radius:14px;
+  padding:12px;
+  display:grid;
+  gap:6px;
+}
+.available-unit-title{
+  font-weight:950;
+  font-size:16px;
+  color:#12385f;
+}
+.available-unit-meta{
+  font-size:12px;
+  font-weight:800;
+  color:#55708c;
+}
+.available-unit-badge{
+  width:max-content;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#effdf4;
+  color:#176b38;
+  border:1px solid #b7e6c7;
+  font-size:11px;
+  font-weight:950;
+}
+</style>
+
+
+
+
+
+<style id="kaman-final-modal-spacing">
+/* ===== Limpieza final de modales en celular ===== */
+
+/* Unidades disponibles: sin contador ni burbuja, listado arriba */
+#availableUnitsBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsList{
+  margin:0 !important;
+  padding:0 !important;
+  display:grid !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsCount{ display:none !important; }
+
+/* Neutralizar cualquier botón vacío o burbuja heredada dentro del listado */
+#availableUnitsBackdrop .content > button:not(.available-unit-select),
+#availableUnitsBackdrop .content > .pill:empty,
+#availableUnitsBackdrop .content > div:empty{
+  display:none !important;
+  height:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+}
+#availableUnitsBackdrop .available-unit-select,
+#availableUnitsBackdrop .available-unit-card{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:10px 12px !important;
+  border-radius:14px !important;
+  display:grid !important;
+  gap:6px !important;
+  text-align:left !important;
+  background:#ffffff !important;
+  border:1px solid #c5e0f6 !important;
+  box-shadow:none !important;
+  flex:none !important;
+}
+#availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
+#availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
+
+/* Historial: subir controles y tabla */
+#historyBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#historyBackdrop .content > div:first-child{
+  margin:0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+#historyBackdrop #historyCount{
+  margin:0 !important;
+}
+#historyBackdrop #btnExportHistoryExcel{
+  margin:0 !important;
+  min-height:42px !important;
+  height:42px !important;
+  padding:8px 14px !important;
+}
+#historyBackdrop .content table{
+  margin-top:0 !important;
+}
+#historyBackdrop .content [style*="max-height"]{
+  margin-top:0 !important;
+  max-height:calc(100vh - 220px) !important;
+}
+
+/* Eliminar huecos grandes causados por estilos inline/heredados */
+#historyBackdrop .content > div,
+#availableUnitsBackdrop .content > div{
+  transform:none !important;
+}
+@media(max-width:768px){
+  #historyBackdrop .modal header,
+  #availableUnitsBackdrop .modal header{
+    min-height:50px !important;
+    padding:7px 10px !important;
+  }
+  #historyBackdrop .modal h2,
+  #availableUnitsBackdrop .modal h2{
+    font-size:20px !important;
+  }
+  #historyBackdrop .actions,
+  #availableUnitsBackdrop .actions{
+    padding:8px 10px !important;
+  }
+}
+</style>
+
+
+
+
+
+<style id="kaman-notas-main-fix">
+@media (max-width:768px){
+  #btnNotesMain{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:19px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+}
+@media (min-width:769px){
+  #btnNotesMain{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style id="kaman-subir-tablas-modales">
+/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
+#clientsBackdrop .content,
+#destinationsBackdrop .content,
+#unitsBackdrop .content,
+#notesBackdrop .content,
+#payrollBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+  justify-content:start !important;
+}
+
+#clientsBackdrop .content > div,
+#destinationsBackdrop .content > div,
+#unitsBackdrop .content > div,
+#notesBackdrop .content > div,
+#payrollBackdrop .content > div{
+  margin-top:0 !important;
+}
+
+/* Primera fila: contador + botón agregar pegados arriba */
+#clientsBackdrop .content > div:first-child,
+#destinationsBackdrop .content > div:first-child,
+#unitsBackdrop .content > div:first-child,
+#notesBackdrop .content > div:first-child,
+#payrollBackdrop .content > div:first-child{
+  margin:0 0 4px 0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+
+/* Tablas/listados inmediatamente debajo */
+#clientsBackdrop .content [style*="border:1px"],
+#destinationsBackdrop .content [style*="border:1px"],
+#unitsBackdrop .content [style*="border:1px"],
+#notesBackdrop .content [style*="border:1px"],
+#payrollBackdrop .content [style*="border:1px"]{
+  margin-top:0 !important;
+}
+
+/* Quitar alturas/huecos exagerados */
+#clientsBackdrop .content [style*="max-height"],
+#destinationsBackdrop .content [style*="max-height"],
+#unitsBackdrop .content [style*="max-height"],
+#notesBackdrop .content [style*="max-height"],
+#payrollBackdrop .content [style*="max-height"]{
+  max-height:calc(100vh - 230px) !important;
+}
+
+#clientsBackdrop .hint,
+#destinationsBackdrop .hint,
+#unitsBackdrop .hint,
+#notesBackdrop .hint,
+#payrollBackdrop .hint{
+  margin-top:4px !important;
+  padding:0 !important;
+}
+
+/* Encabezados compactos */
+#clientsBackdrop .modal header,
+#destinationsBackdrop .modal header,
+#unitsBackdrop .modal header,
+#notesBackdrop .modal header,
+#payrollBackdrop .modal header{
+  min-height:50px !important;
+  padding:7px 10px !important;
+}
+
+/* Botones inferiores compactos */
+#clientsBackdrop .actions,
+#destinationsBackdrop .actions,
+#unitsBackdrop .actions,
+#notesBackdrop .actions,
+#payrollBackdrop .actions{
+  padding:8px 10px !important;
+}
+
+/* En móvil, tabla/listado debe iniciar arriba, no a media pantalla */
+@media(max-width:768px){
+  #clientsBackdrop .modal .content,
+  #destinationsBackdrop .modal .content,
+  #unitsBackdrop .modal .content,
+  #notesBackdrop .modal .content,
+  #payrollBackdrop .modal .content{
+    padding-top:8px !important;
+    grid-auto-rows:max-content !important;
+  }
+
+  #clientsBackdrop table th,
+  #clientsBackdrop table td,
+  #destinationsBackdrop table th,
+  #destinationsBackdrop table td,
+  #unitsBackdrop table th,
+  #unitsBackdrop table td,
+  #notesBackdrop table th,
+  #notesBackdrop table td,
+  #payrollBackdrop table th,
+  #payrollBackdrop table td{
+    padding:8px !important;
+  }
+
+  #clientsBackdrop button,
+  #destinationsBackdrop button,
+  #unitsBackdrop button,
+  #notesBackdrop button,
+  #payrollBackdrop button{
+    min-height:40px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-auto-excel-mes-css">
+#btnExportPrevMonthExcel{
+  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
+  color:#fff !important;
+  border-color:#0f766e !important;
+}
+</style>
+
+
+
+</head><body><div class="page"><div class="top"><div><h1>Control de Transporte • Historial de citas</h1><div>${rows.length} cita(s)</div></div><div class="meta">Generado: ${fecha}<br>Firebase: conectado</div></div>${activeFilters.length ? `<div class="filters"><b>Filtros:</b> ${escapeHTML(activeFilters.join(" | "))}</div>` : ""}${cards}</div><script>window.onload=function(){setTimeout(function(){window.print();},250)}<\/script></body></html>`;
 
     const w = window.open("", "_blank");
     if(!w){ alert("Permite ventanas emergentes para generar el PDF."); return; }
@@ -3060,14 +4288,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 
   // Init
 
-  // Accesos compactos desde Configuración
-  const btnNotesFromConfig = $("#btnNotesFromConfig");
-  if(btnNotesFromConfig){
-    btnNotesFromConfig.addEventListener("click", () => {
-      closeConfig();
-      openNotes();
-    });
-  }
+  // Accesos compactos desde ⚙
 
   const btnPDFfromConfig = $("#btnPDFfromConfig");
   if(btnPDFfromConfig){
@@ -3090,6 +4311,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
     if(!ok) return;
 
     try{
+      await withProcessing("Eliminando citas…", "Limpiando registros y confirmando Firebase.", async ()=>{
       state.rows = [];
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
       render();
@@ -3102,6 +4324,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
       }
 
       setStatus("Todas las citas fueron eliminadas.");
+      });
       alert("✅ Todas las citas fueron eliminadas.");
     }catch(e){
       console.warn("No se pudieron eliminar citas en Firebase:", e);
@@ -3111,9 +4334,1580 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   }
 
   const btnDeleteAllCitasConfig = $("#btnDeleteAllCitasConfig");
-  if(btnDeleteAllCitasConfig){
-    btnDeleteAllCitasConfig.addEventListener("click", eliminarTodasLasCitasConPassword);
+
+
+
+  function moneyMXN(value){
+    const n = Number(value || 0) || 0;
+    return n.toLocaleString("es-MX", { style:"currency", currency:"MXN" });
   }
+
+  function generarReporteNominaPDF(){
+    const workers = Array.isArray(state.workers) ? state.workers.slice() : [];
+    const payroll = Array.isArray(state.payroll) ? state.payroll.slice() : [];
+
+    if(!workers.length){
+      alert("No hay trabajadores registrados para generar reporte.");
+      return;
+    }
+
+    const fecha = new Date().toLocaleString("es-MX");
+    const rowsTrabajadores = workers
+      .sort((a,b)=>normalize(a.nombre).localeCompare(normalize(b.nombre), "es", {sensitivity:"base"}))
+      .map(w => {
+        const regs = payroll
+          .filter(p => p.workerId === w.id)
+          .sort((a,b)=>normalize(a.fecha).localeCompare(normalize(b.fecha)));
+        const total = regs.reduce((s,p)=>s + (Number(p.monto || 0) || 0), 0);
+
+        const desglose = regs.length ? regs.map(p => `
+          <tr>
+            <td>${escapeHTML(p.fecha || "-")}</td>
+            <td>${moneyMXN(p.monto)}</td>
+          </tr>
+        `).join("") : `
+          <tr>
+            <td colspan="2" style="text-align:center;color:#777;">Sin registros de días laborados</td>
+          </tr>
+        `;
+
+        return `
+          <section class="worker-section">
+            <h2>${escapeHTML(w.nombre || "Sin nombre")}</h2>
+            <table class="info">
+              <tr><th>Nombre</th><td>${escapeHTML(w.nombre || "-")}</td></tr>
+              <tr><th>Tipo</th><td>${escapeHTML(w.tipo || "-")}</td></tr>
+              <tr><th>Seguro social</th><td>${escapeHTML(w.seguroSocial || "-")}</td></tr>
+              <tr><th>Total acumulado</th><td><strong>${moneyMXN(total)}</strong></td></tr>
+            </table>
+            <h3>Desglose de días trabajados</h3>
+            <table>
+              <thead>
+                <tr><th>Fecha</th><th>Monto</th></tr>
+              </thead>
+              <tbody>${desglose}</tbody>
+              <tfoot>
+                <tr><th>Total trabajador</th><th>${moneyMXN(total)}</th></tr>
+              </tfoot>
+            </table>
+          </section>
+        `;
+      }).join("");
+
+    const totalGeneral = payroll.reduce((s,p)=>s + (Number(p.monto || 0) || 0), 0);
+
+    const htmlReporte = `
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Reporte de Nómina</title>
+<style>
+  @page{ size: letter; margin: 14mm; }
+  *{ box-sizing:border-box; }
+  body{ font-family: Arial, sans-serif; color:#14213d; margin:0; background:#fff; }
+  .header{
+    border-bottom:3px solid #1d74d8;
+    padding-bottom:10px;
+    margin-bottom:14px;
+  }
+  h1{ margin:0; font-size:22px; color:#0f2742; }
+  .sub{ margin-top:5px; color:#55708c; font-size:12px; }
+  .summary{
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:10px;
+    margin:14px 0;
+  }
+  .box{
+    border:1px solid #b7d7f2;
+    background:#f2f9ff;
+    border-radius:10px;
+    padding:10px;
+  }
+  .label{ font-size:11px; color:#55708c; font-weight:bold; text-transform:uppercase; }
+  .value{ font-size:18px; font-weight:bold; color:#0f2742; margin-top:4px; }
+  .worker-section{
+    page-break-inside:avoid;
+    border:1px solid #c5e0f6;
+    border-radius:12px;
+    margin:14px 0;
+    padding:12px;
+  }
+  h2{ margin:0 0 8px; font-size:18px; color:#12385f; }
+  h3{ margin:12px 0 6px; font-size:14px; color:#12385f; }
+  table{ width:100%; border-collapse:collapse; font-size:12px; }
+  th{
+    background:#d9efff;
+    color:#12385f;
+    text-align:left;
+    padding:7px;
+    border:1px solid #c5e0f6;
+  }
+  td{
+    padding:7px;
+    border:1px solid #e1eef8;
+    vertical-align:top;
+  }
+  .info th{ width:190px; }
+  tfoot th{ background:#eef8ff; }
+  .footer{
+    margin-top:20px;
+    font-size:10px;
+    color:#607d98;
+    text-align:center;
+  }
+  @media print{
+    .no-print{ display:none; }
+  }
+  .print-btn{
+    margin:12px 0;
+    padding:10px 14px;
+    background:#1d74d8;
+    color:white;
+    border:0;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+  }
+</style>
+
+
+
+
+
+
+
+<style id="kaman-ojo-preview-css">
+@media (max-width:768px){
+  header .toolbar{
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:8px !important;
+    margin-top:6px !important;
+  }
+  #btnNew,#btnConfig,#btnPreviewCitas{
+    width:50px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:21px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 50px !important;
+  }
+  #btnConfig{ font-size:20px !important; }
+  #btnPreviewCitas{ font-size:19px !important; }
+}
+@media (min-width:769px){
+  #btnPreviewCitas{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style id="kaman-truck-button-css">
+@media (max-width:768px){
+  header .toolbar{
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:7px !important;
+    margin-top:6px !important;
+  }
+  #btnNew,#btnConfig,#btnPreviewCitas,#btnAvailableUnits{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:20px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+  #btnConfig{ font-size:20px !important; }
+  #btnPreviewCitas{ font-size:18px !important; }
+  #btnAvailableUnits{ font-size:19px !important; }
+}
+@media (min-width:769px){
+  #btnAvailableUnits{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+.available-unit-card{
+  border:1px solid #c5e0f6;
+  background:#f7fcff;
+  border-radius:14px;
+  padding:12px;
+  display:grid;
+  gap:6px;
+}
+.available-unit-title{
+  font-weight:950;
+  font-size:16px;
+  color:#12385f;
+}
+.available-unit-meta{
+  font-size:12px;
+  font-weight:800;
+  color:#55708c;
+}
+.available-unit-badge{
+  width:max-content;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#effdf4;
+  color:#176b38;
+  border:1px solid #b7e6c7;
+  font-size:11px;
+  font-weight:950;
+}
+</style>
+
+
+
+
+
+<style id="kaman-final-modal-spacing">
+/* ===== Limpieza final de modales en celular ===== */
+
+/* Unidades disponibles: sin contador ni burbuja, listado arriba */
+#availableUnitsBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsList{
+  margin:0 !important;
+  padding:0 !important;
+  display:grid !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsCount{ display:none !important; }
+
+/* Neutralizar cualquier botón vacío o burbuja heredada dentro del listado */
+#availableUnitsBackdrop .content > button:not(.available-unit-select),
+#availableUnitsBackdrop .content > .pill:empty,
+#availableUnitsBackdrop .content > div:empty{
+  display:none !important;
+  height:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+}
+#availableUnitsBackdrop .available-unit-select,
+#availableUnitsBackdrop .available-unit-card{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:10px 12px !important;
+  border-radius:14px !important;
+  display:grid !important;
+  gap:6px !important;
+  text-align:left !important;
+  background:#ffffff !important;
+  border:1px solid #c5e0f6 !important;
+  box-shadow:none !important;
+  flex:none !important;
+}
+#availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
+#availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
+
+/* Historial: subir controles y tabla */
+#historyBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#historyBackdrop .content > div:first-child{
+  margin:0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+#historyBackdrop #historyCount{
+  margin:0 !important;
+}
+#historyBackdrop #btnExportHistoryExcel{
+  margin:0 !important;
+  min-height:42px !important;
+  height:42px !important;
+  padding:8px 14px !important;
+}
+#historyBackdrop .content table{
+  margin-top:0 !important;
+}
+#historyBackdrop .content [style*="max-height"]{
+  margin-top:0 !important;
+  max-height:calc(100vh - 220px) !important;
+}
+
+/* Eliminar huecos grandes causados por estilos inline/heredados */
+#historyBackdrop .content > div,
+#availableUnitsBackdrop .content > div{
+  transform:none !important;
+}
+@media(max-width:768px){
+  #historyBackdrop .modal header,
+  #availableUnitsBackdrop .modal header{
+    min-height:50px !important;
+    padding:7px 10px !important;
+  }
+  #historyBackdrop .modal h2,
+  #availableUnitsBackdrop .modal h2{
+    font-size:20px !important;
+  }
+  #historyBackdrop .actions,
+  #availableUnitsBackdrop .actions{
+    padding:8px 10px !important;
+  }
+}
+</style>
+
+
+
+
+
+<style id="kaman-notas-main-fix">
+@media (max-width:768px){
+  #btnNotesMain{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:19px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+}
+@media (min-width:769px){
+  #btnNotesMain{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style id="kaman-subir-tablas-modales">
+/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
+#clientsBackdrop .content,
+#destinationsBackdrop .content,
+#unitsBackdrop .content,
+#notesBackdrop .content,
+#payrollBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+  justify-content:start !important;
+}
+
+#clientsBackdrop .content > div,
+#destinationsBackdrop .content > div,
+#unitsBackdrop .content > div,
+#notesBackdrop .content > div,
+#payrollBackdrop .content > div{
+  margin-top:0 !important;
+}
+
+/* Primera fila: contador + botón agregar pegados arriba */
+#clientsBackdrop .content > div:first-child,
+#destinationsBackdrop .content > div:first-child,
+#unitsBackdrop .content > div:first-child,
+#notesBackdrop .content > div:first-child,
+#payrollBackdrop .content > div:first-child{
+  margin:0 0 4px 0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+
+/* Tablas/listados inmediatamente debajo */
+#clientsBackdrop .content [style*="border:1px"],
+#destinationsBackdrop .content [style*="border:1px"],
+#unitsBackdrop .content [style*="border:1px"],
+#notesBackdrop .content [style*="border:1px"],
+#payrollBackdrop .content [style*="border:1px"]{
+  margin-top:0 !important;
+}
+
+/* Quitar alturas/huecos exagerados */
+#clientsBackdrop .content [style*="max-height"],
+#destinationsBackdrop .content [style*="max-height"],
+#unitsBackdrop .content [style*="max-height"],
+#notesBackdrop .content [style*="max-height"],
+#payrollBackdrop .content [style*="max-height"]{
+  max-height:calc(100vh - 230px) !important;
+}
+
+#clientsBackdrop .hint,
+#destinationsBackdrop .hint,
+#unitsBackdrop .hint,
+#notesBackdrop .hint,
+#payrollBackdrop .hint{
+  margin-top:4px !important;
+  padding:0 !important;
+}
+
+/* Encabezados compactos */
+#clientsBackdrop .modal header,
+#destinationsBackdrop .modal header,
+#unitsBackdrop .modal header,
+#notesBackdrop .modal header,
+#payrollBackdrop .modal header{
+  min-height:50px !important;
+  padding:7px 10px !important;
+}
+
+/* Botones inferiores compactos */
+#clientsBackdrop .actions,
+#destinationsBackdrop .actions,
+#unitsBackdrop .actions,
+#notesBackdrop .actions,
+#payrollBackdrop .actions{
+  padding:8px 10px !important;
+}
+
+/* En móvil, tabla/listado debe iniciar arriba, no a media pantalla */
+@media(max-width:768px){
+  #clientsBackdrop .modal .content,
+  #destinationsBackdrop .modal .content,
+  #unitsBackdrop .modal .content,
+  #notesBackdrop .modal .content,
+  #payrollBackdrop .modal .content{
+    padding-top:8px !important;
+    grid-auto-rows:max-content !important;
+  }
+
+  #clientsBackdrop table th,
+  #clientsBackdrop table td,
+  #destinationsBackdrop table th,
+  #destinationsBackdrop table td,
+  #unitsBackdrop table th,
+  #unitsBackdrop table td,
+  #notesBackdrop table th,
+  #notesBackdrop table td,
+  #payrollBackdrop table th,
+  #payrollBackdrop table td{
+    padding:8px !important;
+  }
+
+  #clientsBackdrop button,
+  #destinationsBackdrop button,
+  #unitsBackdrop button,
+  #notesBackdrop button,
+  #payrollBackdrop button{
+    min-height:40px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-auto-excel-mes-css">
+#btnExportPrevMonthExcel{
+  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
+  color:#fff !important;
+  border-color:#0f766e !important;
+}
+</style>
+
+
+
+</head>
+<body>
+  <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+  <div class="header">
+    <h1>Reporte de Nómina</h1>
+    <div class="sub">Control de Transporte • Citas de Entrega</div>
+    <div class="sub">Generado: ${escapeHTML(fecha)}</div>
+  </div>
+
+  <div class="summary">
+    <div class="box">
+      <div class="label">Trabajadores</div>
+      <div class="value">${workers.length}</div>
+    </div>
+    <div class="box">
+      <div class="label">Registros</div>
+      <div class="value">${payroll.length}</div>
+    </div>
+    <div class="box">
+      <div class="label">Total nómina</div>
+      <div class="value">${moneyMXN(totalGeneral)}</div>
+    </div>
+  </div>
+
+  ${rowsTrabajadores}
+
+  <div class="footer">Reporte generado desde Control de Transporte Kaman.</div>
+<script>
+  window.onload = function(){ setTimeout(function(){ window.print(); }, 400); };
+<\/script>
+</body>
+</html>`;
+
+    const w = window.open("", "_blank");
+    if(!w){
+      alert("Permite ventanas emergentes para generar el reporte de nómina.");
+      return;
+    }
+    w.document.open();
+    w.document.write(htmlReporte);
+    w.document.close();
+    setStatus("Reporte de nómina listo para imprimir/guardar PDF.");
+  }
+
+  const btnPayrollReportPDF = $("#btnPayrollReportPDF");
+  if(btnPayrollReportPDF){
+    btnPayrollReportPDF.addEventListener("click", generarReporteNominaPDF);
+  }
+
+
+
+  // Sincronización automática de la app con Firebase
+  let appSyncBusy = false;
+  let lastAutoSyncAt = 0;
+
+  async function actualizarAppDesdeFirebase(silent=false){
+    if(appSyncBusy) return;
+    if(!citasFirebaseReady()) return;
+    appSyncBusy = true;
+    try{
+      await loadCitasFromFirebase();
+      await loadConfigFromFirebase();
+      lastAutoSyncAt = Date.now();
+      if(!silent) setStatus("App actualizada desde Firebase.");
+    }catch(e){
+      console.warn("No se pudo actualizar app desde Firebase:", e);
+      if(!silent) setStatus("No se pudo actualizar desde Firebase.");
+    }finally{
+      appSyncBusy = false;
+    }
+  }
+
+  function programarActualizacionApp(){
+    clearTimeout(programarActualizacionApp._t);
+    programarActualizacionApp._t = setTimeout(()=>actualizarAppDesdeFirebase(true), 900);
+  }
+
+  window.addEventListener("focus", () => {
+    if(Date.now() - lastAutoSyncAt > 2500) actualizarAppDesdeFirebase(true);
+  });
+
+  document.addEventListener("visibilitychange", () => {
+    if(!document.hidden && Date.now() - lastAutoSyncAt > 2500){
+      actualizarAppDesdeFirebase(true);
+    }
+  });
+
+  window.addEventListener("online", () => actualizarAppDesdeFirebase(false));
+
+  // Revisión automática cada 20 segundos para mantener varios dispositivos vinculados
+  setInterval(() => {
+    if(!document.hidden) actualizarAppDesdeFirebase(true);
+  }, 20000);
+
+
+
+  function abrirVistaPreviaCitas(){
+    const filas = (Array.isArray(state.rows) ? state.rows.slice() : [])
+      .filter(passesFilters)
+      .sort((a,b)=>{
+        const da = normalize(a.data?.[DATE_COL]);
+        const db = normalize(b.data?.[DATE_COL]);
+        const cmpDate = da.localeCompare(db);
+        if(cmpDate) return cmpDate;
+        return timeToMinutes(a.data?.["horario de cita"]) - timeToMinutes(b.data?.["horario de cita"]);
+      });
+
+    const fechaGen = new Date().toLocaleString("es-MX");
+    const cards = filas.map((row, i)=>{
+      const d = row.data || {};
+      const estatus = row.checked ? "REALIZADA" : "PENDIENTE";
+      return `
+        <section class="cita">
+          <div class="top">
+            <div>
+              <div class="folio">CITA ${String(i+1).padStart(3,"0")}</div>
+              <h2>${escapeHTML(d["cliente"] || "-")}</h2>
+              <h3>${escapeHTML(d["destino"] || "-")}</h3>
+              <div class="line">${escapeHTML(d[DATE_COL] || "-")} • Cita: ${escapeHTML(d["horario de cita"] || "-")}</div>
+            </div>
+            <div class="badge ${row.checked ? "ok" : ""}">${estatus}</div>
+          </div>
+          <div class="grid">
+            <div><span>UNIDAD</span><b>${escapeHTML(d[UNIT_COL] || "-")}</b></div>
+            <div><span>OPERADOR</span><b>${escapeHTML(d[OPERADOR_COL] || "-")}</b></div>
+            <div><span>MANIOBRA</span><b>${escapeHTML(d[MANIOBRA_COL] || "-")}</b></div>
+            <div><span>HORARIOS</span><b>Carga: ${escapeHTML(d["horario de carga"] || "-")}<br>Cita: ${escapeHTML(d["horario de cita"] || "-")}</b></div>
+            <div><span>CUSTODIO</span><b>${escapeHTML(d[CUSTODIO_COL] || "-")}</b></div>
+            <div><span>OBSERVACIONES</span><b>${escapeHTML(d["observaciones"] || "-")}</b></div>
+          </div>
+        </section>`;
+    }).join("");
+
+    const htmlPreview = `<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vista de citas</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;min-height:100%;background:#eef7ff;color:#12385f;font-family:Arial, sans-serif}
+  body{padding:10px}
+  .page{
+    width:min(100%, 860px);
+    margin:0 auto;
+    background:#ffffff;
+    border:1px solid #c5e0f6;
+    border-radius:16px;
+    box-shadow:0 8px 24px rgba(23,92,160,.14);
+    padding:12px;
+  }
+  .actions{
+    position:sticky;
+    top:0;
+    z-index:20;
+    display:flex;
+    gap:8px;
+    margin:-12px -12px 10px;
+    padding:10px;
+    background:#eaf6ff;
+    border-bottom:1px solid #c5e0f6;
+    border-radius:16px 16px 0 0;
+  }
+  button{
+    border:1px solid #1d74d8;
+    background:linear-gradient(135deg,#1d74d8,#35a6ff);
+    color:#fff;
+    font-weight:900;
+    border-radius:12px;
+    padding:10px 12px;
+    font-size:13px;
+  }
+  .secondary{background:#ffffff;color:#12385f;border-color:#b8d7f0}
+  .header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    border-bottom:3px solid #1d74d8;
+    padding-bottom:10px;
+    margin-bottom:12px;
+  }
+  h1{font-size:20px;margin:0;color:#12385f;line-height:1.12}
+  .count{font-size:13px;font-weight:900;color:#55708c;margin-top:3px}
+  .meta{text-align:right;font-size:11px;color:#607d98;line-height:1.3}
+  .cita{
+    border:1px solid #c5e0f6;
+    border-radius:16px;
+    padding:12px;
+    margin:12px 0;
+    page-break-inside:avoid;
+    background:#fff;
+    box-shadow:0 4px 14px rgba(23,92,160,.08);
+  }
+  .top{
+    display:flex;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px solid #e1eef8;
+    padding-bottom:9px;
+    margin-bottom:10px;
+  }
+  .folio{font-size:10px;font-weight:950;color:#55708c}
+  h2{font-size:22px;margin:2px 0 0;color:#0f2742;line-height:1.05}
+  h3{font-size:20px;margin:2px 0;color:#0f2742;line-height:1.05}
+  .line{font-size:14px;font-weight:900;color:#55708c;margin-top:4px}
+  .badge{
+    height:max-content;
+    border-radius:999px;
+    padding:6px 10px;
+    background:#effdf4;
+    color:#176b38;
+    font-size:10px;
+    font-weight:950;
+    border:1px solid #b7e6c7;
+    white-space:nowrap;
+  }
+  .badge.ok{background:#e8f5ff;color:#1d4ed8;border-color:#bfdbfe}
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:9px;
+  }
+  .grid div{
+    background:#f2f9ff;
+    border:1px solid #d4eaf9;
+    border-radius:12px;
+    padding:10px;
+    min-height:58px;
+  }
+  span{display:block;font-size:10px;font-weight:950;color:#6c839b;text-transform:uppercase;letter-spacing:.2px}
+  b{display:block;margin-top:4px;font-size:15px;color:#12385f;line-height:1.15}
+  .empty{text-align:center;color:#607d98;padding:35px 10px;border:1px dashed #b7d7f2;border-radius:12px;background:#f7fcff}
+  @media(max-width:700px){
+    body{padding:8px;background:#eef7ff}
+    .page{width:100%;padding:10px;border-radius:16px}
+    .actions{margin:-10px -10px 10px;padding:8px;border-radius:16px 16px 0 0}
+    button{flex:1;padding:10px 6px;font-size:12px}
+    .header{align-items:flex-start}
+    h1{font-size:18px}
+    .meta{font-size:10px}
+    .cita{padding:11px;margin:11px 0;border-radius:15px}
+    h2{font-size:23px}
+    h3{font-size:22px}
+    .line{font-size:14px}
+    .grid{grid-template-columns:1fr 1fr;gap:8px}
+    .grid div{padding:9px;min-height:60px}
+    b{font-size:15px}
+  }
+  @media print{
+    body{background:#fff;padding:0}
+    .page{box-shadow:none;border:0;width:100%;padding:0}
+    .actions{display:none}
+    .cita{box-shadow:none}
+  }
+</style>
+
+<style id="kaman-truck-button-css">
+@media (max-width:768px){
+  header .toolbar{
+    display:flex !important;
+    flex-direction:row !important;
+    justify-content:center !important;
+    align-items:center !important;
+    gap:7px !important;
+    margin-top:6px !important;
+  }
+  #btnNew,#btnConfig,#btnPreviewCitas,#btnAvailableUnits{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:20px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+  #btnConfig{ font-size:20px !important; }
+  #btnPreviewCitas{ font-size:18px !important; }
+  #btnAvailableUnits{ font-size:19px !important; }
+}
+@media (min-width:769px){
+  #btnAvailableUnits{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+.available-unit-card{
+  border:1px solid #c5e0f6;
+  background:#f7fcff;
+  border-radius:14px;
+  padding:12px;
+  display:grid;
+  gap:6px;
+}
+.available-unit-title{
+  font-weight:950;
+  font-size:16px;
+  color:#12385f;
+}
+.available-unit-meta{
+  font-size:12px;
+  font-weight:800;
+  color:#55708c;
+}
+.available-unit-badge{
+  width:max-content;
+  padding:5px 9px;
+  border-radius:999px;
+  background:#effdf4;
+  color:#176b38;
+  border:1px solid #b7e6c7;
+  font-size:11px;
+  font-weight:950;
+}
+</style>
+
+
+
+
+
+<style id="kaman-final-modal-spacing">
+/* ===== Limpieza final de modales en celular ===== */
+
+/* Unidades disponibles: sin contador ni burbuja, listado arriba */
+#availableUnitsBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsList{
+  margin:0 !important;
+  padding:0 !important;
+  display:grid !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#availableUnitsCount{ display:none !important; }
+
+/* Neutralizar cualquier botón vacío o burbuja heredada dentro del listado */
+#availableUnitsBackdrop .content > button:not(.available-unit-select),
+#availableUnitsBackdrop .content > .pill:empty,
+#availableUnitsBackdrop .content > div:empty{
+  display:none !important;
+  height:0 !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:0 !important;
+  border:0 !important;
+}
+#availableUnitsBackdrop .available-unit-select,
+#availableUnitsBackdrop .available-unit-card{
+  width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  margin:0 !important;
+  padding:10px 12px !important;
+  border-radius:14px !important;
+  display:grid !important;
+  gap:6px !important;
+  text-align:left !important;
+  background:#ffffff !important;
+  border:1px solid #c5e0f6 !important;
+  box-shadow:none !important;
+  flex:none !important;
+}
+#availableUnitsBackdrop .available-unit-title{ font-size:18px !important; margin:0 !important; }
+#availableUnitsBackdrop .available-unit-badge{ width:max-content !important; min-height:0 !important; }
+
+/* Historial: subir controles y tabla */
+#historyBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+}
+#historyBackdrop .content > div:first-child{
+  margin:0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+#historyBackdrop #historyCount{
+  margin:0 !important;
+}
+#historyBackdrop #btnExportHistoryExcel{
+  margin:0 !important;
+  min-height:42px !important;
+  height:42px !important;
+  padding:8px 14px !important;
+}
+#historyBackdrop .content table{
+  margin-top:0 !important;
+}
+#historyBackdrop .content [style*="max-height"]{
+  margin-top:0 !important;
+  max-height:calc(100vh - 220px) !important;
+}
+
+/* Eliminar huecos grandes causados por estilos inline/heredados */
+#historyBackdrop .content > div,
+#availableUnitsBackdrop .content > div{
+  transform:none !important;
+}
+@media(max-width:768px){
+  #historyBackdrop .modal header,
+  #availableUnitsBackdrop .modal header{
+    min-height:50px !important;
+    padding:7px 10px !important;
+  }
+  #historyBackdrop .modal h2,
+  #availableUnitsBackdrop .modal h2{
+    font-size:20px !important;
+  }
+  #historyBackdrop .actions,
+  #availableUnitsBackdrop .actions{
+    padding:8px 10px !important;
+  }
+}
+</style>
+
+
+
+
+
+<style id="kaman-notas-main-fix">
+@media (max-width:768px){
+  #btnNotesMain{
+    width:48px !important;
+    height:38px !important;
+    min-height:38px !important;
+    padding:0 !important;
+    border-radius:14px !important;
+    font-size:19px !important;
+    line-height:1 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    flex:0 0 48px !important;
+  }
+}
+@media (min-width:769px){
+  #btnNotesMain{
+    width:48px;
+    height:38px;
+    padding:0 !important;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+  }
+}
+</style>
+
+
+<style id="kaman-subir-tablas-modales">
+/* Subir tablas en Clientes, Destinos, Unidades, Notas y Nómina */
+#clientsBackdrop .content,
+#destinationsBackdrop .content,
+#unitsBackdrop .content,
+#notesBackdrop .content,
+#payrollBackdrop .content{
+  padding:8px 10px !important;
+  gap:8px !important;
+  align-content:start !important;
+  justify-content:start !important;
+}
+
+#clientsBackdrop .content > div,
+#destinationsBackdrop .content > div,
+#unitsBackdrop .content > div,
+#notesBackdrop .content > div,
+#payrollBackdrop .content > div{
+  margin-top:0 !important;
+}
+
+/* Primera fila: contador + botón agregar pegados arriba */
+#clientsBackdrop .content > div:first-child,
+#destinationsBackdrop .content > div:first-child,
+#unitsBackdrop .content > div:first-child,
+#notesBackdrop .content > div:first-child,
+#payrollBackdrop .content > div:first-child{
+  margin:0 0 4px 0 !important;
+  padding:0 !important;
+  align-items:center !important;
+}
+
+/* Tablas/listados inmediatamente debajo */
+#clientsBackdrop .content [style*="border:1px"],
+#destinationsBackdrop .content [style*="border:1px"],
+#unitsBackdrop .content [style*="border:1px"],
+#notesBackdrop .content [style*="border:1px"],
+#payrollBackdrop .content [style*="border:1px"]{
+  margin-top:0 !important;
+}
+
+/* Quitar alturas/huecos exagerados */
+#clientsBackdrop .content [style*="max-height"],
+#destinationsBackdrop .content [style*="max-height"],
+#unitsBackdrop .content [style*="max-height"],
+#notesBackdrop .content [style*="max-height"],
+#payrollBackdrop .content [style*="max-height"]{
+  max-height:calc(100vh - 230px) !important;
+}
+
+#clientsBackdrop .hint,
+#destinationsBackdrop .hint,
+#unitsBackdrop .hint,
+#notesBackdrop .hint,
+#payrollBackdrop .hint{
+  margin-top:4px !important;
+  padding:0 !important;
+}
+
+/* Encabezados compactos */
+#clientsBackdrop .modal header,
+#destinationsBackdrop .modal header,
+#unitsBackdrop .modal header,
+#notesBackdrop .modal header,
+#payrollBackdrop .modal header{
+  min-height:50px !important;
+  padding:7px 10px !important;
+}
+
+/* Botones inferiores compactos */
+#clientsBackdrop .actions,
+#destinationsBackdrop .actions,
+#unitsBackdrop .actions,
+#notesBackdrop .actions,
+#payrollBackdrop .actions{
+  padding:8px 10px !important;
+}
+
+/* En móvil, tabla/listado debe iniciar arriba, no a media pantalla */
+@media(max-width:768px){
+  #clientsBackdrop .modal .content,
+  #destinationsBackdrop .modal .content,
+  #unitsBackdrop .modal .content,
+  #notesBackdrop .modal .content,
+  #payrollBackdrop .modal .content{
+    padding-top:8px !important;
+    grid-auto-rows:max-content !important;
+  }
+
+  #clientsBackdrop table th,
+  #clientsBackdrop table td,
+  #destinationsBackdrop table th,
+  #destinationsBackdrop table td,
+  #unitsBackdrop table th,
+  #unitsBackdrop table td,
+  #notesBackdrop table th,
+  #notesBackdrop table td,
+  #payrollBackdrop table th,
+  #payrollBackdrop table td{
+    padding:8px !important;
+  }
+
+  #clientsBackdrop button,
+  #destinationsBackdrop button,
+  #unitsBackdrop button,
+  #notesBackdrop button,
+  #payrollBackdrop button{
+    min-height:40px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-auto-excel-mes-css">
+#btnExportPrevMonthExcel{
+  background:linear-gradient(135deg,#0f766e,#14b8a6) !important;
+  color:#fff !important;
+  border-color:#0f766e !important;
+}
+</style>
+
+
+
+</head>
+<body>
+  <main class="page">
+    <div class="actions">
+      <button onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+      <button class="secondary" onclick="window.close()">Cerrar</button>
+    </div>
+    <div class="header">
+      <div>
+        <h1>Control de Transporte • Historial de citas</h1>
+        <div class="count">${filas.length} cita(s)</div>
+      </div>
+      <div class="meta">Generado:<br>${escapeHTML(fechaGen)}<br>Firebase: conectado</div>
+    </div>
+    ${filas.length ? cards : '<div class="empty">No hay citas para mostrar.</div>'}
+  </main>
+</body>
+</html>`;
+
+    const w = window.open("", "_blank");
+    if(!w){
+      alert("Permite ventanas emergentes para abrir la vista previa.");
+      return;
+    }
+    w.document.open();
+    w.document.write(htmlPreview);
+    w.document.close();
+    setStatus("Vista previa de citas abierta.");
+  }
+
+  const btnPreviewCitas = $("#btnPreviewCitas");
+  if(btnPreviewCitas){
+    btnPreviewCitas.addEventListener("click", abrirVistaPreviaCitas);
+  }
+
+
+
+  function renderHistory(){
+    const body = $("#historyBody");
+    if(!body) return;
+    const list = sortCitasByDateTime(Array.isArray(state.deliveries) ? state.deliveries : []);
+    body.innerHTML = "";
+    const count = $("#historyCount");
+    if(count) count.textContent = `${list.length} entrega${list.length===1?"":"s"}`;
+
+    for(const row of list){
+      const d = row.data || {};
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td style="padding:10px;">${escapeHTML(d[DATE_COL] || "-")}</td>
+        <td style="padding:10px;font-weight:900;">${escapeHTML(d["cliente"] || "-")}</td>
+        <td style="padding:10px;font-weight:900;">${escapeHTML(d["destino"] || "-")}</td>
+        <td style="padding:10px;">${escapeHTML(d["horario de cita"] || "-")}</td>
+        <td style="padding:10px;">${escapeHTML(row.deliveredAtLocal || "-")}</td>
+        <td style="padding:10px;white-space:nowrap;">
+          <button class="mini" data-restore="${escapeHTML(row.id)}">↩️ Regresar</button>
+        </td>
+      `;
+      const btn = tr.querySelector("[data-restore]");
+      btn.addEventListener("click", ()=>{
+        const ok = confirm("¿Regresar esta entrega al listado de citas activas?");
+        if(!ok) return;
+        state.deliveries = state.deliveries.filter(x => x.id !== row.id);
+        row.checked = false;
+        delete row.deliveredAt;
+        delete row.deliveredAtLocal;
+        state.rows.push(row);
+        saveDeliveries();
+        save();
+        renderHistory();
+        render();
+      });
+      body.appendChild(tr);
+    }
+  }
+
+  function openHistory(){
+    renderHistory();
+    const back = $("#historyBackdrop");
+    if(back){ back.style.display = "flex"; back.setAttribute("aria-hidden","false"); }
+  }
+
+  function closeHistory(){
+    const back = $("#historyBackdrop");
+    if(back){ back.style.display = "none"; back.setAttribute("aria-hidden","true"); }
+  }
+
+  const btnOpenHistoryFromConfig = $("#btnOpenHistoryFromConfig");
+  if(btnOpenHistoryFromConfig){
+    btnOpenHistoryFromConfig.addEventListener("click", ()=>{
+      closeConfig();
+      openHistory();
+    });
+  }
+  $("#btnCloseHistory")?.addEventListener("click", closeHistory);
+  $("#btnHistoryDone")?.addEventListener("click", closeHistory);
+  $("#historyBackdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="historyBackdrop") closeHistory(); });
+
+
+
+  function exportHistoryToExcel(){
+    const list = sortCitasByDateTime(Array.isArray(state.deliveries) ? state.deliveries : []);
+    if(!list.length){
+      alert("No hay registros en historial para exportar.");
+      return;
+    }
+
+    const data = list.map((row, idx)=>{
+      const d = row.data || {};
+      return {
+        "No.": idx + 1,
+        "Fecha de cita": d[DATE_COL] || "",
+        "Cliente": d["cliente"] || "",
+        "Destino": d["destino"] || "",
+        "Operador": d[OPERADOR_COL] || "",
+        "Maniobra": d[MANIOBRA_COL] || "",
+        "Unidad": d[UNIT_COL] || "",
+        "Horario de carga": d["horario de carga"] || "",
+        "Horario de cita": d["horario de cita"] || "",
+        "Custodio": d[CUSTODIO_COL] || "",
+        "Observaciones": d["observaciones"] || "",
+        "Entregada el": row.deliveredAtLocal || "",
+        "ID": row.id || ""
+      };
+    });
+
+    try{
+      if(typeof XLSX === "undefined"){
+        alert("No se encontró la librería de Excel. Revisa tu conexión a internet.");
+        return;
+      }
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      const wb = XLSX.utils.book_new();
+
+      ws["!cols"] = [
+        {wch:6},{wch:14},{wch:22},{wch:24},{wch:24},{wch:24},{wch:18},
+        {wch:18},{wch:18},{wch:12},{wch:30},{wch:24},{wch:22}
+      ];
+
+      XLSX.utils.book_append_sheet(wb, ws, "Historial Entregas");
+
+      const hoy = new Date();
+      const y = hoy.getFullYear();
+      const m = String(hoy.getMonth()+1).padStart(2,"0");
+      const d = String(hoy.getDate()).padStart(2,"0");
+      XLSX.writeFile(wb, `historial_entregas_${y}-${m}-${d}.xlsx`);
+      setStatus("Historial exportado a Excel.");
+    }catch(e){
+      console.error(e);
+      alert("No se pudo exportar el historial a Excel.");
+    }
+  }
+
+  const btnExportHistoryExcel = $("#btnExportHistoryExcel");
+  if(btnExportHistoryExcel){
+    btnExportHistoryExcel.addEventListener("click", exportHistoryToExcel);
+  }
+
+
+
+  function citaDateTimeValue(row){
+    const d = row?.data || {};
+    const date = normalize(d[DATE_COL]);
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+    const mins = timeToMinutes(d["horario de cita"]);
+    const hh = Math.floor((mins === 999999 ? 0 : mins) / 60);
+    const mm = (mins === 999999 ? 0 : mins) % 60;
+    const dt = new Date(date + "T00:00:00");
+    dt.setHours(hh, mm, 0, 0);
+    return dt;
+  }
+
+  function unidadEstaDisponible(unitName){
+    const name = normalize(unitName).toLowerCase();
+    if(!name) return { ok:false, reason:"Unidad sin nombre" };
+
+    const now = new Date();
+    const active = (Array.isArray(state.rows) ? state.rows : [])
+      .filter(r => normalize(r.data?.[UNIT_COL]).toLowerCase() === name)
+      .filter(r => !r.checked);
+
+    if(!active.length){
+      return { ok:true, reason:"Sin citas pendientes" };
+    }
+
+    const future = active.filter(r => {
+      const dt = citaDateTimeValue(r);
+      return !dt || dt.getTime() >= now.getTime();
+    });
+
+    if(!future.length){
+      return { ok:true, reason:"Última cita ya pasó" };
+    }
+
+    const next = sortCitasByDateTime(future)[0];
+    const nd = next?.data || {};
+    return { 
+      ok:false, 
+      reason:`Ocupada: ${normalize(nd[DATE_COL]) || "-"} ${normalize(nd["horario de cita"]) || ""} ${normalize(nd["destino"]) || ""}` 
+    };
+  }
+
+  function renderAvailableUnits(){
+    const listEl = $("#availableUnitsList");
+    const countEl = $("#availableUnitsCount");
+    if(!listEl) return;
+
+    const units = (Array.isArray(state.units) ? state.units : [])
+      .slice()
+      .sort((a,b)=>normalize(a.unidad).localeCompare(normalize(b.unidad),"es",{sensitivity:"base"}));
+
+    const today = todayISO();
+    const available = units
+      .filter(u => !unitNoCirculaOn(u, today))
+      .map(u => ({ unit:u, info: unidadEstaDisponible(u.unidad) }))
+      .filter(x => x.info.ok);
+
+
+    if(!available.length){
+      listEl.innerHTML = `<div class="hint" style="padding:12px;border:1px dashed #b7d7f2;border-radius:14px;background:#f7fcff;">
+        No hay unidades disponibles por el momento.
+      </div>`;
+      return;
+    }
+
+    listEl.innerHTML = available.map(({unit, info}) => `
+      <button type="button" class="available-unit-card available-unit-select" data-unit="${escapeHTML(unit.unidad || "")}" type="button">
+        <div class="available-unit-title">🚚 ${escapeHTML(unit.unidad || "-")}</div>
+        <div class="available-unit-badge">Disponible</div>
+        <div class="available-unit-meta">Placas: ${escapeHTML(unit.placas || "-")} · Tonelaje: ${escapeHTML(unit.tonelaje || "-")} · Tarimas: ${escapeHTML(unit.tarimas || "-")}</div>
+        <div class="available-unit-meta">${escapeHTML(info.reason || "")}</div>
+        <div class="available-unit-meta"><strong>Tocar para crear cita con esta unidad</strong></div>
+      </button>
+    `).join("");
+
+    listEl.querySelectorAll(".available-unit-select").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const unitName = btn.getAttribute("data-unit") || "";
+        closeAvailableUnits();
+        openNew();
+        setTimeout(()=>{
+          const unitSelect = document.querySelector('#formGrid [data-col="'+UNIT_COL+'"]');
+          if(unitSelect){
+            unitSelect.value = unitName;
+            unitSelect.dispatchEvent(new Event("change", { bubbles:true }));
+          }
+        }, 80);
+      });
+    });
+  }
+
+  function openAvailableUnits(){
+    renderAvailableUnits();
+    const back = $("#availableUnitsBackdrop");
+    if(back){ back.style.display = "flex"; back.setAttribute("aria-hidden","false"); }
+  }
+
+  function closeAvailableUnits(){
+    const back = $("#availableUnitsBackdrop");
+    if(back){ back.style.display = "none"; back.setAttribute("aria-hidden","true"); }
+  }
+
+  const btnAvailableUnits = $("#btnAvailableUnits");
+  if(btnAvailableUnits){
+    btnAvailableUnits.addEventListener("click", openAvailableUnits);
+  }
+  $("#btnCloseAvailableUnits")?.addEventListener("click", closeAvailableUnits);
+  $("#btnAvailableUnitsDone")?.addEventListener("click", closeAvailableUnits);
+  $("#availableUnitsBackdrop")?.addEventListener("click", (e)=>{ if(e.target.id==="availableUnitsBackdrop") closeAvailableUnits(); });
+
+
+
+  const btnNotesMain = $("#btnNotesMain");
+
+
+  function getPreviousMonthInfo(){
+    const now = new Date();
+    const firstThisMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const prev = new Date(firstThisMonth);
+    prev.setMonth(prev.getMonth() - 1);
+    const y = prev.getFullYear();
+    const m = String(prev.getMonth() + 1).padStart(2, "0");
+    const label = prev.toLocaleDateString("es-MX", { month:"long", year:"numeric" });
+    return { y, m, prefix:`${y}-${m}`, label };
+  }
+
+  function exportHistorialMesAnteriorAutomatico(force=false){
+    try{
+      if(typeof XLSX === "undefined") return;
+
+      const now = new Date();
+      // Automático solamente el día 1 de cada mes al abrir la app.
+      if(!force && now.getDate() !== 1) return;
+
+      const info = getPreviousMonthInfo();
+      const key = `historial_excel_auto_${info.prefix}`;
+
+      if(!force && localStorage.getItem(key) === "1") return;
+
+      const list = sortCitasByDateTime(Array.isArray(state.deliveries) ? state.deliveries : [])
+        .filter(row => normalize(row.data?.[DATE_COL]).startsWith(info.prefix));
+
+      if(!list.length){
+        if(!force) localStorage.setItem(key, "1");
+        return;
+      }
+
+      const data = list.map((row, idx)=>{
+        const d = row.data || {};
+        return {
+          "No.": idx + 1,
+          "Mes": info.label,
+          "Fecha de cita": d[DATE_COL] || "",
+          "Cliente": d["cliente"] || "",
+          "Destino": d["destino"] || "",
+          "Operador": d[OPERADOR_COL] || "",
+          "Maniobra": d[MANIOBRA_COL] || "",
+          "Unidad": d[UNIT_COL] || "",
+          "Horario de carga": d["horario de carga"] || "",
+          "Horario de cita": d["horario de cita"] || "",
+          "Custodio": d[CUSTODIO_COL] || "",
+          "Observaciones": d["observaciones"] || "",
+          "Entregada el": row.deliveredAtLocal || "",
+          "ID": row.id || ""
+        };
+      });
+
+      const ws = XLSX.utils.json_to_sheet(data);
+      ws["!cols"] = [
+        {wch:6},{wch:18},{wch:14},{wch:22},{wch:24},{wch:24},{wch:24},
+        {wch:18},{wch:18},{wch:18},{wch:12},{wch:30},{wch:24},{wch:24}
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Historial mes anterior");
+      XLSX.writeFile(wb, `historial_citas_${info.prefix}.xlsx`);
+
+      localStorage.setItem(key, "1");
+      setStatus(`Historial de ${info.label} descargado en Excel.`);
+    }catch(e){
+      console.warn("No se pudo descargar historial mensual automático:", e);
+    }
+  }
+
+  // Al iniciar la app, si es día 1, descarga una sola vez el historial del mes anterior.
+  setTimeout(()=>exportHistorialMesAnteriorAutomatico(false), 2500);
+
+
+
+  const btnExportPrevMonthExcel = $("#btnExportPrevMonthExcel");
+  if(btnExportPrevMonthExcel){
+    btnExportPrevMonthExcel.addEventListener("click", ()=>exportHistorialMesAnteriorAutomatico(true));
+  }
+
+
+  async function resetTotalSistema(){
+    const pass = prompt("Contraseña para RESET TOTAL:");
+    if(pass !== "janeth"){
+      alert("❌ Contraseña incorrecta.");
+      return;
+    }
+
+    const ok = confirm("⚠️ RESET TOTAL eliminará TODO: citas, historial, unidades, clientes, destinos, nómina, notas y configuración, también en Firebase. ¿Confirmas continuar?");
+    if(!ok) return;
+
+    try{
+      await withProcessing("Reset total…", "Limpiando todo el sistema y confirmando Firebase.", async ()=>{
+      state.rows = [];
+      state.units = [];
+      state.workers = [];
+      state.payroll = [];
+      state.notes = [];
+      state.clients = [];
+      state.destinations = [];
+      state.deliveries = [];
+
+      Object.keys(localStorage).forEach(k=>{
+        if(k.startsWith("control_transporte_") || k.startsWith("historial_excel_auto_")){
+          localStorage.removeItem(k);
+        }
+      });
+
+      if(citasFirebaseReady()){
+        setFirebaseSignal("syncing", "Limpiando Firebase...");
+
+        const base = FIREBASE_DB_URL.replace(/\/$/, "");
+        const results = await Promise.all([
+          fetch(`${base}/citas.json`, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" }),
+          fetch(`${base}/configuracion.json`, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" })
+        ]);
+        if(results.some(r => !r.ok)) throw new Error("Firebase no confirmó el reset total");
+
+        setFirebaseSignal("online", "Firebase conectado");
+      }
+
+      render();
+      if(typeof renderHistory === "function") renderHistory();
+      if(typeof renderAvailableUnits === "function") renderAvailableUnits();
+      if(typeof renderUnits === "function") renderUnits();
+      if(typeof renderClients === "function") renderClients();
+      if(typeof renderDestinations === "function") renderDestinations();
+      if(typeof renderPayroll === "function") renderPayroll();
+      if(typeof renderNotes === "function") renderNotes();
+
+      setStatus("Reset total realizado.");
+      });
+      alert("✅ Reset total realizado. El sistema quedó limpio.");
+      setTimeout(()=>actualizarAppDesdeFirebase(true), 600);
+    }catch(e){
+      console.error("Error en reset total:", e);
+      alert("⚠️ Ocurrió un error al limpiar Firebase. Revisa conexión y reglas.");
+      setStatus("Error en reset total.");
+    }
+  }
+
+  const btnResetTotalConfig = $("#btnResetTotalConfig");
+
+
+
+  // Refuerzo de eventos: evita tener que presionar dos veces y previene dobles ejecuciones
+  const __actionLocks = {};
+  async function runOnceAction(key, fn, delay=900){
+    if(__actionLocks[key]) return;
+    __actionLocks[key] = true;
+    try{
+      await Promise.resolve(fn());
+    }finally{
+      setTimeout(()=>{ __actionLocks[key] = false; }, delay);
+    }
+  }
+
+  document.addEventListener("click", (e)=>{
+    const target = e.target.closest("button");
+    if(!target) return;
+
+    if(target.id === "btnResetTotalConfig"){
+      e.preventDefault();
+      e.stopPropagation();
+      runOnceAction("resetTotal", resetTotalSistema, 1200);
+    }
+
+    if(target.id === "btnDeleteAllCitasConfig"){
+      e.preventDefault();
+      e.stopPropagation();
+      runOnceAction("deleteAllCitas", eliminarTodasLasCitasConPassword, 1200);
+    }
+
+    if(target.id === "btnExportHistoryExcel"){
+      e.preventDefault();
+      e.stopPropagation();
+      runOnceAction("exportHistory", exportHistoryToExcel, 1000);
+    }
+
+    if(target.id === "btnExportPrevMonthExcel"){
+      e.preventDefault();
+      e.stopPropagation();
+      runOnceAction("exportPrevMonth", ()=>exportHistorialMesAnteriorAutomatico(true), 1000);
+    }
+
+    if(target.id === "btnNotesMain"){
+      e.preventDefault();
+      e.stopPropagation();
+      runOnceAction("notesMain", openNotes, 500);
+    }
+
+    if(target.id === "btnAvailableUnits"){
+      e.preventDefault();
+      e.stopPropagation();
+      runOnceAction("availableUnits", openAvailableUnits, 500);
+    }
+
+    if(target.id === "btnPreviewCitas"){
+      e.preventDefault();
+      e.stopPropagation();
+      runOnceAction("previewCitas", abrirVistaPreviaCitas, 800);
+    }
+  }, true);
 
 
   makeHeader();
