@@ -558,6 +558,58 @@ tbody tr:hover td{ background:#eef8ff !important; }
   }
 }
 
+
+/* ===== Ajustes compactos profesionales ===== */
+.firebase-signal{
+  padding:5px 8px !important;
+  gap:6px !important;
+  width:max-content !important;
+}
+.firebase-signal .signal-text{ display:none !important; }
+.firebase-signal .antenna{ font-size:15px !important; }
+.firebase-signal .signal-dot{ width:10px !important; height:10px !important; }
+
+@media (max-width:768px){
+  header{
+    padding:10px 12px !important;
+    gap:8px !important;
+    margin-bottom:8px !important;
+  }
+  h1{ font-size:19px !important; line-height:1.18 !important; }
+  .title{ gap:5px !important; }
+  .toolbar{ grid-template-columns:1fr !important; gap:7px !important; }
+  #btnNew{
+    min-height:44px !important;
+    height:44px !important;
+    padding:8px 10px !important;
+    font-size:14px !important;
+    border-radius:15px !important;
+  }
+  #btnConfig{
+    min-height:40px !important;
+    height:40px !important;
+    padding:7px 10px !important;
+    font-size:13px !important;
+    border-radius:14px !important;
+  }
+  .card{ margin-top:8px !important; }
+  .toprow{ padding:8px !important; gap:8px !important; }
+  .pill{ padding:6px 9px !important; font-size:11px !important; }
+  .search input{ font-size:14px !important; }
+  .search{ padding:7px 9px !important; border-radius:13px !important; }
+  .clear-filter-btn{ min-height:40px !important; padding:8px 10px !important; }
+  .mobile-cards{ max-height: calc(100vh - 165px) !important; }
+}
+
+
+/* Botón de eliminación total en configuración */
+#btnDeleteAllCitasConfig{
+  grid-column: 1 / -1;
+  background:#fff1f4 !important;
+  color:#a70f31 !important;
+  border-color:#f3a9ba !important;
+}
+
 </style>
 </head>
 <body>
@@ -568,14 +620,15 @@ tbody tr:hover td{ background:#eef8ff !important; }
         <div id="firebaseSignal" class="firebase-signal firebase-pending" title="Firebase: verificando conexión">
           <span class="antenna" aria-hidden="true">📡</span>
           <span class="signal-dot" aria-hidden="true"></span>
-          <span class="signal-text">Firebase verificando...</span>
+          <span class="signal-text" aria-hidden="true"></span>
         </div>
       </div>
       <div class="toolbar">
         <button class="primary" id="btnNew">➕ Nueva cita</button>
         <button id="btnConfig">⚙️ Configuración</button>
-        <button id="btnNotes">📝 Notas</button>
-        <button id="btnExportPDF">📄 PDF</button>
+
+        <button id="btnNotes" style="display:none" aria-hidden="true" tabindex="-1">📝 Notas</button>
+        <button id="btnExportPDF" style="display:none" aria-hidden="true" tabindex="-1">📄 PDF</button>
       </div>
     </header>
 
@@ -740,29 +793,20 @@ tbody tr:hover td{ background:#eef8ff !important; }
       </header>
 
       <div class="content" style="grid-template-columns: 1fr; gap: 12px;">
-        <div class="hint" style="padding:0;">Administra catálogos para que aparezcan en “Nueva cita”.</div>
+        <div class="hint" style="padding:0;">Administra catálogos para que aparezcan en “Nueva cita”. Los catálogos se sincronizan con Firebase para usarlos en otros dispositivos.</div>
 
         <div style="display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:12px;">
           <button class="primary" id="btnOpenUnitsFromConfig">🚚 Unidades</button>
           <button class="primary" id="btnOpenPayrollFromConfig">💵 Nómina</button>
           <button class="primary" id="btnOpenClientsFromConfig">👥 Clientes</button>
           <button class="primary" id="btnOpenDestinationsFromConfig">📍 Destinos</button>
+          <button class="primary" id="btnNotesFromConfig">📝 Notas</button>
+          <button class="primary" id="btnPDFfromConfig">📄 PDF</button>
+          <button class="danger" id="btnDeleteAllCitasConfig">🗑️ Eliminar todas las citas</button>
         </div>
 
         <div class="hint" style="padding:0;">
           Tip: agrega clientes/destinos aquí para que salgan como opciones en filtros y al crear citas.
-<hr style="margin:12px 0;border:0;border-top:1px solid #c5e0f6;">
-<div style="padding:10px;border:1px solid #c5e0f6;border-radius:12px;background:#f4fbff;">
-  <div style="font-weight:900;margin-bottom:8px;">🌐 Enlace público</div>
-  <input id="publicLinkInput" type="text" readonly
-    value="https://janethzarate86-ux.github.io/Citas-Transporte-Kaman/"
-    style="width:100%;padding:10px;border:1px solid #aacfeb;border-radius:10px;">
-  <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap;">
-    <button class="primary" id="btnCopyPublicLink">📋 Copiar enlace</button>
-    <button id="btnOpenPublicLink">🔗 Abrir sitio</button>
-  </div>
-</div>
-
         </div>
       </div>
 
@@ -1128,6 +1172,8 @@ tbody tr:hover td{ background:#eef8ff !important; }
   const FIREBASE_DB_URL = "https://controltransportekaman-default-rtdb.firebaseio.com";
   const FIREBASE_CITAS_PATH = "citas";
   const FIREBASE_CITAS_ENDPOINT = `${FIREBASE_DB_URL.replace(/\/$/, "")}/${FIREBASE_CITAS_PATH}.json`;
+  const FIREBASE_CONFIG_PATH = "configuracion";
+  const FIREBASE_CONFIG_ENDPOINT = `${FIREBASE_DB_URL.replace(/\/$/, "")}/${FIREBASE_CONFIG_PATH}.json`;
 
   const UNITS_KEY   = "control_transporte_unidades_v1";
   const WORKERS_KEY = "control_transporte_trabajadores_v1";
@@ -1247,7 +1293,9 @@ tbody tr:hover td{ background:#eef8ff !important; }
     try{ const raw = localStorage.getItem(DESTS_KEY); if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)) state.destinations=p; } }catch(e){}
   }
   let firebaseLoadingCitas = false;
+  let firebaseLoadingConfig = false;
   let firebaseSaveTimer = null;
+  let firebaseConfigSaveTimer = null;
 
   function citasFirebaseReady(){
     return /^https:\/\/.+\.firebasedatabase\.app|^https:\/\/.+\.firebaseio\.com/.test(FIREBASE_DB_URL);
@@ -1341,17 +1389,114 @@ tbody tr:hover td{ background:#eef8ff !important; }
     firebaseSaveTimer = setTimeout(()=>pushCitasToFirebase(false), 350);
   }
 
+
+  function configPayload(){
+    return {
+      units: Array.isArray(state.units) ? state.units : [],
+      workers: Array.isArray(state.workers) ? state.workers : [],
+      payroll: Array.isArray(state.payroll) ? state.payroll : [],
+      notes: Array.isArray(state.notes) ? state.notes : [],
+      clients: Array.isArray(state.clients) ? state.clients : [],
+      destinations: Array.isArray(state.destinations) ? state.destinations : [],
+      updatedAt: new Date().toISOString()
+    };
+  }
+
+  function applyRemoteConfig(cfg){
+    if(!cfg || typeof cfg !== "object") return false;
+
+    const arrays = ["units","workers","payroll","notes","clients","destinations"];
+    let hasData = false;
+    for(const key of arrays){
+      if(Array.isArray(cfg[key]) && cfg[key].length){
+        hasData = true;
+        break;
+      }
+    }
+    if(!hasData) return false;
+
+    state.units = Array.isArray(cfg.units) ? cfg.units : [];
+    state.workers = Array.isArray(cfg.workers) ? cfg.workers : [];
+    state.payroll = Array.isArray(cfg.payroll) ? cfg.payroll : [];
+    state.notes = Array.isArray(cfg.notes) ? cfg.notes : [];
+    state.clients = Array.isArray(cfg.clients) ? cfg.clients : [];
+    state.destinations = Array.isArray(cfg.destinations) ? cfg.destinations : [];
+
+    localStorage.setItem(UNITS_KEY, JSON.stringify(state.units));
+    localStorage.setItem(WORKERS_KEY, JSON.stringify(state.workers));
+    localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
+    localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes));
+    localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients));
+    localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations));
+
+    render();
+    if(typeof renderClients === "function") renderClients();
+    if(typeof renderDestinations === "function") renderDestinations();
+    if(typeof renderUnits === "function") renderUnits();
+    if(typeof renderPayroll === "function") renderPayroll();
+    if(typeof renderNotes === "function") renderNotes();
+
+    return true;
+  }
+
+  async function loadConfigFromFirebase(){
+    if(!citasFirebaseReady()) return;
+    firebaseLoadingConfig = true;
+    try{
+      const res = await fetch(FIREBASE_CONFIG_ENDPOINT, { method:"GET", cache:"no-store" });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      const cfg = await res.json();
+      const applied = applyRemoteConfig(cfg);
+
+      if(applied){
+        setStatus("Configuración cargada desde Firebase.");
+      } else if(
+        state.units.length || state.workers.length || state.payroll.length ||
+        state.notes.length || state.clients.length || state.destinations.length
+      ){
+        await pushConfigToFirebase(true);
+      }
+    }catch(e){
+      console.warn("Configuración Firebase no disponible:", e);
+    }finally{
+      firebaseLoadingConfig = false;
+    }
+  }
+
+  async function pushConfigToFirebase(silent=false){
+    if(!citasFirebaseReady() || firebaseLoadingConfig) return;
+    try{
+      const res = await fetch(FIREBASE_CONFIG_ENDPOINT, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(configPayload())
+      });
+      if(!res.ok) throw new Error("HTTP " + res.status);
+      if(!silent) setStatus("Configuración guardada en Firebase.");
+    }catch(e){
+      console.warn("No se pudo guardar configuración en Firebase:", e);
+      if(!silent) setStatus("Configuración guardada local. Firebase pendiente.");
+    }
+  }
+
+  function scheduleConfigFirebaseSave(){
+    if(firebaseLoadingConfig) return;
+    clearTimeout(firebaseConfigSaveTimer);
+    firebaseConfigSaveTimer = setTimeout(()=>pushConfigToFirebase(false), 350);
+  }
+
+
   function save(){
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
     setStatus("Guardado local.");
     scheduleFirebaseSave();
   }
-  function saveUnits(){ localStorage.setItem(UNITS_KEY, JSON.stringify(state.units)); setStatus("Unidades guardadas."); }
-  function saveWorkers(){ localStorage.setItem(WORKERS_KEY, JSON.stringify(state.workers)); setStatus("Trabajadores guardados."); }
-  function savePayroll(){ localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll)); setStatus("Nómina guardada."); }
-  function saveNotes(){ localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes)); setStatus("Notas guardadas."); }
-  function saveClients(){ localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients)); setStatus("Clientes guardados."); }
-  function saveDestinations(){ localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations)); setStatus("Destinos guardados."); }
+  function saveUnits(){ localStorage.setItem(UNITS_KEY, JSON.stringify(state.units)); setStatus("Unidades guardadas."); scheduleConfigFirebaseSave(); }
+  function saveWorkers(){ localStorage.setItem(WORKERS_KEY, JSON.stringify(state.workers)); setStatus("Trabajadores guardados."); scheduleConfigFirebaseSave(); }
+  function savePayroll(){ localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll)); setStatus("Nómina guardada."); scheduleConfigFirebaseSave(); }
+  function saveNotes(){ localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes)); setStatus("Notas guardadas."); scheduleConfigFirebaseSave(); }
+  function saveClients(){ localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients)); setStatus("Clientes guardados."); scheduleConfigFirebaseSave(); }
+  function saveDestinations(){ localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations)); setStatus("Destinos guardados."); scheduleConfigFirebaseSave(); }
 
   function parseNoCirculaDays(value){
     if(Array.isArray(value)) return value.map(v=>normalize(v).toUpperCase()).filter(Boolean);
@@ -2914,12 +3059,70 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 
 
   // Init
+
+  // Accesos compactos desde Configuración
+  const btnNotesFromConfig = $("#btnNotesFromConfig");
+  if(btnNotesFromConfig){
+    btnNotesFromConfig.addEventListener("click", () => {
+      closeConfig();
+      openNotes();
+    });
+  }
+
+  const btnPDFfromConfig = $("#btnPDFfromConfig");
+  if(btnPDFfromConfig){
+    btnPDFfromConfig.addEventListener("click", () => {
+      closeConfig();
+      const pdfButton = $("#btnExportPDF");
+      if(pdfButton) pdfButton.click();
+    });
+  }
+
+
+  async function eliminarTodasLasCitasConPassword(){
+    const pass = prompt("Contraseña para eliminar todas las citas:");
+    if(pass !== "janeth"){
+      alert("❌ Contraseña incorrecta.");
+      return;
+    }
+
+    const ok = confirm("⚠️ Esta acción eliminará TODAS las citas registradas también en Firebase. ¿Deseas continuar?");
+    if(!ok) return;
+
+    try{
+      state.rows = [];
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+      render();
+
+      if(citasFirebaseReady()){
+        setFirebaseSignal("syncing", "Eliminando citas...");
+        const res = await fetch(FIREBASE_CITAS_ENDPOINT, { method: "DELETE" });
+        if(!res.ok) throw new Error("HTTP " + res.status);
+        setFirebaseSignal("online", "Firebase conectado");
+      }
+
+      setStatus("Todas las citas fueron eliminadas.");
+      alert("✅ Todas las citas fueron eliminadas.");
+    }catch(e){
+      console.warn("No se pudieron eliminar citas en Firebase:", e);
+      setFirebaseSignal("offline", "Firebase pendiente");
+      alert("⚠️ Se eliminaron localmente, pero no se pudo confirmar el borrado en Firebase.");
+    }
+  }
+
+  const btnDeleteAllCitasConfig = $("#btnDeleteAllCitasConfig");
+  if(btnDeleteAllCitasConfig){
+    btnDeleteAllCitasConfig.addEventListener("click", eliminarTodasLasCitasConPassword);
+  }
+
+
   makeHeader();
   setupMobileMenuAutoHide();
   setFirebaseSignal("pending", "Firebase verificando...");
   load();
   render();
   loadCitasFromFirebase();
+  loadConfigFromFirebase();
 
   // Voz requiere gesto
   let ran = false;
@@ -2957,25 +3160,3 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 
 </body>
 </html>
-
-<script>
-document.addEventListener("click",function(e){
-  if(e.target && e.target.id==="btnCopyPublicLink"){
-    const url="https://janethzarate86-ux.github.io/Citas-Transporte-Kaman/";
-    navigator.clipboard.writeText(url).then(()=>{
-      alert("✅ Enlace copiado al portapapeles");
-    }).catch(()=>{
-      const t=document.createElement("textarea");
-      t.value=url;
-      document.body.appendChild(t);
-      t.select();
-      document.execCommand("copy");
-      document.body.removeChild(t);
-      alert("✅ Enlace copiado al portapapeles");
-    });
-  }
-  if(e.target && e.target.id==="btnOpenPublicLink"){
-    window.open("https://janethzarate86-ux.github.io/Citas-Transporte-Kaman/","_blank");
-  }
-});
-</script>
