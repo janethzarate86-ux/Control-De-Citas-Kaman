@@ -1412,6 +1412,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
           <button class="primary" id="btnOpenDestinationsFromConfig">📍 Destinos</button>
           <button class="primary" id="btnPDFfromConfig">📄 PDF</button>
           <button class="primary" id="btnOpenHistoryFromConfig">📚 Historial</button>
+          <button class="primary" id="btnShowURLConfig">🔗 URL</button>
           <button type="button" class="danger" id="btnDeleteAllCitasConfig">🗑️ Eliminar todas las citas</button>
           <button type="button" class="danger" id="btnResetTotalConfig">🧨 Reset total</button>
         </div>
@@ -1636,6 +1637,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
               <thead>
                 <tr>
                   <th style="padding:10px; text-align:left;">NOMBRE</th><th style="padding:10px; text-align:left;">SEGURO SOCIAL</th>
+                  <th style="padding:10px; text-align:left;">SUELDO</th>
                   <th style="padding:10px; text-align:left;">TOTAL</th>
                   <th style="padding:10px; text-align:left;">ACCIONES</th>
                 </tr>
@@ -2339,6 +2341,32 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       .sort((a,b)=>normalize(a.nombre).localeCompare(normalize(b.nombre), "es", {sensitivity:"base"}));
   }
   function getWorkerById(id){ return state.workers.find(w => w.id === id); }
+  function getWorkerByName(name){
+    const key = normalize(name).toLowerCase();
+    if(!key) return null;
+    return state.workers.find(w => normalize(w.nombre).toLowerCase() === key) || null;
+  }
+  function workerSalary(worker){ return Number(worker?.sueldo || 0) || 0; }
+  function citaWorkerNames(data){
+    const names = [];
+    const op = normalize(data?.[OPERADOR_COL]);
+    if(op) names.push(op);
+    normalize(data?.[MANIOBRA_COL]).split(',').map(x=>normalize(x)).filter(Boolean).forEach(n=>names.push(n));
+    return Array.from(new Set(names.map(n=>normalize(n)).filter(Boolean)));
+  }
+  function syncPayrollForCita(row){
+    if(!row || !row.id) return;
+    const fecha = normalize(row.data?.[DATE_COL]) || todayISO();
+    state.payroll = state.payroll.filter(p => p.citaId !== row.id);
+    for(const name of citaWorkerNames(row.data)){
+      const w = getWorkerByName(name);
+      if(!w) continue;
+      const sueldo = workerSalary(w);
+      if(sueldo <= 0) continue;
+      state.payroll.unshift({ id: uid(), workerId: w.id, fecha, monto: sueldo, citaId: row.id, origen: "CITA" });
+    }
+    savePayroll();
+  }
 
   function noteStatus(note){
     if(note.done) return "Hecha";
@@ -2967,10 +2995,12 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
     if(state.editingId){
       const row = state.rows.find(r=>r.id===state.editingId);
-      if(row) row.data=data;
+      if(row){ row.data=data; syncPayrollForCita(row); }
       setStatus("Cita actualizada.");
     } else {
-      state.rows.unshift({ id: uid(), checked:false, createdAt:new Date().toISOString(), data });
+      const newRow = { id: uid(), checked:false, createdAt:new Date().toISOString(), data };
+      state.rows.unshift(newRow);
+      syncPayrollForCita(newRow);
       setStatus("Cita agregada.");
     }
     save();
@@ -2983,6 +3013,8 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     if(!confirm("¿Eliminar esta cita?")) return;
     await withProcessing("Eliminando cita…", "Actualizando Firebase. Espera a que termine el proceso.", async ()=>{
       state.rows = state.rows.filter(r=>r.id!==id);
+      state.payroll = state.payroll.filter(p => p.citaId !== id);
+      savePayroll();
       save();
       render();
       await syncCitasNow(true);
@@ -3022,7 +3054,8 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
     const trabajadores = state.workers.map(w => ({
       "NOMBRE": normalize(w.nombre),
-      "SEGURO_SOCIAL": normalize(w.nss)
+      "SEGURO_SOCIAL": normalize(w.nss),
+      "SUELDO": Number(w.sueldo || 0) || 0
     }));
 
     const nomina = state.payroll.map(p => {
@@ -3032,7 +3065,9 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         "NOMBRE": normalize(w?.nombre),
         "TIPO": "",
         "SEGURO_SOCIAL": normalize(w?.nss),
-        "MONTO": Number(p.monto || 0) || 0
+        "MONTO": Number(p.monto || 0) || 0,
+        "ORIGEN": normalize(p.origen),
+        "CITA_ID": normalize(p.citaId)
       };
     });
 
@@ -3112,8 +3147,9 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
           mappedWorkers = wJson.map(r => ({
             id: uid(),
             nombre: normalize(r["NOMBRE"] ?? r["nombre"]).toUpperCase(),
-            nss: normalize(r["SEGURO_SOCIAL"] ?? r["seguro_social"] ?? r["nss"])
-          })).filter(w => normalize(w.nombre) && (normalize(w.tipo || "")==="OPERADOR" || normalize(w.tipo || "")==="MANIOBRA"));
+            nss: normalize(r["SEGURO_SOCIAL"] ?? r["seguro_social"] ?? r["nss"]),
+            sueldo: Number(r["SUELDO"] ?? r["sueldo"] ?? 0) || 0
+          })).filter(w => normalize(w.nombre));
         }
 
         let mappedPayroll = null;
@@ -3124,7 +3160,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
           mappedPayroll = pJson.map(r => {
             const nombre = normalize(r["NOMBRE"] ?? r["nombre"]).toUpperCase();
             const wid = mapByName.get(normalize(nombre).toLowerCase()) || null;
-            return { id: uid(), workerId: wid, fecha: normalize(r["FECHA"] ?? r["fecha"]), monto: Number(r["MONTO"] ?? r["monto"] ?? 0) || 0 };
+            return { id: uid(), workerId: wid, fecha: normalize(r["FECHA"] ?? r["fecha"]), monto: Number(r["MONTO"] ?? r["monto"] ?? 0) || 0, origen: normalize(r["ORIGEN"] ?? r["origen"]), citaId: normalize(r["CITA_ID"] ?? r["cita_id"]) };
           }).filter(p => p.workerId);
         }
 
@@ -3448,9 +3484,11 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     const g = $("#workerFormGrid");
     const nombre = normalize(initial.nombre);
 const nss = normalize(initial.nss);
+    const sueldo = normalize(initial.sueldo);
     g.innerHTML = `
       <div class="field"><label>NOMBRE</label><input id="w_nombre" placeholder="Ej. CESAR" value="${nombre.replaceAll('"',"&quot;")}" /></div>
 <div class="field"><label>SEGURO SOCIAL</label><input id="w_nss" placeholder="NSS" value="${nss.replaceAll('"',"&quot;")}" /></div>
+<div class="field"><label>SUELDO POR CITA / DÍA</label><input id="w_sueldo" type="number" step="0.01" min="0" placeholder="0.00" value="${sueldo.replaceAll('"',"&quot;")}" /></div>
     `;
 $("#w_nombre")?.focus();
   }
@@ -3461,14 +3499,15 @@ $("#w_nombre")?.focus();
   function saveWorkerFromForm(){
     const nombre = normalize($("#w_nombre").value).toUpperCase();
     const nss = normalize($("#w_nss").value);
+    const sueldo = Number($("#w_sueldo")?.value || 0) || 0;
 
     if(!nombre){ alert("Nombre obligatorio."); return; }
 if(state.editingWorkerId){
       const w = state.workers.find(x=>x.id===state.editingWorkerId);
-      if(w){ w.nombre=nombre; w.nss=nss; }
+      if(w){ w.nombre=nombre; w.nss=nss; w.sueldo=sueldo; }
       setStatus("Trabajador actualizado.");
     } else {
-      state.workers.unshift({ id: uid(), nombre, nss });
+      state.workers.unshift({ id: uid(), nombre, nss, sueldo });
       setStatus("Trabajador agregado.");
     }
     saveWorkers();
@@ -3518,6 +3557,12 @@ if(state.editingWorkerId){
       <div class="hint" style="padding:0; margin:0;">El seguro social lo toma del trabajador.</div>
     `;
     $("#p_worker").value = workerId || "";
+    const workerSel = $("#p_worker");
+    workerSel?.addEventListener("change", ()=>{
+      const w = getWorkerById(workerSel.value);
+      const current = Number($("#p_monto")?.value || 0) || 0;
+      if(w && current <= 0) $("#p_monto").value = workerSalary(w).toFixed(2);
+    });
     $("#p_worker")?.focus();
   }
 
@@ -3569,6 +3614,7 @@ if(state.editingWorkerId){
       tr.innerHTML = `
         <td style="padding:10px; font-weight:900;">${normalize(w.nombre)}</td>
         <td style="padding:10px;">${normalize(w.nss)}</td>
+        <td style="padding:10px; font-weight:900;">$${workerSalary(w).toFixed(2)}</td>
         <td style="padding:10px; font-weight:900;">$${total.toFixed(2)}</td>
         <td style="padding:10px; white-space:nowrap;">
           <button class="mini" data-act="e">✏️</button>
@@ -3588,7 +3634,7 @@ if(state.editingWorkerId){
       tr.innerHTML = `
         <td style="padding:10px;">${normalize(p.fecha)}</td>
         <td style="padding:10px; font-weight:900;">${normalize(w?.nombre)}</td>
-<td style="padding:10px; font-weight:900;">$${(Number(p.monto||0)||0).toFixed(2)}</td>
+<td style="padding:10px; font-weight:900;">$${(Number(p.monto||0)||0).toFixed(2)}${p.origen === "CITA" ? " · CITA" : ""}</td>
         <td style="padding:10px; white-space:nowrap;">
           <button class="mini" data-act="e">✏️</button>
           <button class="mini danger" data-act="d">🗑️</button>
@@ -4157,6 +4203,21 @@ if(state.editingWorkerId){
   $("#btnNew")?.addEventListener("click", openNew);
   $("#btnCloseModal")?.addEventListener("click", closeModal);
   $("#btnCancel")?.addEventListener("click", closeModal);
+
+  const PUBLIC_APP_URL = "https://janethzarate86-ux.github.io/Control-De-Citas-Kaman/";
+  async function showPublicURL(){
+    const msg = `URL del sistema:\n\n${PUBLIC_APP_URL}\n\nPresiona Aceptar para copiarla.`;
+    if(confirm(msg)){
+      try{
+        await navigator.clipboard.writeText(PUBLIC_APP_URL);
+        setStatus("URL copiada al portapapeles.");
+        alert("✅ URL copiada.");
+      }catch(e){
+        prompt("Copia esta URL:", PUBLIC_APP_URL);
+      }
+    }
+  }
+
   $("#btnSave")?.addEventListener("click", upsertRow);
   $("#btnClearFilters")?.addEventListener("click", clearFilters);
   $("#btnExportPDF")?.addEventListener("click", exportPDF);
@@ -4170,6 +4231,8 @@ $("#btnUnitsDone")?.addEventListener("click", closeUnits);
   $("#btnCloseUnitForm")?.addEventListener("click", closeUnitForm);
 
   // Nómina
+$("#btnShowURLConfig")?.addEventListener("click", showPublicURL);
+
 $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   $("#btnClosePayroll")?.addEventListener("click", closePayroll);
   $("#btnAddWorker")?.addEventListener("click", openAddWorker);
