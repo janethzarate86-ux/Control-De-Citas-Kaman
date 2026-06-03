@@ -3071,7 +3071,6 @@ button:active{
     if(typeof renderClients === "function") renderClients();
     if(typeof renderDestinations === "function") renderDestinations();
     if(typeof renderUnits === "function") renderUnits();
-    if(typeof cleanOrphanCitaPayroll === "function") cleanOrphanCitaPayroll();
     if(typeof renderPayroll === "function") renderPayroll();
     if(typeof renderNotes === "function") renderNotes();
 
@@ -3545,8 +3544,15 @@ button:active{
   }
 
   function resyncPayrollFromActiveCitas(){
-    const manual = state.payroll.filter(p => normalize(p.origen) !== "CITA" && !normalize(p.citaId));
-    state.payroll = manual;
+    // Recalcula únicamente las citas activas.
+    // Los registros de nómina de citas finalizadas en historial NO se borran,
+    // porque sirven para conservar el acumulado real de pagos por trabajador.
+    const activeIds = new Set((Array.isArray(state.rows) ? state.rows : []).map(r => normalize(r.id)).filter(Boolean));
+    state.payroll = state.payroll.filter(p => {
+      const isCita = normalize(p.origen) === "CITA" || !!normalize(p.citaId);
+      if(!isCita) return true;
+      return !activeIds.has(normalize(p.citaId));
+    });
     for(const row of state.rows){
       if(row && !row.checked) syncPayrollForCita(row);
     }
@@ -3554,17 +3560,10 @@ button:active{
   }
 
   function cleanOrphanCitaPayroll(){
-    const activeIds = new Set((Array.isArray(state.rows) ? state.rows : []).map(r => normalize(r.id)).filter(Boolean));
-    const before = state.payroll.length;
-    state.payroll = state.payroll.filter(p => {
-      const isCita = normalize(p.origen) === "CITA" || !!normalize(p.citaId);
-      if(!isCita) return true;
-      return activeIds.has(normalize(p.citaId));
-    });
-    if(state.payroll.length !== before){
-      localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
-      scheduleConfigFirebaseSave();
-    }
+    // Antes se eliminaban registros cuyo citaId ya no estaba activo.
+    // Eso borraba pagos cuando una cita pasaba a historial.
+    // Se deja como no-op para preservar el acumulado de días laborados.
+    return 0;
   }
 
   function citaFirma(row){
@@ -3729,13 +3728,126 @@ button:active{
     return h * 60 + min;
   }
 
+  function citaDateSortValue(value){
+    const s = normalize(value);
+    if(!s) return "9999-99-99";
+
+    // Acepta fechas guardadas como AAAA-MM-DD o DD/MM/AAAA.
+    let m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if(m) return `${m[1]}-${String(m[2]).padStart(2,"0")}-${String(m[3]).padStart(2,"0")}`;
+
+    m = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if(m) return `${m[3]}-${String(m[2]).padStart(2,"0")}-${String(m[1]).padStart(2,"0")}`;
+
+    return s;
+  }
+
+  function todaySortValue(){
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  }
+
+  function nowMinutes(){
+    const d = new Date();
+    return d.getHours() * 60 + d.getMinutes();
+  }
+
+  function nextCitaProgressTime(row){
+    const data = row?.data || {};
+    const times = [
+      data["horario de carga"],
+      data[SEGUNDA_PARADA_COL],
+      data[TERCERA_PARADA_COL],
+      data["horario de cita"]
+    ].map(timeToMinutes).filter(v => Number.isFinite(v) && v !== 999999);
+
+    if(!times.length) return 999999;
+
+    // Orden principal: fecha + horario de carga.
+    // En el día actual, si ya pasó la carga, la cita se reacomoda a la siguiente parada;
+    // si no hay parada pendiente, usa tercera/segunda parada o finalmente horario de cita.
+    const citaDate = citaDateSortValue(data[DATE_COL]);
+    if(citaDate === todaySortValue()){
+      const now = nowMinutes();
+      const next = times.find(t => t >= now);
+      if(next !== undefined) return next;
+      return times[times.length - 1];
+    }
+
+    return times[0];
+  }
+
+  function getCitaProgressDisplay(data){
+    data = data || {};
+    const etapas = [
+      { key: "carga", label: "Carga", value: data["horario de carga"] },
+      { key: "segunda", label: "2ª parada", value: data[SEGUNDA_PARADA_COL] },
+      { key: "tercera", label: "3ª parada", value: data[TERCERA_PARADA_COL] },
+      { key: "cita", label: "Cita", value: data["horario de cita"] }
+    ].map(e => ({...e, clean: normalize(e.value), min: timeToMinutes(e.value)}))
+     .filter(e => e.clean && Number.isFinite(e.min) && e.min !== 999999);
+
+    if(!etapas.length) return { label:"Horario", time:"-", status:"Sin horario" };
+
+    const citaDate = citaDateSortValue(data[DATE_COL]);
+    const today = todaySortValue();
+
+    if(citaDate > today){
+      const e = etapas[0];
+      return { label:e.label, time:e.clean, status:"Programada" };
+    }
+    if(citaDate < today){
+      const e = etapas[etapas.length - 1];
+      return { label:e.label, time:e.clean, status:"Vencida" };
+    }
+
+    const now = nowMinutes();
+    const next = etapas.find(e => e.min >= now);
+    if(next) return { label:next.label, time:next.clean, status:"Próximo" };
+
+    const last = etapas[etapas.length - 1];
+    return { label:last.label, time:last.clean, status:"Última etapa" };
+  }
+
+
+
+  function getUnidadConPlacas(unidadNombre){
+    const nombre = normalize(unidadNombre);
+    if(!nombre) return "-";
+    const u = (state.units || []).find(x => normalize(x.unidad).toLowerCase() === nombre.toLowerCase());
+    const placas = normalize(u?.placas);
+    return placas ? `${nombre} · Placas: ${placas}` : nombre;
+  }
+
+  function buildHorariosResumen(data, includeActual=false){
+    data = data || {};
+    const progreso = getCitaProgressDisplay(data);
+    const lines = [];
+    if(includeActual && progreso.time && progreso.time !== "-"){
+      lines.push(`Actual: ${progreso.label} ${progreso.time}`);
+    }
+    const carga = normalize(data["horario de carga"]);
+    const segunda = normalize(data[SEGUNDA_PARADA_COL]);
+    const tercera = normalize(data[TERCERA_PARADA_COL]);
+    const cita = normalize(data["horario de cita"]);
+    if(carga) lines.push(`Carga: ${carga}`);
+    if(segunda) lines.push(`2ª parada: ${segunda}`);
+    if(tercera) lines.push(`3ª parada: ${tercera}`);
+    if(cita) lines.push(`Cita: ${cita}`);
+    return lines.length ? lines.join("<br>") : "-";
+  }
+
   function sortCitasByDateTime(list){
     return (Array.isArray(list) ? list : []).slice().sort((a,b)=>{
-      const da = normalize(a.data?.[DATE_COL]);
-      const db = normalize(b.data?.[DATE_COL]);
+      const da = citaDateSortValue(a.data?.[DATE_COL]);
+      const db = citaDateSortValue(b.data?.[DATE_COL]);
       const cmpDate = da.localeCompare(db);
       if(cmpDate) return cmpDate;
-      return timeToMinutes(a.data?.["horario de cita"]) - timeToMinutes(b.data?.["horario de cita"]);
+
+      const cmpTime = nextCitaProgressTime(a) - nextCitaProgressTime(b);
+      if(cmpTime) return cmpTime;
+
+      return normalize(a.data?.["cliente"]).localeCompare(normalize(b.data?.["cliente"]));
     });
   }
 
@@ -3784,7 +3896,9 @@ button:active{
       state.deliveries.push(entrega);
       markCitaRemovedLocal(row);
       state.rows = state.rows.filter(r => r.id !== row.id);
-      removePayrollForCitaId(row.id);
+      // Importante: NO borrar nómina ligada a esta cita.
+      // Al finalizar y enviar al historial se conserva el registro del día laborado
+      // para que la columna TOTAL de trabajadores mantenga el acumulado de pagos.
 
       localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sortCitasByDateTime(state.rows)));
@@ -3839,13 +3953,10 @@ button:active{
       const destinoPrincipal = normalize(d["destino"]);
       const sub = [normalize(d[DATE_COL])]
         .filter(Boolean).join(" • ") || "Sin fecha";
-      const unit = normalize(d[UNIT_COL]) || "-";
+      const unit = getUnidadConPlacas(d[UNIT_COL]);
       const op = normalize(d[OPERADOR_COL]) || "-";
       const maniobra = normalize(d[MANIOBRA_COL]) || "-";
-      const carga = normalize(d["horario de carga"]) || "-";
-      const segundaParada = normalize(d[SEGUNDA_PARADA_COL]) || "-";
-      const cita = normalize(d["horario de cita"]) || "-";
-      const horarios = `Carga: ${carga} · 2ª parada: ${segundaParada} · Cita: ${cita}`;
+      const horarios = buildHorariosResumen(d, false);
       const custodio = normalize(d[CUSTODIO_COL]) || "-";
       const obs = normalize(d["observaciones"]) || "-";
       const pagoOp = normalize(d[PAGO_OPERADOR_COL]) ? `$${Number(d[PAGO_OPERADOR_COL] || 0).toFixed(2)}` : "-";
@@ -3864,7 +3975,7 @@ button:active{
           <div class="mc-item"><span class="mc-label">Unidad</span><span class="mc-value">${escapeHTML(unit)}</span></div>
           <div class="mc-item"><span class="mc-label">Operador</span><span class="mc-value">${escapeHTML(op)} · ${escapeHTML(pagoOp)}</span></div>
           <div class="mc-item"><span class="mc-label">Maniobra</span><span class="mc-value">${escapeHTML(maniobra)} · ${escapeHTML(pagoMan)}</span></div>
-          <div class="mc-item"><span class="mc-label">Horarios</span><span class="mc-value">${escapeHTML(horarios)}</span></div>
+          <div class="mc-item"><span class="mc-label">Horarios</span><span class="mc-value">${horarios}</span></div>
           <div class="mc-item"><span class="mc-label">Custodio</span><span class="mc-value">${escapeHTML(custodio)}</span></div>
           <div class="mc-item"><span class="mc-label">Observaciones</span><span class="mc-value">${escapeHTML(obs)}</span></div>
         </div>
@@ -5003,7 +5114,7 @@ Observaciones y maniobra pueden quedar vacíos.`);
   }
 
   // === Nómina UI ===
-  function openPayroll(){ $("#payrollBackdrop").style.display="flex"; $("#payrollBackdrop").setAttribute("aria-hidden","false"); cleanOrphanCitaPayroll(); renderPayroll(); }
+  function openPayroll(){ $("#payrollBackdrop").style.display="flex"; $("#payrollBackdrop").setAttribute("aria-hidden","false"); renderPayroll(); }
   function closePayroll(){ $("#payrollBackdrop").style.display="none"; $("#payrollBackdrop").setAttribute("aria-hidden","true"); render(); }
 
   function openWorkerForm(title){ $("#workerFormTitle").textContent=title; $("#workerFormBackdrop").style.display="flex"; $("#workerFormBackdrop").setAttribute("aria-hidden","false"); }
@@ -6547,6 +6658,15 @@ button:active{
     if(Date.now() - lastAutoSyncAt > 2500) actualizarAppDesdeFirebase(true);
   });
 
+
+  // Reacomoda automáticamente la lista conforme avanza el día:
+  // carga -> segunda parada -> tercera parada -> cita.
+  setInterval(() => {
+    if(!document.hidden && !document.querySelector('.modal-backdrop[style*="display: flex"]')){
+      render();
+    }
+  }, 60000);
+
   document.addEventListener("visibilitychange", () => {
     if(!document.hidden && Date.now() - lastAutoSyncAt > 2500){
       actualizarAppDesdeFirebase(true);
@@ -6563,20 +6683,14 @@ button:active{
 
 
   function abrirVistaPreviaCitas(){
-    const filas = (Array.isArray(state.rows) ? state.rows.slice() : [])
-      .filter(passesFilters)
-      .sort((a,b)=>{
-        const da = normalize(a.data?.[DATE_COL]);
-        const db = normalize(b.data?.[DATE_COL]);
-        const cmpDate = da.localeCompare(db);
-        if(cmpDate) return cmpDate;
-        return timeToMinutes(a.data?.["horario de cita"]) - timeToMinutes(b.data?.["horario de cita"]);
-      });
+    const filas = sortCitasByDateTime((Array.isArray(state.rows) ? state.rows.slice() : [])
+      .filter(passesFilters));
 
     const fechaGen = new Date().toLocaleString("es-MX");
     const cards = filas.map((row, i)=>{
       const d = row.data || {};
       const estatus = row.checked ? "REALIZADA" : "PENDIENTE";
+      const progreso = getCitaProgressDisplay(d);
       return `
         <section class="cita">
           <div class="top">
@@ -6584,15 +6698,15 @@ button:active{
               <div class="folio">CITA ${String(i+1).padStart(3,"0")}</div>
               <h2>${escapeHTML(d["cliente"] || "-")}</h2>
               <h3>${escapeHTML(d["destino"] || "-")}</h3>
-              <div class="line">${escapeHTML(d[DATE_COL] || "-")} • Cita: ${escapeHTML(d["horario de cita"] || "-")}</div>
+              <div class="line">${escapeHTML(d[DATE_COL] || "-")} • ${escapeHTML(progreso.label)}: ${escapeHTML(progreso.time)}</div>
             </div>
             <div class="badge ${row.checked ? "ok" : ""}">${estatus}</div>
           </div>
           <div class="grid">
-            <div><span>UNIDAD</span><b>${escapeHTML(d[UNIT_COL] || "-")}</b></div>
+            <div><span>UNIDAD</span><b>${escapeHTML(getUnidadConPlacas(d[UNIT_COL]))}</b></div>
             <div><span>OPERADOR</span><b>${escapeHTML(d[OPERADOR_COL] || "-")}</b></div>
             <div><span>MANIOBRA</span><b>${escapeHTML(d[MANIOBRA_COL] || "-")}</b></div>
-            <div><span>HORARIOS</span><b>Carga: ${escapeHTML(d["horario de carga"] || "-")}<br>2ª parada: ${escapeHTML(d[SEGUNDA_PARADA_COL] || "-")}<br>Cita: ${escapeHTML(d["horario de cita"] || "-")}</b></div>
+            <div><span>HORARIOS</span><b>${buildHorariosResumen(d, false)}</b></div>
             <div><span>CUSTODIO</span><b>${escapeHTML(d[CUSTODIO_COL] || "-")}</b></div>
             <div><span>OBSERVACIONES</span><b>${escapeHTML(d["observaciones"] || "-")}</b></div>
           </div>
