@@ -1241,6 +1241,714 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 #historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
 </style>
 
+
+<style id="kaman-home-menu-css">
+/* ===== Pantalla inicial 4 opciones para celular y escritorio ===== */
+.kaman-home-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:12px;}
+.kaman-home-option{min-height:190px;border:1px solid #b8d7f0 !important;border-radius:24px !important;background:linear-gradient(145deg,#ffffff,#eaf6ff) !important;color:#12385f !important;box-shadow:0 12px 28px rgba(23,92,160,.14) !important;display:grid !important;place-items:center !important;gap:10px !important;padding:18px !important;text-align:center !important;}
+.kaman-home-option .home-icon{font-size:46px;line-height:1;}
+.kaman-home-option .home-title{font-size:20px;font-weight:950;line-height:1.1;}
+.kaman-home-option .home-sub{font-size:13px;font-weight:800;color:#55708c;line-height:1.25;}
+.kaman-home-option:active{transform:scale(.99);}
+body.kaman-home-active #appContentCard{display:none !important;}
+body.kaman-home-active #btnHome{display:none !important;}
+body:not(.kaman-home-active) #homeMenu{display:none !important;}
+/* Los botones superiores ya no se muestran; las 4 acciones viven en el menú principal */
+.wrap > header .toolbar{display:none !important;}
+#btnHome{font-size:18px !important;}
+@media(max-width:768px){#btnHome{width:48px !important;height:38px !important;min-height:38px !important;padding:0 !important;border-radius:14px !important;font-size:19px !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;flex:0 0 48px !important;}body.kaman-home-active header{position:relative !important;top:auto !important;}body.kaman-home-active .wrap{min-height:100dvh;display:flex;flex-direction:column;}body.kaman-home-active #homeMenu{flex:1;grid-template-columns:1fr 1fr;grid-auto-rows:1fr;margin-top:8px;gap:10px;}.kaman-home-option{min-height:calc((100dvh - 138px) / 2);border-radius:22px !important;padding:12px !important;}.kaman-home-option .home-icon{font-size:44px;}.kaman-home-option .home-title{font-size:17px;}.kaman-home-option .home-sub{font-size:11px;}body.kaman-home-active .toolbar{display:none !important;}}
+</style>
+
+
+<style id="kaman-editor-citas-css">
+/* ===== Editor de citas registradas desde el botón + ===== */
+#btnOpenCitasEditorFromNew{
+  background:linear-gradient(135deg,#f59e0b,#fbbf24) !important;
+  color:#12385f !important;
+  border-color:#d97706 !important;
+  font-weight:950 !important;
+}
+#citasEditorBackdrop{z-index:90 !important;}
+.citas-editor-list{display:grid;gap:10px;width:100%;}
+.citas-editor-card{
+  border:1px solid #c5e0f6;
+  background:#ffffff;
+  border-radius:16px;
+  padding:12px;
+  display:grid;
+  gap:10px;
+  box-shadow:0 8px 20px rgba(23,92,160,.10);
+}
+.citas-editor-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+.citas-editor-title{font-size:17px;font-weight:950;color:#12385f;line-height:1.12;}
+.citas-editor-dest{font-size:16px;font-weight:950;color:#0f2742;margin-top:3px;overflow-wrap:anywhere;}
+.citas-editor-sub{font-size:12px;font-weight:850;color:#55708c;margin-top:4px;}
+.citas-editor-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;}
+.citas-editor-item{background:#f2f9ff;border:1px solid #d4eaf9;border-radius:12px;padding:8px;}
+.citas-editor-label{display:block;font-size:10px;font-weight:950;color:#5f7e99;text-transform:uppercase;letter-spacing:.2px;}
+.citas-editor-value{display:block;margin-top:3px;font-size:13px;font-weight:900;color:#12385f;overflow-wrap:anywhere;}
+.citas-editor-actions{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.citas-editor-empty{text-align:center;padding:30px 12px;border:1px dashed #b7d7f2;border-radius:14px;background:#f7fcff;color:#55708c;font-weight:900;}
+@media(max-width:768px){
+  #modalBackdrop .modal .actions{grid-template-columns:1fr 1fr !important;}
+  #btnOpenCitasEditorFromNew{grid-column:1 / -1;min-height:46px !important;}
+  #citasEditorBackdrop .modal{height:100dvh !important;max-height:none !important;border-radius:0 !important;}
+  #citasEditorBackdrop .content{padding:10px !important;align-content:start !important;}
+  .citas-editor-grid{grid-template-columns:1fr 1fr;}
+  .citas-editor-actions{grid-template-columns:1fr;gap:7px;}
+  .citas-editor-actions button{min-height:42px !important;}
+}
+</style>
+
+
+<style id="kaman-segunda-parada-pagos-css">
+.kaman-pay-inline{margin-top:6px;display:grid;grid-template-columns:92px 1fr;gap:6px;align-items:center;}
+.kaman-pay-inline label{font-size:10px !important;color:#607d98 !important;font-weight:950 !important;text-transform:uppercase;letter-spacing:.2px;}
+.kaman-pay-inline input{min-height:34px !important;padding:6px 9px !important;border-radius:11px !important;font-size:12px !important;background:#f8fcff !important;}
+.kaman-stop-field input{background:#fbfdff !important;}
+@media(max-width:768px){
+  .kaman-pay-inline{grid-template-columns:78px 1fr;margin-top:5px;}
+  .kaman-pay-inline label{font-size:9px !important;}
+  .kaman-pay-inline input{min-height:32px !important;height:32px !important;font-size:12px !important;}
+  #modalBackdrop .modal .content{padding-bottom:82px !important;}
+}
+</style>
+
+<style id="kaman-maniobra-pago-individual-css">
+.kaman-maniobra-pay-list{display:grid;gap:6px;margin-top:6px;}
+.kaman-maniobra-pay-row{display:grid;grid-template-columns:1fr 110px;gap:6px;align-items:center;border:1px solid #d4eaf9;background:#f8fcff;border-radius:13px;padding:6px;}
+.kaman-maniobra-person{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:12px;font-weight:950;color:#12385f;min-width:0;}
+.kaman-maniobra-person span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.kaman-maniobra-person button{width:28px !important;height:28px !important;min-height:28px !important;padding:0 !important;border-radius:999px !important;flex:0 0 28px !important;}
+.kaman-pay-mini{display:grid;grid-template-columns:34px 1fr;gap:4px;align-items:center;}
+.kaman-pay-mini label{font-size:9px !important;font-weight:950 !important;color:#607d98 !important;text-transform:uppercase;}
+.kaman-pay-mini input{min-height:30px !important;height:30px !important;padding:5px 7px !important;border-radius:10px !important;font-size:12px !important;background:#fff !important;}
+@media(max-width:768px){
+  .kaman-maniobra-pay-row{grid-template-columns:1fr 100px;padding:5px;}
+  .kaman-pay-mini{grid-template-columns:30px 1fr;}
+  .kaman-pay-mini input{font-size:12px !important;min-height:30px !important;height:30px !important;}
+}
+</style>
+
+<style id="kaman-ajuste-final-parada-pagos-css">
+/* Segunda parada ahora es horario y maniobra usa pago individual por trabajador */
+.kaman-stop-field input{background:#ffffff !important;}
+.kaman-maniobra-pay-list{display:grid !important;gap:6px !important;margin-top:6px !important;}
+.kaman-maniobra-pay-row{display:grid !important;grid-template-columns:minmax(0,1fr) 112px !important;gap:6px !important;align-items:center !important;border:1px solid #d4eaf9 !important;background:#f8fcff !important;border-radius:13px !important;padding:6px !important;}
+.kaman-maniobra-person{display:flex !important;align-items:center !important;justify-content:space-between !important;gap:6px !important;font-size:12px !important;font-weight:950 !important;color:#12385f !important;min-width:0 !important;}
+.kaman-maniobra-person span{overflow:hidden !important;text-overflow:ellipsis !important;white-space:nowrap !important;}
+.kaman-maniobra-person button{width:28px !important;height:28px !important;min-height:28px !important;padding:0 !important;border-radius:999px !important;flex:0 0 28px !important;}
+.kaman-pay-mini{display:grid !important;grid-template-columns:34px 1fr !important;gap:4px !important;align-items:center !important;}
+.kaman-pay-mini label{font-size:9px !important;font-weight:950 !important;color:#607d98 !important;text-transform:uppercase !important;}
+.kaman-pay-mini input{min-height:30px !important;height:30px !important;padding:5px 7px !important;border-radius:10px !important;font-size:12px !important;background:#fff !important;}
+@media(max-width:768px){
+  .kaman-maniobra-pay-row{grid-template-columns:minmax(0,1fr) 100px !important;padding:5px !important;}
+  .kaman-pay-mini{grid-template-columns:30px 1fr !important;}
+  .kaman-pay-mini input{font-size:12px !important;min-height:30px !important;height:30px !important;}
+}
+</style>
+
+<style id="kaman-destinos-paradas-css">
+.kaman-destino-list{display:grid;gap:7px;margin-top:7px;}
+.kaman-destino-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #c5e0f6;background:#f3faff;border-radius:13px;padding:7px 8px;font-size:12px;font-weight:950;color:#12385f;}
+.kaman-destino-chip button{width:28px!important;height:28px!important;min-height:28px!important;padding:0!important;border-radius:10px!important;font-size:13px!important;box-shadow:none!important;}
+.kaman-stop-field{transition:opacity .15s ease;}
+.kaman-stop-field.kaman-hidden-stop{display:none!important;}
+@media(max-width:768px){.kaman-destino-chip{font-size:12px;padding:6px 8px}.kaman-stop-field input{min-height:42px!important;height:42px!important}}
+</style>
+
+<style id="kaman-notificacion-suave-css">
+#kamanNoticeBackdrop{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.30);backdrop-filter:blur(2px);}
+#kamanNoticeBackdrop.is-open{display:flex;}
+.kaman-notice-card{width:min(420px,92vw);background:#fff;border:1px solid #bfdbfe;border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.25);color:#0f3c68;overflow:hidden;}
+.kaman-notice-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#eaf6ff;border-bottom:1px solid #c5e0f6;font-weight:950;font-size:16px;}
+.kaman-notice-body{padding:14px 16px;white-space:pre-line;font-size:13px;font-weight:800;line-height:1.45;color:#12385f;}
+.kaman-notice-actions{display:flex;justify-content:flex-end;padding:10px 12px;background:#f1f9ff;border-top:1px solid #c5e0f6;}
+#kamanNoticeOk{min-height:42px;padding:8px 18px!important;background:#1d74d8!important;color:#fff!important;border-color:#1d74d8!important;}
+@media(max-width:768px){#kamanNoticeBackdrop{align-items:flex-start;padding-top:70px}.kaman-notice-card{width:94vw;border-radius:18px}.kaman-notice-body{font-size:13px}.kaman-notice-actions{display:grid;grid-template-columns:1fr}#kamanNoticeOk{width:100%;min-height:46px}}
+</style>
+
+<style id="kaman-final-buttons-antenna-css">
+/* Ajuste final: botón editar más discreto, guardar más grande */
+#modalBackdrop .modal .actions{
+  align-items:center !important;
+  gap:8px !important;
+}
+#btnOpenCitasEditorFromNew{
+  flex:0 0 auto !important;
+  min-height:34px !important;
+  height:34px !important;
+  padding:6px 10px !important;
+  border-radius:12px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#fff7db !important;
+  color:#7a4a00 !important;
+  border-color:#f6c65b !important;
+  box-shadow:0 2px 8px rgba(180,118,0,.12) !important;
+}
+#btnSave{
+  flex:1 1 190px !important;
+  min-height:52px !important;
+  height:52px !important;
+  padding:12px 18px !important;
+  border-radius:16px !important;
+  font-size:16px !important;
+  font-weight:950 !important;
+}
+#btnCancel{
+  flex:0 0 auto !important;
+  min-height:46px !important;
+  height:46px !important;
+}
+.firebase-signal,
+#historyFirebaseSignal{
+  padding:6px 9px !important;
+  min-height:34px !important;
+  gap:7px !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:30px !important;
+  height:30px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.antenna-svg{
+  width:30px;
+  height:30px;
+  overflow:visible;
+}
+.antenna-svg .ant-dish{
+  fill:#eaf6ff;
+  stroke:#0f3c68;
+  stroke-width:3.2;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-mast{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:3;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-core{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:2.5;
+}
+.antenna-svg .ant-wave{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:3;
+  stroke-linecap:round;
+  opacity:.85;
+  animation:kamanAntennaPulse 1.4s ease-in-out infinite;
+}
+.antenna-svg .ant-wave-2{ animation-delay:.18s; opacity:.65; }
+.firebase-offline .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-core{ fill:#ef4444; }
+.firebase-syncing .antenna-svg .ant-core,
+.firebase-pending .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-syncing .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-pending .antenna-svg .ant-core{ fill:#f59e0b; }
+.firebase-offline .antenna-svg .ant-wave,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-wave{ stroke:#ef4444; animation:none; opacity:.35; }
+@keyframes kamanAntennaPulse{
+  0%,100%{ transform:translateY(0); opacity:.50; }
+  50%{ transform:translateY(-1px); opacity:1; }
+}
+@media(max-width:768px){
+  #modalBackdrop .modal .actions{
+    grid-template-columns:.78fr 1.25fr .78fr !important;
+    padding:8px 10px !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    min-height:38px !important;
+    height:38px !important;
+    padding:5px 7px !important;
+    font-size:10px !important;
+    line-height:1.12 !important;
+    white-space:normal !important;
+  }
+  #btnSave{
+    min-height:54px !important;
+    height:54px !important;
+    font-size:17px !important;
+    padding:12px 14px !important;
+  }
+  #btnCancel{
+    min-height:42px !important;
+    height:42px !important;
+    padding:8px 9px !important;
+    font-size:13px !important;
+  }
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .antenna-svg{
+    width:31px !important;
+    height:31px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-ajuste-botones-final-celular">
+/* Ajuste solicitado: editar citas más chico y Guardar más grande en celular */
+@media (max-width:768px){
+  #modalBackdrop .modal .actions{
+    display:grid !important;
+    grid-template-columns: 1.55fr .95fr !important;
+    grid-template-rows: 38px 48px !important;
+    gap:8px !important;
+    padding:8px 10px 10px !important;
+    align-items:stretch !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-height:38px !important;
+    height:38px !important;
+    padding:4px 6px !important;
+    border-radius:14px !important;
+    font-size:10.5px !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+    text-align:center !important;
+  }
+  #btnSave{
+    grid-column:1 !important;
+    grid-row:1 / span 2 !important;
+    width:100% !important;
+    min-height:94px !important;
+    height:94px !important;
+    padding:10px 12px !important;
+    border-radius:24px !important;
+    font-size:27px !important;
+    line-height:1.05 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+  }
+  #btnCancel{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    border-radius:18px !important;
+    font-size:14px !important;
+    padding:6px 8px !important;
+  }
+}
+@media (min-width:769px){
+  #btnOpenCitasEditorFromNew{
+    min-height:32px !important;
+    height:32px !important;
+    padding:5px 10px !important;
+    font-size:11px !important;
+  }
+  #btnSave{
+    min-height:58px !important;
+    height:58px !important;
+    font-size:19px !important;
+    padding:13px 24px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-botones-derecha-celular-final">
+/* ===== Ajuste final celular: Guardar más chico y del lado derecho ===== */
+#modalBackdrop .modal .actions{
+  justify-content:flex-end !important;
+  align-items:center !important;
+}
+#btnOpenCitasEditorFromNew{
+  flex:0 0 auto !important;
+  min-height:30px !important;
+  height:30px !important;
+  padding:4px 9px !important;
+  border-radius:11px !important;
+  font-size:10.5px !important;
+  line-height:1.05 !important;
+  width:auto !important;
+  max-width:190px !important;
+}
+#btnSave{
+  flex:0 0 auto !important;
+  min-height:46px !important;
+  height:46px !important;
+  padding:9px 18px !important;
+  border-radius:17px !important;
+  font-size:17px !important;
+  line-height:1.05 !important;
+  width:auto !important;
+  min-width:142px !important;
+}
+#btnCancel{
+  flex:0 0 auto !important;
+  min-height:42px !important;
+  height:42px !important;
+  padding:8px 14px !important;
+}
+
+/* Todos los botones Listo se cargan al lado derecho */
+#btnConfigDone,#btnClientsDone,#btnDestinationsDone,#btnUnitsDone,#btnPayrollDone,#btnNotesDone,
+#btnHistoryDone,#btnAvailableUnitsDone,#btnCitasEditorDone,#btnClientsDone,#btnDestinationsDone,
+#btnPayrollDone,#btnUnitsDone{
+  margin-left:auto !important;
+  justify-self:end !important;
+  align-self:center !important;
+  min-width:116px !important;
+  width:auto !important;
+}
+
+@media (max-width:768px){
+  /* Formulario de cita: editar arriba discreto; cancelar al centro; guardar a la derecha */
+  #modalBackdrop .modal .actions{
+    display:grid !important;
+    grid-template-columns: 1fr 118px 132px !important;
+    grid-template-rows: 30px 50px !important;
+    gap:8px !important;
+    padding:8px 10px 10px !important;
+    align-items:center !important;
+    justify-content:stretch !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    grid-column:1 / 4 !important;
+    grid-row:1 !important;
+    justify-self:end !important;
+    width:auto !important;
+    max-width:184px !important;
+    min-height:30px !important;
+    height:30px !important;
+    padding:3px 8px !important;
+    border-radius:12px !important;
+    font-size:10px !important;
+    line-height:1 !important;
+    white-space:nowrap !important;
+  }
+  #btnCancel{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    justify-self:stretch !important;
+    width:100% !important;
+    min-height:46px !important;
+    height:46px !important;
+    padding:7px 8px !important;
+    border-radius:18px !important;
+    font-size:14px !important;
+  }
+  #btnSave{
+    grid-column:3 !important;
+    grid-row:2 !important;
+    justify-self:stretch !important;
+    width:100% !important;
+    min-width:0 !important;
+    min-height:50px !important;
+    height:50px !important;
+    padding:8px 10px !important;
+    border-radius:20px !important;
+    font-size:18px !important;
+    line-height:1.05 !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:5px !important;
+  }
+
+  /* Listo de modales: derecho y cómodo para pulgar */
+  #configBackdrop .actions,#clientsBackdrop .actions,#destinationsBackdrop .actions,#unitsBackdrop .actions,
+  #payrollBackdrop .actions,#notesBackdrop .actions,#historyBackdrop .actions,#availableUnitsBackdrop .actions,
+  #citasEditorBackdrop .actions{
+    display:flex !important;
+    justify-content:flex-end !important;
+    align-items:center !important;
+    padding:9px 10px !important;
+  }
+  #btnConfigDone,#btnClientsDone,#btnDestinationsDone,#btnUnitsDone,#btnPayrollDone,#btnNotesDone,
+  #btnHistoryDone,#btnAvailableUnitsDone,#btnCitasEditorDone{
+    margin-left:auto !important;
+    width:auto !important;
+    min-width:112px !important;
+    max-width:45vw !important;
+    min-height:44px !important;
+    height:44px !important;
+    padding:8px 14px !important;
+    border-radius:17px !important;
+    font-size:14px !important;
+  }
+}
+
+@media (max-width:420px){
+  #modalBackdrop .modal .actions{
+    grid-template-columns: 1fr 108px 124px !important;
+  }
+  #btnSave{ font-size:17px !important; }
+  #btnCancel{ font-size:13px !important; }
+  #btnOpenCitasEditorFromNew{ max-width:174px !important; font-size:9.5px !important; }
+}
+</style>
+
+
+
+<style id="kaman-botones-sin-cancelar-misma-fila">
+/* Ajuste final celular: sin Cancelar, Editar izquierda y Guardar derecha */
+#modalBackdrop .modal .actions #btnCancel{
+  display:none !important;
+}
+@media (max-width:768px){
+  #modalBackdrop .modal .actions{
+    display:grid !important;
+    grid-template-columns: minmax(0,.98fr) minmax(0,1.08fr) !important;
+    grid-template-rows: 60px !important;
+    gap:10px !important;
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom)) !important;
+    align-items:stretch !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-height:52px !important;
+    height:52px !important;
+    align-self:center !important;
+    padding:6px 8px !important;
+    border-radius:18px !important;
+    font-size:12px !important;
+    line-height:1.08 !important;
+    white-space:normal !important;
+    text-align:center !important;
+  }
+  #btnSave{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-height:60px !important;
+    height:60px !important;
+    padding:8px 12px !important;
+    border-radius:22px !important;
+    font-size:24px !important;
+    line-height:1.05 !important;
+    display:flex !important;
+    flex-direction:row !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:8px !important;
+  }
+}
+@media (min-width:769px){
+  #modalBackdrop .modal .actions{
+    justify-content:flex-end !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    order:1 !important;
+    min-height:38px !important;
+    height:38px !important;
+    padding:7px 12px !important;
+    font-size:12px !important;
+  }
+  #btnSave{
+    order:2 !important;
+    min-height:52px !important;
+    height:52px !important;
+    padding:10px 22px !important;
+    font-size:18px !important;
+  }
+}
+</style>
+
+<style id="kaman-satelite-sombras-profesional-css">
+/* Satélite profesional para estado de conexión */
+.firebase-signal,
+#historyFirebaseSignal{
+  background:linear-gradient(135deg,#eef9ff,#ffffff) !important;
+  border:1px solid rgba(44,132,210,.32) !important;
+  box-shadow:0 8px 22px rgba(26,91,150,.14), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:34px !important;
+  height:34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.satellite-svg{
+  width:34px !important;
+  height:34px !important;
+  overflow:visible !important;
+  filter:drop-shadow(0 3px 5px rgba(15,59,105,.22));
+}
+.satellite-svg .sat-orbit{
+  fill:none;
+  stroke:#94c8f1;
+  stroke-width:1.8;
+  stroke-dasharray:4 4;
+  opacity:.72;
+}
+.satellite-svg .sat-panel{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:2.2;
+}
+.satellite-svg .sat-core{
+  fill:#ffffff;
+  stroke:#0f3c68;
+  stroke-width:2.4;
+}
+.satellite-svg .sat-arm{
+  stroke:#0f3c68;
+  stroke-width:2.5;
+  stroke-linecap:round;
+}
+.satellite-svg .sat-dot{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:1.8;
+}
+.satellite-svg .sat-signal{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  opacity:.9;
+  animation:kamanSatellitePulse 1.45s ease-in-out infinite;
+}
+.satellite-svg .sat-signal-2{ animation-delay:.18s; opacity:.58; }
+.firebase-offline .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-dot{ fill:#ef4444 !important; }
+.firebase-offline .satellite-svg .sat-signal,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-signal{ stroke:#ef4444 !important; animation:none !important; opacity:.35 !important; }
+.firebase-syncing .satellite-svg .sat-dot,
+.firebase-pending .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-syncing .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-pending .satellite-svg .sat-dot{ fill:#f59e0b !important; }
+@keyframes kamanSatellitePulse{
+  0%,100%{ transform:translate(0,0); opacity:.48; }
+  50%{ transform:translate(1px,-1px); opacity:1; }
+}
+
+/* Sombras profesionales para todos los botones principales */
+button{
+  box-shadow:0 8px 18px rgba(23,92,160,.13), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+button:hover{
+  box-shadow:0 10px 24px rgba(23,92,160,.18), 0 3px 8px rgba(15,59,105,.13), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  transform:translateY(-1px);
+}
+button:active{
+  transform:translateY(1px) !important;
+  box-shadow:0 4px 10px rgba(23,92,160,.13), inset 0 2px 4px rgba(15,59,105,.10) !important;
+}
+.primary, #btnSave, #btnConfigDone, #btnClientsDone, #btnDestinationsDone, #btnUnitsDone,
+#btnPayrollDone, #btnNotesDone, #btnHistoryDone, #btnAvailableUnitsDone, #btnCitasEditorDone{
+  box-shadow:0 12px 24px rgba(29,116,216,.24), 0 3px 8px rgba(15,59,105,.14), inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+.danger{
+  box-shadow:0 10px 22px rgba(216,50,86,.17), 0 2px 6px rgba(120,20,40,.10), inset 0 1px 0 rgba(255,255,255,.80) !important;
+}
+#btnOpenCitasEditorFromNew{
+  box-shadow:0 8px 16px rgba(180,118,0,.18), 0 2px 5px rgba(120,74,0,.10), inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+.main-menu-card, .menu-card, [data-menu-card]{
+  box-shadow:0 14px 34px rgba(23,92,160,.13), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+@media(max-width:768px){
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .satellite-svg{ width:35px !important; height:35px !important; }
+  button{ box-shadow:0 7px 16px rgba(23,92,160,.14), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important; }
+}
+</style>
+
+
+<style id="kaman-animacion-inicio-2s-css">
+/* Animación inicial: solo los primeros 2 segundos al abrir */
+.satellite-svg{
+  transform-origin:50% 50% !important;
+  animation:kamanSatSurvey 2s ease-in-out 1 both !important;
+}
+.satellite-svg .sat-signal,
+#historyFirebaseSignal .satellite-svg .sat-signal{
+  animation:kamanSatSonarOnce 2s ease-in-out 1 both !important;
+}
+.kaman-home-option[data-home-action="new"] .home-icon{
+  display:inline-block !important;
+  animation:kamanPlusJump 2s ease-in-out 1 both !important;
+  transform-origin:50% 70% !important;
+}
+.kaman-home-option[data-home-action="preview"] .home-icon{
+  display:inline-block !important;
+  animation:kamanEyeBlink 2s ease-in-out 1 both !important;
+  transform-origin:50% 50% !important;
+}
+.kaman-home-option[data-home-action="units"] .home-icon{
+  display:inline-block !important;
+  animation:kamanTruckMove 2s ease-in-out 1 both !important;
+  transform-origin:50% 80% !important;
+}
+.kaman-home-option[data-home-action="config"] .home-icon{
+  display:inline-block !important;
+  animation:kamanGearSpin 2s ease-in-out 1 both !important;
+  transform-origin:50% 50% !important;
+}
+@keyframes kamanSatSurvey{
+  0%{ transform:rotate(-10deg) scale(.96); filter:drop-shadow(0 3px 5px rgba(15,59,105,.18)); }
+  18%{ transform:rotate(9deg) scale(1.04); }
+  36%{ transform:rotate(-7deg) scale(1.02); }
+  54%{ transform:rotate(6deg) scale(1.04); }
+  72%{ transform:rotate(-3deg) scale(1.01); }
+  100%{ transform:rotate(0deg) scale(1); filter:drop-shadow(0 3px 5px rgba(15,59,105,.22)); }
+}
+@keyframes kamanSatSonarOnce{
+  0%{ opacity:.15; transform:translate(0,0) scale(.88); }
+  20%{ opacity:1; transform:translate(2px,-2px) scale(1.12); }
+  42%{ opacity:.28; transform:translate(0,0) scale(.92); }
+  64%{ opacity:1; transform:translate(2px,-2px) scale(1.16); }
+  82%{ opacity:.45; transform:translate(0,0) scale(1); }
+  100%{ opacity:.55; transform:translate(0,0) scale(1); }
+}
+@keyframes kamanPlusJump{
+  0%,100%{ transform:translateY(0) scale(1); }
+  18%{ transform:translateY(-16px) scale(1.12); }
+  32%{ transform:translateY(0) scale(.98); }
+  50%{ transform:translateY(-10px) scale(1.08); }
+  66%{ transform:translateY(0) scale(1); }
+}
+@keyframes kamanEyeBlink{
+  0%,24%,42%,70%,100%{ transform:scaleY(1); filter:brightness(1); }
+  32%,58%{ transform:scaleY(.18); filter:brightness(.72); }
+  78%{ transform:scale(1.06); filter:brightness(1.08); }
+}
+@keyframes kamanTruckMove{
+  0%{ transform:translateX(-18px) rotate(-2deg); opacity:.76; }
+  28%{ transform:translateX(14px) rotate(2deg); opacity:1; }
+  48%{ transform:translateX(-6px) rotate(-1deg); }
+  72%{ transform:translateX(6px) rotate(1deg); }
+  100%{ transform:translateX(0) rotate(0deg); opacity:1; }
+}
+@keyframes kamanGearSpin{
+  0%{ transform:rotate(0deg) scale(.96); }
+  70%{ transform:rotate(360deg) scale(1.08); }
+  100%{ transform:rotate(360deg) scale(1); }
+}
+@media (prefers-reduced-motion: reduce){
+  .satellite-svg,
+  .satellite-svg .sat-signal,
+  #historyFirebaseSignal .satellite-svg .sat-signal,
+  .kaman-home-option .home-icon{
+    animation:none !important;
+  }
+}
+</style>
+
 </head>
 <body>
   <div id="processingOverlay" role="status" aria-live="polite" aria-hidden="true">
@@ -1256,7 +1964,18 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       <div class="title">
         <h1>Control de Citas Kaman</h1>
         <div id="firebaseSignal" class="firebase-signal firebase-pending" title="Firebase: verificando conexión">
-          <span class="antenna" aria-hidden="true">📡</span>
+          <span class="antenna" aria-hidden="true"><svg class="satellite-svg" viewBox="0 0 64 64" focusable="false" aria-hidden="true">
+  <circle class="sat-orbit" cx="32" cy="32" r="23"/>
+  <g class="sat-body" transform="rotate(-18 32 32)">
+    <rect class="sat-panel sat-panel-left" x="6" y="25" width="18" height="14" rx="2"/>
+    <rect class="sat-panel sat-panel-right" x="40" y="25" width="18" height="14" rx="2"/>
+    <rect class="sat-core" x="25" y="22" width="14" height="20" rx="3"/>
+    <line class="sat-arm" x1="24" y1="32" x2="40" y2="32"/>
+    <circle class="sat-dot" cx="32" cy="32" r="3"/>
+    <path class="sat-signal sat-signal-1" d="M40 19 C47 18 53 22 56 28"/>
+    <path class="sat-signal sat-signal-2" d="M43 12 C54 12 61 19 63 30"/>
+  </g>
+</svg></span>
           <span class="signal-dot" aria-hidden="true"></span>
           <span class="signal-text" aria-hidden="true"></span>
         </div>
@@ -1266,11 +1985,20 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         <button id="btnConfig">⚙</button>
         <button type="button" id="btnPreviewCitas" title="Vista previa de citas">👁</button>
         <button type="button" id="btnAvailableUnits" title="Unidades disponibles">🚚</button>
+        <button type="button" id="btnHome" title="Inicio">🏠</button>
         <button id="btnExportPDF" style="display:none" aria-hidden="true" tabindex="-1">📄 PDF</button>
       </div>
     </header>
 
-    <div class="card">
+    <section id="homeMenu" class="kaman-home-menu" aria-label="Menú principal">
+      <button type="button" class="kaman-home-option" data-home-action="new"><span class="home-icon">➕</span><span class="home-title">Nueva cita</span><span class="home-sub">Capturar viaje o servicio</span></button>
+      <button type="button" class="kaman-home-option" data-home-action="preview"><span class="home-icon">👁️</span><span class="home-title">Citas</span><span class="home-sub">Ver y buscar registros</span></button>
+      <button type="button" class="kaman-home-option" data-home-action="units"><span class="home-icon">🚚</span><span class="home-title">Unidades</span><span class="home-sub">Disponibles y no circula</span></button>
+      <button type="button" class="kaman-home-option" data-home-action="config"><span class="home-icon">⚙️</span><span class="home-title">Configuración</span><span class="home-sub">Catálogos, PDF e historial</span></button>
+    </section>
+
+
+    <div class="card" id="appContentCard">
       <div class="toprow">
         <div class="left" style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
           <span class="pill" id="countPill">0 citas</span>
@@ -1664,7 +2392,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
             <table style="width:100%; border-collapse:collapse;">
               <thead>
                 <tr>
-                  <th style="padding:10px; text-align:left;">NOMBRE</th><th style="padding:10px; text-align:left;">SEGURO SOCIAL</th>
+                  <th style="padding:10px; text-align:left;">NOMBRE</th><th style="padding:10px; text-align:left;">TELÉFONO</th><th style="padding:10px; text-align:left;">SEGURO SOCIAL</th>
                   <th style="padding:10px; text-align:left;">SUELDO</th>
                   <th style="padding:10px; text-align:left;">TOTAL</th>
                   <th style="padding:10px; text-align:left;">ACCIONES</th>
@@ -1815,7 +2543,18 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
           <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
             <div class="pill" id="historyCount">0 entregas</div>
             <div id="historyFirebaseSignal" class="firebase-signal firebase-pending" title="Historial Firebase: pendiente">
-              <span class="antenna" aria-hidden="true">📡</span>
+              <span class="antenna" aria-hidden="true"><svg class="satellite-svg" viewBox="0 0 64 64" focusable="false" aria-hidden="true">
+  <circle class="sat-orbit" cx="32" cy="32" r="23"/>
+  <g class="sat-body" transform="rotate(-18 32 32)">
+    <rect class="sat-panel sat-panel-left" x="6" y="25" width="18" height="14" rx="2"/>
+    <rect class="sat-panel sat-panel-right" x="40" y="25" width="18" height="14" rx="2"/>
+    <rect class="sat-core" x="25" y="22" width="14" height="20" rx="3"/>
+    <line class="sat-arm" x1="24" y1="32" x2="40" y2="32"/>
+    <circle class="sat-dot" cx="32" cy="32" r="3"/>
+    <path class="sat-signal sat-signal-1" d="M40 19 C47 18 53 22 56 28"/>
+    <path class="sat-signal sat-signal-2" d="M43 12 C54 12 61 19 63 30"/>
+  </g>
+</svg></span>
               <span class="signal-dot" aria-hidden="true"></span>
               <span class="signal-text">Historial sin conectar</span>
             </div>
@@ -1898,9 +2637,17 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   const CLIENTS_KEY = "control_transporte_clientes_v1";
   const DESTS_KEY   = "control_transporte_destinos_v1";
   const DELIVERIES_KEY = "control_transporte_historial_entregas_v1";
+  const FIREBASE_DIRTY_CITAS_KEY = "control_transporte_firebase_dirty_citas_v2";
+  const FIREBASE_DIRTY_CONFIG_KEY = "control_transporte_firebase_dirty_config_v2";
+  const FIREBASE_DIRTY_HISTORY_KEY = "control_transporte_firebase_dirty_history_v2";
+  const FIREBASE_RESET_PENDING_KEY = "control_transporte_firebase_reset_pending_v2";
 
-  const COLS = ["fecha de cita","cliente","destino","operador","maniobra","unidad","horario de carga","horario de cita","custodio","observaciones"];
-  const TIME_COLS = new Set(["horario de carga","horario de cita"]);
+  const SEGUNDA_PARADA_COL = "segunda parada";
+  const TERCERA_PARADA_COL = "tercera parada";
+  const PAGO_OPERADOR_COL = "pago operador";
+  const PAGO_MANIOBRA_COL = "pago maniobra";
+  const COLS = ["fecha de cita","cliente","destino","operador",PAGO_OPERADOR_COL,"maniobra",PAGO_MANIOBRA_COL,"unidad","horario de carga",SEGUNDA_PARADA_COL,TERCERA_PARADA_COL,"horario de cita","custodio","observaciones"];
+  const TIME_COLS = new Set(["horario de carga","horario de cita",SEGUNDA_PARADA_COL,TERCERA_PARADA_COL]);
   const DATE_COL = "fecha de cita";
   const CUSTODIO_COL = "custodio";
   const UNIT_COL = "unidad";
@@ -2056,6 +2803,13 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     try{ const raw = localStorage.getItem(DESTS_KEY); if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)) state.destinations=p; } }catch(e){}
     try{ const raw = localStorage.getItem(DELIVERIES_KEY); if(raw){ const p=JSON.parse(raw); if(Array.isArray(p)) state.deliveries=p; } }catch(e){}
   }
+  function setDirty(key){ try{ localStorage.setItem(key, String(Date.now())); }catch(e){} }
+  function clearDirty(key){ try{ localStorage.removeItem(key); }catch(e){} }
+  function isDirty(key){ try{ return !!localStorage.getItem(key); }catch(e){ return false; } }
+  function setResetPending(){ try{ localStorage.setItem(FIREBASE_RESET_PENDING_KEY, String(Date.now())); }catch(e){} }
+  function clearResetPending(){ try{ localStorage.removeItem(FIREBASE_RESET_PENDING_KEY); }catch(e){} }
+  function hasResetPending(){ try{ return !!localStorage.getItem(FIREBASE_RESET_PENDING_KEY); }catch(e){ return false; } }
+
   let firebaseLoadingCitas = false;
   let firebaseLoadingConfig = false;
   let firebaseLoadingHistory = false;
@@ -2153,6 +2907,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     });
     if(!res.ok) throw new Error("HTTP " + res.status);
     setFirebaseSignal("online", "Firebase conectado");
+    clearDirty(FIREBASE_DIRTY_CITAS_KEY);
     if(!silent) setStatus("Citas guardadas en Firebase.");
     return true;
   }
@@ -2168,6 +2923,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     });
     if(!res.ok) throw new Error("HTTP " + res.status);
     setFirebaseSignal("online", "Firebase conectado");
+    clearDirty(FIREBASE_DIRTY_CONFIG_KEY);
     if(!silent) setStatus("Configuración guardada en Firebase.");
     return true;
   }
@@ -2183,6 +2939,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     });
     if(!res.ok) throw new Error("HTTP " + res.status);
     setHistoryFirebaseSignal("online", "Historial conectado");
+    clearDirty(FIREBASE_DIRTY_HISTORY_KEY);
     historyLoadedFromFirebase = true;
     if(!silent) setStatus("Historial guardado en Firebase de respaldo.");
     return true;
@@ -2200,6 +2957,13 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     if(!citasFirebaseReady()){
       setFirebaseSignal("offline", "Firebase sin configurar");
       return;
+    }
+    if(hasResetPending()){
+      setFirebaseSignal("syncing", "Reset pendiente de Firebase...");
+      try{ await ejecutarResetFirebasePendiente(); }catch(e){ setFirebaseSignal("offline", "Reset pendiente"); return; }
+    }
+    if(isDirty(FIREBASE_DIRTY_CITAS_KEY)){
+      try{ await syncCitasNow(true); }catch(e){ setFirebaseSignal("offline", "Citas pendientes"); return; }
     }
     firebaseLoadingCitas = true;
     setFirebaseSignal("syncing", "Conectando Firebase...");
@@ -2247,9 +3011,11 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       });
       if(!res.ok) throw new Error("HTTP " + res.status);
       setFirebaseSignal("online", "Firebase conectado");
+      clearDirty(FIREBASE_DIRTY_CITAS_KEY);
       if(!silent) setStatus("Cita guardada en Firebase.");
     }catch(e){
       console.warn("No se pudo guardar en Firebase:", e);
+      setDirty(FIREBASE_DIRTY_CITAS_KEY);
       setFirebaseSignal("offline", "Firebase pendiente");
       if(!silent) setStatus("Guardado local. Firebase pendiente.");
     }
@@ -2314,6 +3080,10 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
   async function loadConfigFromFirebase(){
     if(!citasFirebaseReady()) return;
+    if(hasResetPending()) return;
+    if(isDirty(FIREBASE_DIRTY_CONFIG_KEY)){
+      try{ await syncConfigNow(true); }catch(e){ return; }
+    }
     firebaseLoadingConfig = true;
     try{
       const res = await fetch(FIREBASE_CONFIG_ENDPOINT, { method:"GET", cache:"no-store" });
@@ -2345,10 +3115,12 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         body: JSON.stringify(configPayload())
       });
       if(!res.ok) throw new Error("HTTP " + res.status);
+      clearDirty(FIREBASE_DIRTY_CONFIG_KEY);
       if(!silent) setStatus("⚙ guardada en Firebase.");
       programarActualizacionApp();
     }catch(e){
       console.warn("No se pudo guardar configuración en Firebase:", e);
+      setDirty(FIREBASE_DIRTY_CONFIG_KEY);
       if(!silent) setStatus("⚙ guardada local. Firebase pendiente.");
     }
   }
@@ -2379,10 +3151,12 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         body: JSON.stringify(historyPayload())
       });
       if(!res.ok) throw new Error("HTTP " + res.status);
+      clearDirty(FIREBASE_DIRTY_HISTORY_KEY);
       if(!silent) setStatus("Historial guardado en Firebase de respaldo.");
       return true;
     }catch(e){
       console.warn("No se pudo guardar historial en Firebase de respaldo:", e);
+      setDirty(FIREBASE_DIRTY_HISTORY_KEY);
       if(!silent) setStatus("Historial local. Firebase de respaldo pendiente.");
       return false;
     }
@@ -2398,6 +3172,10 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     if(!historyFirebaseReady()){
       setHistoryFirebaseSignal("offline", "Historial sin configurar");
       return false;
+    }
+    if(hasResetPending()) return false;
+    if(isDirty(FIREBASE_DIRTY_HISTORY_KEY)){
+      try{ await syncHistoryNow(true); }catch(e){ setHistoryFirebaseSignal("offline", "Historial pendiente"); return false; }
     }
     if(historyLoadedFromFirebase && !force){
       setHistoryFirebaseSignal("online", "Historial conectado");
@@ -2439,22 +3217,24 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
   function save(){
     state.rows = sortCitasByDateTime(state.rows);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+    setDirty(FIREBASE_DIRTY_CITAS_KEY);
     setStatus("Guardado local.");
     scheduleFirebaseSave();
   }
-  function saveUnits(){ localStorage.setItem(UNITS_KEY, JSON.stringify(state.units)); setStatus("Unidades guardadas."); scheduleConfigFirebaseSave(); }
-  function saveWorkers(){ localStorage.setItem(WORKERS_KEY, JSON.stringify(state.workers)); setStatus("Trabajadores guardados."); scheduleConfigFirebaseSave(); }
-  function savePayroll(){ localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll)); setStatus("Nómina guardada."); scheduleConfigFirebaseSave(); }
-  function saveNotes(){ localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes)); setStatus("Notas guardadas."); scheduleConfigFirebaseSave(); }
-  function saveClients(){ localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients)); setStatus("Clientes guardados."); scheduleConfigFirebaseSave(); }
+  function saveUnits(){ localStorage.setItem(UNITS_KEY, JSON.stringify(state.units)); setDirty(FIREBASE_DIRTY_CONFIG_KEY); setStatus("Unidades guardadas."); scheduleConfigFirebaseSave(); }
+  function saveWorkers(){ localStorage.setItem(WORKERS_KEY, JSON.stringify(state.workers)); setDirty(FIREBASE_DIRTY_CONFIG_KEY); setStatus("Trabajadores guardados."); scheduleConfigFirebaseSave(); }
+  function savePayroll(){ localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll)); setDirty(FIREBASE_DIRTY_CONFIG_KEY); setStatus("Nómina guardada."); scheduleConfigFirebaseSave(); }
+  function saveNotes(){ localStorage.setItem(NOTES_KEY, JSON.stringify(state.notes)); setDirty(FIREBASE_DIRTY_CONFIG_KEY); setStatus("Notas guardadas."); scheduleConfigFirebaseSave(); }
+  function saveClients(){ localStorage.setItem(CLIENTS_KEY, JSON.stringify(state.clients)); setDirty(FIREBASE_DIRTY_CONFIG_KEY); setStatus("Clientes guardados."); scheduleConfigFirebaseSave(); }
 
   function saveDeliveries(){
     localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
+    setDirty(FIREBASE_DIRTY_HISTORY_KEY);
     setStatus("Historial guardado.");
     scheduleHistoryFirebaseSave();
   }
 
-  function saveDestinations(){ localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations)); setStatus("Destinos guardados."); scheduleConfigFirebaseSave(); }
+  function saveDestinations(){ localStorage.setItem(DESTS_KEY, JSON.stringify(state.destinations)); setDirty(FIREBASE_DIRTY_CONFIG_KEY); setStatus("Destinos guardados."); scheduleConfigFirebaseSave(); }
 
   function parseNoCirculaDays(value){
     if(Array.isArray(value)) return value.map(v=>normalize(v).toUpperCase()).filter(Boolean);
@@ -2507,6 +3287,39 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     return `Carga: ${normalize(data?.["horario de carga"]) || "sin hora"} · Cita: ${normalize(data?.["horario de cita"]) || "sin hora"}`;
   }
 
+  let kamanLastNoticeKey = "";
+  let kamanLastNoticeAt = 0;
+  function showKamanNotice(title, message, key=""){
+    const now = Date.now();
+    const noticeKey = key || (title + "|" + message);
+    if(noticeKey === kamanLastNoticeKey && now - kamanLastNoticeAt < 1800) return;
+    kamanLastNoticeKey = noticeKey;
+    kamanLastNoticeAt = now;
+
+    let back = document.getElementById("kamanNoticeBackdrop");
+    if(!back){
+      back = document.createElement("div");
+      back.id = "kamanNoticeBackdrop";
+      back.setAttribute("aria-hidden", "true");
+      back.innerHTML = `
+        <div class="kaman-notice-card" role="dialog" aria-modal="true" aria-labelledby="kamanNoticeTitle">
+          <div class="kaman-notice-head"><span aria-hidden="true">⚠️</span><span id="kamanNoticeTitle"></span></div>
+          <div class="kaman-notice-body" id="kamanNoticeBody"></div>
+          <div class="kaman-notice-actions"><button type="button" id="kamanNoticeOk">Aceptar</button></div>
+        </div>`;
+      document.body.appendChild(back);
+      const closeNotice = ()=>{ back.classList.remove("is-open"); back.setAttribute("aria-hidden", "true"); };
+      back.querySelector("#kamanNoticeOk").addEventListener("click", closeNotice);
+      back.addEventListener("click", (ev)=>{ if(ev.target === back) closeNotice(); });
+      document.addEventListener("keydown", (ev)=>{ if(ev.key === "Escape" && back.classList.contains("is-open")) closeNotice(); });
+    }
+    back.querySelector("#kamanNoticeTitle").textContent = title || "Aviso";
+    back.querySelector("#kamanNoticeBody").textContent = message || "";
+    back.classList.add("is-open");
+    back.setAttribute("aria-hidden", "false");
+    setTimeout(()=>{ const ok = back.querySelector("#kamanNoticeOk"); if(ok) ok.focus(); }, 30);
+  }
+
   function findUnitScheduleConflict(data, excludeId = null){
     const unitName = normalize(data?.[UNIT_COL]).toLowerCase();
     const dateISO = normalize(data?.[DATE_COL]);
@@ -2543,13 +3356,13 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     if(!normalize(data[UNIT_COL]) || !normalize(data[DATE_COL])) return true;
     const conflict = findUnitScheduleConflict(data, state.editingId);
     if(!conflict) return true;
-    if(!silent){
-      speak(`Atención. La unidad ${normalize(data[UNIT_COL])} está ocupada. Confirma entrega para liberarla.`);
-      alert(`⚠️ ${conflict.title}\n\n${conflict.message}`);
-    }
     if(clearUnit){
       const unitSel = grid.querySelector('[data-col="'+UNIT_COL+'"]');
       if(unitSel) unitSel.value = "";
+    }
+    if(!silent){
+      speak(`Atención. La unidad ${normalize(data[UNIT_COL])} está ocupada. Confirma entrega para liberarla.`);
+      showKamanNotice(conflict.title, conflict.message, "unit-conflict-" + normalize(data[UNIT_COL]) + "-" + normalize(data[DATE_COL]));
     }
     return false;
   }
@@ -2613,6 +3426,62 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     return state.workers.find(w => normalize(w.nombre).toLowerCase() === key) || null;
   }
   function workerSalary(worker){ return Number(worker?.sueldo || 0) || 0; }
+  function moneyNumber(value){
+    const n = Number(String(value ?? "").replace(/[^0-9.\-]/g, ""));
+    return Number.isFinite(n) ? n : 0;
+  }
+  function parseManiobraPays(raw, names){
+    const selected = (Array.isArray(names) ? names : [])
+      .map(n => normalize(n)).filter(Boolean);
+    const out = {};
+    const txt = normalize(raw);
+    if(!selected.length) return out;
+
+    // Nuevo formato: "Nombre:300; Otro:450"
+    if(txt.includes(":")){
+      txt.split(";").map(x=>normalize(x)).filter(Boolean).forEach(part=>{
+        const idx = part.lastIndexOf(":");
+        if(idx <= 0) return;
+        const name = normalize(part.slice(0, idx));
+        const amount = moneyNumber(part.slice(idx + 1));
+        if(name) out[name] = amount;
+      });
+    }
+
+    // Compatibilidad con versiones anteriores: número total dividido entre maniobras.
+    if(!Object.keys(out).length && txt && !isNaN(Number(txt))){
+      const total = moneyNumber(txt);
+      const each = selected.length ? total / selected.length : 0;
+      selected.forEach(n => out[n] = each);
+    }
+
+    // Si falta alguien, tomar sueldo de nómina como sugerencia inicial.
+    selected.forEach(n => {
+      if(!(n in out)) out[n] = workerSalary(getWorkerByName(n));
+    });
+    return out;
+  }
+  function serializeManiobraPays(pays, names){
+    return (Array.isArray(names) ? names : [])
+      .map(n => normalize(n)).filter(Boolean)
+      .map(n => `${n}:${(moneyNumber(pays?.[n])).toFixed(2)}`)
+      .join('; ');
+  }
+  function formatManiobraPays(raw, names){
+    const selected = (Array.isArray(names) ? names : [])
+      .map(n => normalize(n)).filter(Boolean);
+    const pays = parseManiobraPays(raw, selected);
+    return selected.map(n => `${n} $${moneyNumber(pays[n]).toFixed(2)}`).join(', ');
+  }
+  function defaultOperatorPay(name){
+    const w = getWorkerByName(name);
+    return workerSalary(w);
+  }
+  function defaultManiobraPay(names){
+    return (Array.isArray(names) ? names : [])
+      .map(n => getWorkerByName(n))
+      .reduce((sum, w) => sum + workerSalary(w), 0);
+  }
   function citaWorkerNames(data){
     const names = [];
     const op = normalize(data?.[OPERADOR_COL]);
@@ -2654,21 +3523,23 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
     const publicId = citaPublicId(row);
     const resumen = citaPayrollSummary(row);
-    for(const name of citaWorkerNames(row.data)){
+    const opName = normalize(row.data?.[OPERADOR_COL]);
+    if(opName){
+      const w = getWorkerByName(opName);
+      const monto = moneyNumber(row.data?.[PAGO_OPERADOR_COL]) || workerSalary(w);
+      if(w && monto > 0){
+        state.payroll.unshift({ id: uid(), workerId: w.id, fecha, monto, citaId: row.id, citaPublicId: publicId, citaResumen: resumen, origen: "CITA" });
+      }
+    }
+
+    const maniobraNames = normalize(row.data?.[MANIOBRA_COL]).split(',').map(x=>normalize(x)).filter(Boolean);
+    const pagosManiobra = parseManiobraPays(row.data?.[PAGO_MANIOBRA_COL], maniobraNames);
+    for(const name of maniobraNames){
       const w = getWorkerByName(name);
       if(!w) continue;
-      const sueldo = workerSalary(w);
-      if(sueldo <= 0) continue;
-      state.payroll.unshift({
-        id: uid(),
-        workerId: w.id,
-        fecha,
-        monto: sueldo,
-        citaId: row.id,
-        citaPublicId: publicId,
-        citaResumen: resumen,
-        origen: "CITA"
-      });
+      const monto = moneyNumber(pagosManiobra[name]) || workerSalary(w);
+      if(monto <= 0) continue;
+      state.payroll.unshift({ id: uid(), workerId: w.id, fecha, monto, citaId: row.id, citaPublicId: publicId, citaResumen: resumen, origen: "CITA" });
     }
     savePayroll();
   }
@@ -2918,6 +3789,9 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sortCitasByDateTime(state.rows)));
       localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
+      setDirty(FIREBASE_DIRTY_CITAS_KEY);
+      setDirty(FIREBASE_DIRTY_CONFIG_KEY);
+      setDirty(FIREBASE_DIRTY_HISTORY_KEY);
       render();
       if(typeof renderHistory === "function") renderHistory();
 
@@ -2969,10 +3843,13 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       const op = normalize(d[OPERADOR_COL]) || "-";
       const maniobra = normalize(d[MANIOBRA_COL]) || "-";
       const carga = normalize(d["horario de carga"]) || "-";
+      const segundaParada = normalize(d[SEGUNDA_PARADA_COL]) || "-";
       const cita = normalize(d["horario de cita"]) || "-";
-      const horarios = `Carga: ${carga} · Cita: ${cita}`;
+      const horarios = `Carga: ${carga} · 2ª parada: ${segundaParada} · Cita: ${cita}`;
       const custodio = normalize(d[CUSTODIO_COL]) || "-";
       const obs = normalize(d["observaciones"]) || "-";
+      const pagoOp = normalize(d[PAGO_OPERADOR_COL]) ? `$${Number(d[PAGO_OPERADOR_COL] || 0).toFixed(2)}` : "-";
+      const pagoMan = normalize(d[PAGO_MANIOBRA_COL]) ? formatManiobraPays(d[PAGO_MANIOBRA_COL], maniobra.split(',').map(x=>normalize(x)).filter(Boolean)) : "-";
 
       card.innerHTML = `
         <div class="mc-head">
@@ -2985,8 +3862,8 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         </div>
         <div class="mc-grid">
           <div class="mc-item"><span class="mc-label">Unidad</span><span class="mc-value">${escapeHTML(unit)}</span></div>
-          <div class="mc-item"><span class="mc-label">Operador</span><span class="mc-value">${escapeHTML(op)}</span></div>
-          <div class="mc-item"><span class="mc-label">Maniobra</span><span class="mc-value">${escapeHTML(maniobra)}</span></div>
+          <div class="mc-item"><span class="mc-label">Operador</span><span class="mc-value">${escapeHTML(op)} · ${escapeHTML(pagoOp)}</span></div>
+          <div class="mc-item"><span class="mc-label">Maniobra</span><span class="mc-value">${escapeHTML(maniobra)} · ${escapeHTML(pagoMan)}</span></div>
           <div class="mc-item"><span class="mc-label">Horarios</span><span class="mc-value">${escapeHTML(horarios)}</span></div>
           <div class="mc-item"><span class="mc-label">Custodio</span><span class="mc-value">${escapeHTML(custodio)}</span></div>
           <div class="mc-item"><span class="mc-label">Observaciones</span><span class="mc-value">${escapeHTML(obs)}</span></div>
@@ -3057,11 +3934,33 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
     }
     state.editingId = null;
     if(grid) grid.innerHTML = "";
+    if(window.kamanShowHome) window.kamanShowHome();
   }
 
   function buildForm(initial = {}){
     const grid = $("#formGrid");
     grid.innerHTML = "";
+
+    function selectedDestinosCount(){
+      const hidden = grid.querySelector('[data-col="destino"]');
+      return normalize(hidden?.value).split(",").map(x=>normalize(x)).filter(Boolean).length;
+    }
+
+    function refreshParadasVisibility(){
+      const n = selectedDestinosCount();
+      const segunda = grid.querySelector('[data-stop="2"]');
+      const tercera = grid.querySelector('[data-stop="3"]');
+      if(segunda){
+        segunda.classList.toggle("kaman-hidden-stop", n < 2);
+        const inp = segunda.querySelector('[data-col="'+SEGUNDA_PARADA_COL+'"]');
+        if(inp && n < 2) inp.value = "";
+      }
+      if(tercera){
+        tercera.classList.toggle("kaman-hidden-stop", n < 3);
+        const inp = tercera.querySelector('[data-col="'+TERCERA_PARADA_COL+'"]');
+        if(inp && n < 3) inp.value = "";
+      }
+    }
 
     function getSelectedDate(){
       const el = grid.querySelector('[data-col="'+DATE_COL+'"]');
@@ -3124,19 +4023,49 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
           .map(d => normalize(d.nombre))
           .filter(Boolean)
           .sort((a,b)=>a.localeCompare(b,"es",{sensitivity:"base"}));
-
+        let selectedDestinos = val ? val.split(",").map(x=>normalize(x)).filter(Boolean) : [];
         field.innerHTML = `
           <label for="${id}">${col}</label>
-          <select id="${id}" data-col="${col}">
-            <option value="">Selecciona destino…</option>
+          <select id="${id}">
+            <option value="">Agregar destino / parada…</option>
             ${options.map(o => {
               const safe = o.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
               return `<option value="${safe}">${safe}</option>`;
             }).join("")}
           </select>
+          <div id="destinoChips" class="kaman-destino-list"></div>
+          <input type="hidden" data-col="${col}" id="destinoHidden" />
+          <div class="hint" style="padding:0; margin:0; font-size:11px;">Puedes agregar más de un destino. Si agregas 2 se activa horario de segunda parada; si agregas 3 se activa tercera parada.</div>
         `;
         grid.appendChild(field);
-        field.querySelector("select").value = val;
+        const selDestino = field.querySelector("select");
+        const hiddenDestino = field.querySelector("#destinoHidden");
+        const chipsDestino = field.querySelector("#destinoChips");
+        function syncDestinos(){
+          hiddenDestino.value = selectedDestinos.join(", ");
+          chipsDestino.innerHTML = selectedDestinos.map((n,idx)=>`
+            <div class="kaman-destino-chip">
+              <span>${idx+1}. ${escapeHTML(n)}</span>
+              <button type="button" class="ghost" data-dest-x="${escapeHTML(n)}" title="Quitar destino">✖</button>
+            </div>
+          `).join("");
+          chipsDestino.querySelectorAll("button[data-dest-x]").forEach(b=>{
+            b.addEventListener("click", ()=>{
+              const name = b.getAttribute("data-dest-x");
+              selectedDestinos = selectedDestinos.filter(x=>x!==name);
+              syncDestinos();
+            });
+          });
+          refreshParadasVisibility();
+        }
+        selDestino.addEventListener("change", ()=>{
+          const v = normalize(selDestino.value);
+          if(!v) return;
+          if(!selectedDestinos.includes(v)) selectedDestinos.push(v);
+          selDestino.value = "";
+          syncDestinos();
+        });
+        syncDestinos();
         continue;
       }
 
@@ -3193,6 +4122,7 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
 
       if(col === OPERADOR_COL){
         const ops = workersAllSorted();
+        const pagoVal = normalize(initial[PAGO_OPERADOR_COL]);
         field.innerHTML = `
           <label for="${id}">${col}</label>
           <select id="${id}" data-col="${col}">
@@ -3203,20 +4133,34 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
               return `<option value="${safe}">${safe}</option>`;
             }).join("")}
           </select>
-          <div class="hint" style="padding:0; margin:0; font-size:12px;">Gestiona empleados en 💵 Nómina.</div>
+          <div class="kaman-pay-inline">
+            <label for="pagoOperadorInput">Pago</label>
+            <input id="pagoOperadorInput" data-col="${PAGO_OPERADOR_COL}" type="number" step="0.01" min="0" placeholder="0.00" />
+          </div>
+          <div class="hint" style="padding:0; margin:0; font-size:11px;">Se llena con nómina, editable por ruta.</div>
         `;
         grid.appendChild(field);
-        field.querySelector("select").value = val;
+        const selOp = field.querySelector("select");
+        const payOp = field.querySelector('#pagoOperadorInput');
+        selOp.value = val;
+        payOp.value = pagoVal || (val ? defaultOperatorPay(val).toFixed(2) : "");
+        selOp.addEventListener('change', ()=>{
+          const n = defaultOperatorPay(selOp.value);
+          payOp.value = n > 0 ? n.toFixed(2) : "";
+        });
         continue;
       }
+
+      if(col === PAGO_OPERADOR_COL){ continue; }
 
       if(col === MANIOBRA_COL){
         const mans = workersAllSorted();
         const initialList = val ? val.split(",").map(x=>normalize(x)).filter(Boolean) : [];
+        const pagoVal = normalize(initial[PAGO_MANIOBRA_COL]);
         field.innerHTML = `
           <label>${col} (hasta 4)</label>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <select id="${id}" style="flex:1; min-width:220px;">
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <select id="${id}" style="flex:1; min-width:180px;">
               <option value="">Agregar maniobra…</option>
               ${mans.map(w => {
                 const n = normalize(w.nombre);
@@ -3226,30 +4170,52 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
             </select>
             <button type="button" class="mini" id="btnClearMan">Limpiar</button>
           </div>
-          <div id="manChips" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;"></div>
+          <div id="manChips" class="kaman-maniobra-pay-list"></div>
           <input type="hidden" data-col="${col}" id="manHidden"/>
-          <div class="hint" style="padding:0; margin:0; font-size:12px;">Gestiona empleados en 💵 Nómina.</div>
+          <input type="hidden" data-col="${PAGO_MANIOBRA_COL}" id="manPaysHidden"/>
+          <div class="hint" style="padding:0; margin:0; font-size:11px;">Pago individual por trabajador; cada persona puede llevar monto diferente.</div>
         `;
         grid.appendChild(field);
 
         const sel = field.querySelector("select");
         const hidden = field.querySelector("#manHidden");
+        const paysHidden = field.querySelector("#manPaysHidden");
         const chips = field.querySelector("#manChips");
         let selected = [...initialList].slice(0,4);
+        let pays = parseManiobraPays(pagoVal, selected);
 
         function sync(){
+          selected.forEach(n => {
+            if(!(n in pays)) pays[n] = workerSalary(getWorkerByName(n));
+          });
+          Object.keys(pays).forEach(n => { if(!selected.includes(n)) delete pays[n]; });
           hidden.value = selected.join(", ");
+          paysHidden.value = serializeManiobraPays(pays, selected);
           chips.innerHTML = selected.map(n => `
-            <span style="border:1px solid rgba(255,255,255,.18); background: rgba(15,23,42,.55); padding:6px 10px; border-radius:999px; font-weight:900;">
-              ${n}
-              <button type="button" data-x="${n.replaceAll('"',"&quot;")}" class="ghost" style="margin-left:8px; padding:2px 8px; border-radius:999px;">✖</button>
-            </span>
+            <div class="kaman-maniobra-pay-row" data-name="${escapeHTML(n)}">
+              <div class="kaman-maniobra-person">
+                <span>${escapeHTML(n)}</span>
+                <button type="button" data-x="${n.replaceAll('"',"&quot;")}" class="ghost" title="Quitar">✖</button>
+              </div>
+              <div class="kaman-pay-mini">
+                <label>Pago</label>
+                <input type="number" step="0.01" min="0" value="${moneyNumber(pays[n]).toFixed(2)}" data-pay-name="${n.replaceAll('"',"&quot;")}" />
+              </div>
+            </div>
           `).join("");
           chips.querySelectorAll("button[data-x]").forEach(b=>{
             b.addEventListener("click", ()=>{
               const name = b.getAttribute("data-x");
               selected = selected.filter(x=>x!==name);
+              delete pays[name];
               sync();
+            });
+          });
+          chips.querySelectorAll("input[data-pay-name]").forEach(inp=>{
+            inp.addEventListener("input", ()=>{
+              const name = inp.getAttribute("data-pay-name");
+              pays[name] = moneyNumber(inp.value);
+              paysHidden.value = serializeManiobraPays(pays, selected);
             });
           });
         }
@@ -3265,18 +4231,22 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
             return;
           }
           selected.push(v);
+          pays[v] = workerSalary(getWorkerByName(v));
           sel.value="";
           sync();
         });
 
         field.querySelector("#btnClearMan").addEventListener("click", ()=>{
           selected = [];
+          pays = {};
           sync();
         });
 
         sync();
         continue;
       }
+
+      if(col === PAGO_MANIOBRA_COL){ continue; }
 
       if(col === CUSTODIO_COL){
         field.innerHTML = `
@@ -3291,6 +4261,23 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
         const el = field.querySelector("select");
         const up = val.toUpperCase();
         el.value = (up==="SI"||up==="NO") ? up : "";
+        continue;
+      }
+
+      if(col === SEGUNDA_PARADA_COL || col === TERCERA_PARADA_COL){
+        const num = col === SEGUNDA_PARADA_COL ? 2 : 3;
+        field.classList.add("kaman-stop-field");
+        field.setAttribute("data-stop", String(num));
+        field.innerHTML = `
+          <label for="${id}">horario ${num === 2 ? "segunda" : "tercera"} parada</label>
+          <input id="${id}" data-col="${col}" list="timeOptions" placeholder="Ej. 10:30 AM" inputmode="text" />
+        `;
+        grid.appendChild(field);
+        const inpStop = field.querySelector("input");
+        inpStop.value = val;
+        inpStop.addEventListener("change", ()=> validateUnitScheduleInForm({ clearUnit:false }));
+        inpStop.addEventListener("blur", ()=> validateUnitScheduleInForm({ clearUnit:false }));
+        refreshParadasVisibility();
         continue;
       }
 
@@ -3344,14 +4331,18 @@ body.is-processing button, body.is-processing input, body.is-processing select, 
       "operador": "Operador",
       [UNIT_COL]: "Unidad",
       "horario de carga": "Horario de carga",
+      [SEGUNDA_PARADA_COL]: "Horario segunda parada",
+      [TERCERA_PARADA_COL]: "Horario tercera parada",
       "horario de cita": "Horario de cita",
+      [PAGO_OPERADOR_COL]: "Pago operador",
+      [PAGO_MANIOBRA_COL]: "Pago maniobra",
       [CUSTODIO_COL]: "Custodio"
     };
     return nombres[col] || String(col || "Campo").replace(/\b\w/g, m => m.toUpperCase());
   }
 
   function validarCamposObligatoriosCita(data){
-    const opcionales = new Set([MANIOBRA_COL, "observaciones"]);
+    const opcionales = new Set([MANIOBRA_COL, "observaciones", SEGUNDA_PARADA_COL, TERCERA_PARADA_COL, PAGO_OPERADOR_COL, PAGO_MANIOBRA_COL]);
     const faltantes = COLS.filter(col => !opcionales.has(col) && !normalize(data[col]));
     if(!faltantes.length) return true;
 
@@ -3389,9 +4380,115 @@ Observaciones y maniobra pueden quedar vacíos.`);
     openModal("Editar cita");
   }
 
+  function buildResumenCitaTexto(data){
+    const lineas = [];
+    const add = (etiqueta, valor) => {
+      const v = normalize(valor);
+      if(v) lineas.push(`${etiqueta}: ${v}`);
+    };
+
+    add("Fecha", data[DATE_COL]);
+    add("Cliente", data["cliente"]);
+    add("Destino / paradas", data["destino"]);
+    add("Operador", data["operador"]);
+    add("Pago operador", data[PAGO_OPERADOR_COL]);
+    add("Maniobra", data[MANIOBRA_COL]);
+    add("Pago maniobra", data[PAGO_MANIOBRA_COL]);
+    add("Unidad", data[UNIT_COL]);
+    add("Horario de carga", data["horario de carga"]);
+    add("Horario segunda parada", data[SEGUNDA_PARADA_COL]);
+    add("Horario tercera parada", data[TERCERA_PARADA_COL]);
+    add("Horario de cita", data["horario de cita"]);
+    add("Custodio", data[CUSTODIO_COL]);
+    add("Observaciones", data["observaciones"]);
+
+    return lineas.join("\n");
+  }
+
+  function confirmarGuardarCita(data){
+    const resumen = buildResumenCitaTexto(data);
+    const tipo = state.editingId ? "actualizar" : "guardar";
+    return confirm(`✅ Revisa el resumen antes de ${tipo} la cita:\n\n${resumen || "Sin datos."}\n\n¿Está segura de ${tipo} esta cita?\n\nAceptar = Guardar\nCancelar = Regresar a edición`);
+  }
+
+
+  function onlyDigitsPhone(value){
+    return normalize(value).replace(/\D+/g, "");
+  }
+
+  function phoneForWhatsApp(raw){
+    let d = onlyDigitsPhone(raw);
+    if(!d) return "";
+    if(d.length === 10) d = "52" + d;
+    if(d.length === 11 && d.startsWith("1")) d = "52" + d.slice(1);
+    return d;
+  }
+
+  function getWorkerByName(name){
+    const n = normalize(name).toLowerCase();
+    if(!n) return null;
+    return state.workers.find(w => normalize(w.nombre).toLowerCase() === n) || null;
+  }
+
+  function buildWhatsAppCitaTexto(row){
+    const d = row?.data || {};
+    const operador = normalize(d["operador"]);
+    const lineas = [
+      "Hola, te comparto la cita/viaje registrado:",
+      "",
+      `Fecha: ${normalize(d[DATE_COL]) || "Sin fecha"}`,
+      `Cliente: ${normalize(d["cliente"]) || "Sin cliente"}`,
+      `Destino / paradas: ${normalize(d["destino"]) || "Sin destino"}`,
+      `Operador: ${operador || "Sin operador"}`,
+      `Unidad: ${normalize(d[UNIT_COL]) || "Sin unidad"}`,
+      `Horario de carga: ${normalize(d["horario de carga"]) || "Sin horario"}`,
+      normalize(d[SEGUNDA_PARADA_COL]) ? `Segunda parada: ${normalize(d[SEGUNDA_PARADA_COL])}` : "",
+      normalize(d[TERCERA_PARADA_COL]) ? `Tercera parada: ${normalize(d[TERCERA_PARADA_COL])}` : "",
+      `Horario de cita: ${normalize(d["horario de cita"]) || "Sin horario"}`,
+      normalize(d[MANIOBRA_COL]) ? `Maniobra: ${normalize(d[MANIOBRA_COL])}` : "",
+      normalize(d[CUSTODIO_COL]) ? `Custodio: ${normalize(d[CUSTODIO_COL])}` : "",
+      normalize(d["observaciones"]) ? `Observaciones: ${normalize(d["observaciones"])}` : ""
+    ].filter(Boolean);
+    return lineas.join("\n");
+  }
+
+  function askSendWhatsAppForCita(row){
+    try{
+      const d = row?.data || {};
+      const operador = normalize(d["operador"]);
+      const worker = getWorkerByName(operador);
+      let telefono = normalize(worker?.telefono);
+      let destinoLabel = operador ? `al operador ${operador}` : "por WhatsApp";
+
+      if(!telefono){
+        const capturado = prompt(`La cita ya se guardó.\n\nNo encontré teléfono/WhatsApp para ${operador || "el operador"}.\nEscribe un número para enviar la cita por WhatsApp o deja vacío para omitir:`);
+        telefono = normalize(capturado);
+      } else if(!confirm(`Cita guardada correctamente.\n\n¿Enviar resumen por WhatsApp ${destinoLabel}?`)) {
+        return;
+      }
+
+      const phone = phoneForWhatsApp(telefono);
+      if(!phone){
+        setStatus("Cita guardada. WhatsApp omitido por falta de número.");
+        return;
+      }
+      const text = buildWhatsAppCitaTexto(row);
+      const url = `https://wa.me/${phone}?text=${encodeURIComponent(text)}`;
+      setTimeout(()=> window.open(url, "_blank"), 250);
+      setStatus("Cita guardada. Abriendo WhatsApp...");
+    }catch(err){
+      console.warn("No se pudo abrir WhatsApp:", err);
+      setStatus("Cita guardada. WhatsApp no se pudo abrir.");
+    }
+  }
+
   function upsertRow(){
     const data = getFormData();
     if(!validarCamposObligatoriosCita(data)) return;
+    if(!confirmarGuardarCita(data)) {
+      setStatus("Regresaste a edición. La cita no se guardó.");
+      return;
+    }
     const dateISO = normalize(data[DATE_COL]);
     const uName = normalize(data[UNIT_COL]);
     const u = getUnitByName(uName);
@@ -3404,12 +4501,12 @@ Observaciones y maniobra pueden quedar vacíos.`);
     const conflict = findUnitScheduleConflict(data, state.editingId);
     if(conflict){
       speak(`Atención. No puedes guardar. La unidad ${normalize(uName)} ya está ocupada en ese horario.`);
-      alert(`⚠️ ${conflict.title}
-
-${conflict.message}`);
+      showKamanNotice(conflict.title, conflict.message, "save-unit-conflict-" + normalize(uName) + "-" + normalize(data[DATE_COL]));
       return;
     }
 
+    let rowForWhatsApp = null;
+    const isNewCita = !state.editingId;
     if(state.editingId){
       const row = state.rows.find(r=>r.id===state.editingId);
       if(row){ row.data=data; syncPayrollForCita(row); }
@@ -3417,6 +4514,7 @@ ${conflict.message}`);
     } else {
       const newRow = { id: uid(), checked:false, createdAt:new Date().toISOString(), data };
       state.rows.unshift(newRow);
+      rowForWhatsApp = newRow;
       syncPayrollForCita(newRow);
       setStatus("Cita agregada.");
     }
@@ -3424,6 +4522,7 @@ ${conflict.message}`);
     closeModal();
     render();
     hideMobileMenuAfterCita();
+    if(isNewCita && rowForWhatsApp) askSendWhatsAppForCita(rowForWhatsApp);
   }
 
   async function deleteRow(id){
@@ -3438,6 +4537,8 @@ ${conflict.message}`);
 
       localStorage.setItem(STORAGE_KEY, JSON.stringify(sortCitasByDateTime(state.rows)));
       localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
+      setDirty(FIREBASE_DIRTY_CITAS_KEY);
+      setDirty(FIREBASE_DIRTY_CONFIG_KEY);
       render();
       if(typeof renderPayroll === "function") renderPayroll();
 
@@ -3480,6 +4581,7 @@ ${conflict.message}`);
 
     const trabajadores = state.workers.map(w => ({
       "NOMBRE": normalize(w.nombre),
+      "TELEFONO": normalize(w.telefono),
       "SEGURO_SOCIAL": normalize(w.nss),
       "SUELDO": Number(w.sueldo || 0) || 0
     }));
@@ -3649,6 +4751,7 @@ ${conflict.message}`);
   function closeConfig(){
     $("#configBackdrop").style.display="none";
     $("#configBackdrop").setAttribute("aria-hidden","true");
+    if(window.kamanShowHome) window.kamanShowHome();
   }
 
   // === Clientes UI ===
@@ -3797,7 +4900,7 @@ ${conflict.message}`);
 
 // === Unidades UI ===
   function openUnits(){ $("#unitsBackdrop").style.display="flex"; $("#unitsBackdrop").setAttribute("aria-hidden","false"); renderUnits(); }
-  function closeUnits(){ $("#unitsBackdrop").style.display="none"; $("#unitsBackdrop").setAttribute("aria-hidden","true"); render(); }
+  function closeUnits(){ $("#unitsBackdrop").style.display="none"; $("#unitsBackdrop").setAttribute("aria-hidden","true"); render(); if(window.kamanShowHome) window.kamanShowHome(); }
 
   function openUnitForm(title){ $("#unitFormTitle").textContent=title; $("#unitFormBackdrop").style.display="flex"; $("#unitFormBackdrop").setAttribute("aria-hidden","false"); }
   function closeUnitForm(){ $("#unitFormBackdrop").style.display="none"; $("#unitFormBackdrop").setAttribute("aria-hidden","true"); state.editingUnitId=null; $("#unitFormGrid").innerHTML=""; }
@@ -3909,11 +5012,12 @@ ${conflict.message}`);
   function buildWorkerForm(initial={}){
     const g = $("#workerFormGrid");
     const nombre = normalize(initial.nombre);
+    const telefono = normalize(initial.telefono || initial.telefonoWhatsapp || initial.phone);
 const nss = normalize(initial.nss);
     const sueldo = normalize(initial.sueldo);
     g.innerHTML = `
       <div class="field"><label>NOMBRE</label><input id="w_nombre" placeholder="Ej. CESAR" value="${nombre.replaceAll('"',"&quot;")}" /></div>
-<div class="field"><label>SEGURO SOCIAL</label><input id="w_nss" placeholder="NSS" value="${nss.replaceAll('"',"&quot;")}" /></div>
+<div class="field"><label>TELÉFONO / WHATSAPP</label><input id="workerTelefono" type="tel" inputmode="tel" placeholder="Ej. 55 1234 5678" value="${telefono.replaceAll('"',"&quot;")}" /></div><div class="field"><label>SEGURO SOCIAL</label><input id="w_nss" placeholder="NSS" value="${nss.replaceAll('"',"&quot;")}" /></div>
 <div class="field"><label>SUELDO POR CITA / DÍA</label><input id="w_sueldo" type="number" step="0.01" min="0" placeholder="0.00" value="${sueldo.replaceAll('"',"&quot;")}" /></div>
     `;
 $("#w_nombre")?.focus();
@@ -3924,16 +5028,17 @@ $("#w_nombre")?.focus();
 
   function saveWorkerFromForm(){
     const nombre = normalize($("#w_nombre").value).toUpperCase();
+    const telefono = normalize($("#workerTelefono")?.value);
     const nss = normalize($("#w_nss").value);
     const sueldo = Number($("#w_sueldo")?.value || 0) || 0;
 
     if(!nombre){ alert("Nombre obligatorio."); return; }
 if(state.editingWorkerId){
       const w = state.workers.find(x=>x.id===state.editingWorkerId);
-      if(w){ w.nombre=nombre; w.nss=nss; w.sueldo=sueldo; }
+      if(w){ w.nombre=nombre; w.telefono=telefono; w.nss=nss; w.sueldo=sueldo; }
       setStatus("Trabajador actualizado.");
     } else {
-      state.workers.unshift({ id: uid(), nombre, nss, sueldo });
+      state.workers.unshift({ id: uid(), nombre, telefono, nss, sueldo });
       setStatus("Trabajador agregado.");
     }
     saveWorkers();
@@ -4040,6 +5145,7 @@ if(state.editingWorkerId){
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td style="padding:10px; font-weight:900;">${normalize(w.nombre)}</td>
+        <td style="padding:10px;">${normalize(w.telefono)}</td>
         <td style="padding:10px;">${normalize(w.nss)}</td>
         <td style="padding:10px; font-weight:900;">$${workerSalary(w).toFixed(2)}</td>
         <td style="padding:10px; font-weight:900;">$${total.toFixed(2)}</td>
@@ -4213,6 +5319,7 @@ if(state.editingWorkerId){
             <div><b>Operador</b><span>${escapePrint(d[OPERADOR_COL])}</span></div>
             <div><b>Maniobra</b><span>${escapePrint(d[MANIOBRA_COL])}</span></div>
             <div><b>Horario de carga</b><span>${escapePrint(d["horario de carga"])}</span></div>
+            <div><b>Segunda parada</b><span>${escapePrint(d[SEGUNDA_PARADA_COL] || "-")}</span></div>
             <div><b>Custodio</b><span>${escapePrint(d[CUSTODIO_COL])}</span></div>
             <div><b>Observaciones</b><span>${escapePrint(d["observaciones"])}</span></div>
           </div>
@@ -4275,6 +5382,324 @@ if(state.editingWorkerId){
 #historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
 </style>
 
+
+<style id="kaman-destinos-paradas-css">
+.kaman-destino-list{display:grid;gap:7px;margin-top:7px;}
+.kaman-destino-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #c5e0f6;background:#f3faff;border-radius:13px;padding:7px 8px;font-size:12px;font-weight:950;color:#12385f;}
+.kaman-destino-chip button{width:28px!important;height:28px!important;min-height:28px!important;padding:0!important;border-radius:10px!important;font-size:13px!important;box-shadow:none!important;}
+.kaman-stop-field{transition:opacity .15s ease;}
+.kaman-stop-field.kaman-hidden-stop{display:none!important;}
+@media(max-width:768px){.kaman-destino-chip{font-size:12px;padding:6px 8px}.kaman-stop-field input{min-height:42px!important;height:42px!important}}
+</style>
+
+<style id="kaman-notificacion-suave-css">
+#kamanNoticeBackdrop{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.30);backdrop-filter:blur(2px);}
+#kamanNoticeBackdrop.is-open{display:flex;}
+.kaman-notice-card{width:min(420px,92vw);background:#fff;border:1px solid #bfdbfe;border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.25);color:#0f3c68;overflow:hidden;}
+.kaman-notice-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#eaf6ff;border-bottom:1px solid #c5e0f6;font-weight:950;font-size:16px;}
+.kaman-notice-body{padding:14px 16px;white-space:pre-line;font-size:13px;font-weight:800;line-height:1.45;color:#12385f;}
+.kaman-notice-actions{display:flex;justify-content:flex-end;padding:10px 12px;background:#f1f9ff;border-top:1px solid #c5e0f6;}
+#kamanNoticeOk{min-height:42px;padding:8px 18px!important;background:#1d74d8!important;color:#fff!important;border-color:#1d74d8!important;}
+@media(max-width:768px){#kamanNoticeBackdrop{align-items:flex-start;padding-top:70px}.kaman-notice-card{width:94vw;border-radius:18px}.kaman-notice-body{font-size:13px}.kaman-notice-actions{display:grid;grid-template-columns:1fr}#kamanNoticeOk{width:100%;min-height:46px}}
+</style>
+
+<style id="kaman-final-buttons-antenna-css">
+/* Ajuste final: botón editar más discreto, guardar más grande */
+#modalBackdrop .modal .actions{
+  align-items:center !important;
+  gap:8px !important;
+}
+#btnOpenCitasEditorFromNew{
+  flex:0 0 auto !important;
+  min-height:34px !important;
+  height:34px !important;
+  padding:6px 10px !important;
+  border-radius:12px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#fff7db !important;
+  color:#7a4a00 !important;
+  border-color:#f6c65b !important;
+  box-shadow:0 2px 8px rgba(180,118,0,.12) !important;
+}
+#btnSave{
+  flex:1 1 190px !important;
+  min-height:52px !important;
+  height:52px !important;
+  padding:12px 18px !important;
+  border-radius:16px !important;
+  font-size:16px !important;
+  font-weight:950 !important;
+}
+#btnCancel{
+  flex:0 0 auto !important;
+  min-height:46px !important;
+  height:46px !important;
+}
+.firebase-signal,
+#historyFirebaseSignal{
+  padding:6px 9px !important;
+  min-height:34px !important;
+  gap:7px !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:30px !important;
+  height:30px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.antenna-svg{
+  width:30px;
+  height:30px;
+  overflow:visible;
+}
+.antenna-svg .ant-dish{
+  fill:#eaf6ff;
+  stroke:#0f3c68;
+  stroke-width:3.2;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-mast{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:3;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-core{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:2.5;
+}
+.antenna-svg .ant-wave{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:3;
+  stroke-linecap:round;
+  opacity:.85;
+  animation:kamanAntennaPulse 1.4s ease-in-out infinite;
+}
+.antenna-svg .ant-wave-2{ animation-delay:.18s; opacity:.65; }
+.firebase-offline .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-core{ fill:#ef4444; }
+.firebase-syncing .antenna-svg .ant-core,
+.firebase-pending .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-syncing .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-pending .antenna-svg .ant-core{ fill:#f59e0b; }
+.firebase-offline .antenna-svg .ant-wave,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-wave{ stroke:#ef4444; animation:none; opacity:.35; }
+@keyframes kamanAntennaPulse{
+  0%,100%{ transform:translateY(0); opacity:.50; }
+  50%{ transform:translateY(-1px); opacity:1; }
+}
+@media(max-width:768px){
+  #modalBackdrop .modal .actions{
+    grid-template-columns:.78fr 1.25fr .78fr !important;
+    padding:8px 10px !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    min-height:38px !important;
+    height:38px !important;
+    padding:5px 7px !important;
+    font-size:10px !important;
+    line-height:1.12 !important;
+    white-space:normal !important;
+  }
+  #btnSave{
+    min-height:54px !important;
+    height:54px !important;
+    font-size:17px !important;
+    padding:12px 14px !important;
+  }
+  #btnCancel{
+    min-height:42px !important;
+    height:42px !important;
+    padding:8px 9px !important;
+    font-size:13px !important;
+  }
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .antenna-svg{
+    width:31px !important;
+    height:31px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-ajuste-botones-final-celular">
+/* Ajuste solicitado: editar citas más chico y Guardar más grande en celular */
+@media (max-width:768px){
+  #modalBackdrop .modal .actions{
+    display:grid !important;
+    grid-template-columns: 1.55fr .95fr !important;
+    grid-template-rows: 38px 48px !important;
+    gap:8px !important;
+    padding:8px 10px 10px !important;
+    align-items:stretch !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-height:38px !important;
+    height:38px !important;
+    padding:4px 6px !important;
+    border-radius:14px !important;
+    font-size:10.5px !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+    text-align:center !important;
+  }
+  #btnSave{
+    grid-column:1 !important;
+    grid-row:1 / span 2 !important;
+    width:100% !important;
+    min-height:94px !important;
+    height:94px !important;
+    padding:10px 12px !important;
+    border-radius:24px !important;
+    font-size:27px !important;
+    line-height:1.05 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+  }
+  #btnCancel{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    border-radius:18px !important;
+    font-size:14px !important;
+    padding:6px 8px !important;
+  }
+}
+@media (min-width:769px){
+  #btnOpenCitasEditorFromNew{
+    min-height:32px !important;
+    height:32px !important;
+    padding:5px 10px !important;
+    font-size:11px !important;
+  }
+  #btnSave{
+    min-height:58px !important;
+    height:58px !important;
+    font-size:19px !important;
+    padding:13px 24px !important;
+  }
+}
+</style>
+
+<style id="kaman-satelite-sombras-profesional-css">
+/* Satélite profesional para estado de conexión */
+.firebase-signal,
+#historyFirebaseSignal{
+  background:linear-gradient(135deg,#eef9ff,#ffffff) !important;
+  border:1px solid rgba(44,132,210,.32) !important;
+  box-shadow:0 8px 22px rgba(26,91,150,.14), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:34px !important;
+  height:34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.satellite-svg{
+  width:34px !important;
+  height:34px !important;
+  overflow:visible !important;
+  filter:drop-shadow(0 3px 5px rgba(15,59,105,.22));
+}
+.satellite-svg .sat-orbit{
+  fill:none;
+  stroke:#94c8f1;
+  stroke-width:1.8;
+  stroke-dasharray:4 4;
+  opacity:.72;
+}
+.satellite-svg .sat-panel{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:2.2;
+}
+.satellite-svg .sat-core{
+  fill:#ffffff;
+  stroke:#0f3c68;
+  stroke-width:2.4;
+}
+.satellite-svg .sat-arm{
+  stroke:#0f3c68;
+  stroke-width:2.5;
+  stroke-linecap:round;
+}
+.satellite-svg .sat-dot{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:1.8;
+}
+.satellite-svg .sat-signal{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  opacity:.9;
+  animation:kamanSatellitePulse 1.45s ease-in-out infinite;
+}
+.satellite-svg .sat-signal-2{ animation-delay:.18s; opacity:.58; }
+.firebase-offline .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-dot{ fill:#ef4444 !important; }
+.firebase-offline .satellite-svg .sat-signal,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-signal{ stroke:#ef4444 !important; animation:none !important; opacity:.35 !important; }
+.firebase-syncing .satellite-svg .sat-dot,
+.firebase-pending .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-syncing .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-pending .satellite-svg .sat-dot{ fill:#f59e0b !important; }
+@keyframes kamanSatellitePulse{
+  0%,100%{ transform:translate(0,0); opacity:.48; }
+  50%{ transform:translate(1px,-1px); opacity:1; }
+}
+
+/* Sombras profesionales para todos los botones principales */
+button{
+  box-shadow:0 8px 18px rgba(23,92,160,.13), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+button:hover{
+  box-shadow:0 10px 24px rgba(23,92,160,.18), 0 3px 8px rgba(15,59,105,.13), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  transform:translateY(-1px);
+}
+button:active{
+  transform:translateY(1px) !important;
+  box-shadow:0 4px 10px rgba(23,92,160,.13), inset 0 2px 4px rgba(15,59,105,.10) !important;
+}
+.primary, #btnSave, #btnConfigDone, #btnClientsDone, #btnDestinationsDone, #btnUnitsDone,
+#btnPayrollDone, #btnNotesDone, #btnHistoryDone, #btnAvailableUnitsDone, #btnCitasEditorDone{
+  box-shadow:0 12px 24px rgba(29,116,216,.24), 0 3px 8px rgba(15,59,105,.14), inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+.danger{
+  box-shadow:0 10px 22px rgba(216,50,86,.17), 0 2px 6px rgba(120,20,40,.10), inset 0 1px 0 rgba(255,255,255,.80) !important;
+}
+#btnOpenCitasEditorFromNew{
+  box-shadow:0 8px 16px rgba(180,118,0,.18), 0 2px 5px rgba(120,74,0,.10), inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+.main-menu-card, .menu-card, [data-menu-card]{
+  box-shadow:0 14px 34px rgba(23,92,160,.13), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+@media(max-width:768px){
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .satellite-svg{ width:35px !important; height:35px !important; }
+  button{ box-shadow:0 7px 16px rgba(23,92,160,.14), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important; }
+}
+</style>
 </head><body><div class="page"><div class="top"><div><h1>Control de Transporte • Historial de citas</h1><div>${rows.length} cita(s)</div></div><div class="meta">Generado: ${fecha}<br>Firebase: conectado</div></div>${activeFilters.length ? `<div class="filters"><b>Filtros:</b> ${escapeHTML(activeFilters.join(" | "))}</div>` : ""}${cards}</div><script>window.onload=function(){setTimeout(function(){window.print();},250)}<\/script></body></html>`;
 
     const w = window.open("", "_blank");
@@ -4481,6 +5906,8 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
       state.payroll = state.payroll.filter(p => normalize(p.origen).toUpperCase() !== "CITA" && !p.citaId);
       localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
       localStorage.setItem(PAYROLL_KEY, JSON.stringify(state.payroll));
+      setDirty(FIREBASE_DIRTY_CITAS_KEY);
+      setDirty(FIREBASE_DIRTY_CONFIG_KEY);
       render();
       if(typeof renderPayroll === "function") renderPayroll();
 
@@ -4687,6 +6114,324 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 #historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
 </style>
 
+
+<style id="kaman-destinos-paradas-css">
+.kaman-destino-list{display:grid;gap:7px;margin-top:7px;}
+.kaman-destino-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #c5e0f6;background:#f3faff;border-radius:13px;padding:7px 8px;font-size:12px;font-weight:950;color:#12385f;}
+.kaman-destino-chip button{width:28px!important;height:28px!important;min-height:28px!important;padding:0!important;border-radius:10px!important;font-size:13px!important;box-shadow:none!important;}
+.kaman-stop-field{transition:opacity .15s ease;}
+.kaman-stop-field.kaman-hidden-stop{display:none!important;}
+@media(max-width:768px){.kaman-destino-chip{font-size:12px;padding:6px 8px}.kaman-stop-field input{min-height:42px!important;height:42px!important}}
+</style>
+
+<style id="kaman-notificacion-suave-css">
+#kamanNoticeBackdrop{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.30);backdrop-filter:blur(2px);}
+#kamanNoticeBackdrop.is-open{display:flex;}
+.kaman-notice-card{width:min(420px,92vw);background:#fff;border:1px solid #bfdbfe;border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.25);color:#0f3c68;overflow:hidden;}
+.kaman-notice-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#eaf6ff;border-bottom:1px solid #c5e0f6;font-weight:950;font-size:16px;}
+.kaman-notice-body{padding:14px 16px;white-space:pre-line;font-size:13px;font-weight:800;line-height:1.45;color:#12385f;}
+.kaman-notice-actions{display:flex;justify-content:flex-end;padding:10px 12px;background:#f1f9ff;border-top:1px solid #c5e0f6;}
+#kamanNoticeOk{min-height:42px;padding:8px 18px!important;background:#1d74d8!important;color:#fff!important;border-color:#1d74d8!important;}
+@media(max-width:768px){#kamanNoticeBackdrop{align-items:flex-start;padding-top:70px}.kaman-notice-card{width:94vw;border-radius:18px}.kaman-notice-body{font-size:13px}.kaman-notice-actions{display:grid;grid-template-columns:1fr}#kamanNoticeOk{width:100%;min-height:46px}}
+</style>
+
+<style id="kaman-final-buttons-antenna-css">
+/* Ajuste final: botón editar más discreto, guardar más grande */
+#modalBackdrop .modal .actions{
+  align-items:center !important;
+  gap:8px !important;
+}
+#btnOpenCitasEditorFromNew{
+  flex:0 0 auto !important;
+  min-height:34px !important;
+  height:34px !important;
+  padding:6px 10px !important;
+  border-radius:12px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#fff7db !important;
+  color:#7a4a00 !important;
+  border-color:#f6c65b !important;
+  box-shadow:0 2px 8px rgba(180,118,0,.12) !important;
+}
+#btnSave{
+  flex:1 1 190px !important;
+  min-height:52px !important;
+  height:52px !important;
+  padding:12px 18px !important;
+  border-radius:16px !important;
+  font-size:16px !important;
+  font-weight:950 !important;
+}
+#btnCancel{
+  flex:0 0 auto !important;
+  min-height:46px !important;
+  height:46px !important;
+}
+.firebase-signal,
+#historyFirebaseSignal{
+  padding:6px 9px !important;
+  min-height:34px !important;
+  gap:7px !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:30px !important;
+  height:30px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.antenna-svg{
+  width:30px;
+  height:30px;
+  overflow:visible;
+}
+.antenna-svg .ant-dish{
+  fill:#eaf6ff;
+  stroke:#0f3c68;
+  stroke-width:3.2;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-mast{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:3;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-core{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:2.5;
+}
+.antenna-svg .ant-wave{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:3;
+  stroke-linecap:round;
+  opacity:.85;
+  animation:kamanAntennaPulse 1.4s ease-in-out infinite;
+}
+.antenna-svg .ant-wave-2{ animation-delay:.18s; opacity:.65; }
+.firebase-offline .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-core{ fill:#ef4444; }
+.firebase-syncing .antenna-svg .ant-core,
+.firebase-pending .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-syncing .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-pending .antenna-svg .ant-core{ fill:#f59e0b; }
+.firebase-offline .antenna-svg .ant-wave,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-wave{ stroke:#ef4444; animation:none; opacity:.35; }
+@keyframes kamanAntennaPulse{
+  0%,100%{ transform:translateY(0); opacity:.50; }
+  50%{ transform:translateY(-1px); opacity:1; }
+}
+@media(max-width:768px){
+  #modalBackdrop .modal .actions{
+    grid-template-columns:.78fr 1.25fr .78fr !important;
+    padding:8px 10px !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    min-height:38px !important;
+    height:38px !important;
+    padding:5px 7px !important;
+    font-size:10px !important;
+    line-height:1.12 !important;
+    white-space:normal !important;
+  }
+  #btnSave{
+    min-height:54px !important;
+    height:54px !important;
+    font-size:17px !important;
+    padding:12px 14px !important;
+  }
+  #btnCancel{
+    min-height:42px !important;
+    height:42px !important;
+    padding:8px 9px !important;
+    font-size:13px !important;
+  }
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .antenna-svg{
+    width:31px !important;
+    height:31px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-ajuste-botones-final-celular">
+/* Ajuste solicitado: editar citas más chico y Guardar más grande en celular */
+@media (max-width:768px){
+  #modalBackdrop .modal .actions{
+    display:grid !important;
+    grid-template-columns: 1.55fr .95fr !important;
+    grid-template-rows: 38px 48px !important;
+    gap:8px !important;
+    padding:8px 10px 10px !important;
+    align-items:stretch !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-height:38px !important;
+    height:38px !important;
+    padding:4px 6px !important;
+    border-radius:14px !important;
+    font-size:10.5px !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+    text-align:center !important;
+  }
+  #btnSave{
+    grid-column:1 !important;
+    grid-row:1 / span 2 !important;
+    width:100% !important;
+    min-height:94px !important;
+    height:94px !important;
+    padding:10px 12px !important;
+    border-radius:24px !important;
+    font-size:27px !important;
+    line-height:1.05 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+  }
+  #btnCancel{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    border-radius:18px !important;
+    font-size:14px !important;
+    padding:6px 8px !important;
+  }
+}
+@media (min-width:769px){
+  #btnOpenCitasEditorFromNew{
+    min-height:32px !important;
+    height:32px !important;
+    padding:5px 10px !important;
+    font-size:11px !important;
+  }
+  #btnSave{
+    min-height:58px !important;
+    height:58px !important;
+    font-size:19px !important;
+    padding:13px 24px !important;
+  }
+}
+</style>
+
+<style id="kaman-satelite-sombras-profesional-css">
+/* Satélite profesional para estado de conexión */
+.firebase-signal,
+#historyFirebaseSignal{
+  background:linear-gradient(135deg,#eef9ff,#ffffff) !important;
+  border:1px solid rgba(44,132,210,.32) !important;
+  box-shadow:0 8px 22px rgba(26,91,150,.14), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:34px !important;
+  height:34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.satellite-svg{
+  width:34px !important;
+  height:34px !important;
+  overflow:visible !important;
+  filter:drop-shadow(0 3px 5px rgba(15,59,105,.22));
+}
+.satellite-svg .sat-orbit{
+  fill:none;
+  stroke:#94c8f1;
+  stroke-width:1.8;
+  stroke-dasharray:4 4;
+  opacity:.72;
+}
+.satellite-svg .sat-panel{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:2.2;
+}
+.satellite-svg .sat-core{
+  fill:#ffffff;
+  stroke:#0f3c68;
+  stroke-width:2.4;
+}
+.satellite-svg .sat-arm{
+  stroke:#0f3c68;
+  stroke-width:2.5;
+  stroke-linecap:round;
+}
+.satellite-svg .sat-dot{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:1.8;
+}
+.satellite-svg .sat-signal{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  opacity:.9;
+  animation:kamanSatellitePulse 1.45s ease-in-out infinite;
+}
+.satellite-svg .sat-signal-2{ animation-delay:.18s; opacity:.58; }
+.firebase-offline .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-dot{ fill:#ef4444 !important; }
+.firebase-offline .satellite-svg .sat-signal,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-signal{ stroke:#ef4444 !important; animation:none !important; opacity:.35 !important; }
+.firebase-syncing .satellite-svg .sat-dot,
+.firebase-pending .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-syncing .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-pending .satellite-svg .sat-dot{ fill:#f59e0b !important; }
+@keyframes kamanSatellitePulse{
+  0%,100%{ transform:translate(0,0); opacity:.48; }
+  50%{ transform:translate(1px,-1px); opacity:1; }
+}
+
+/* Sombras profesionales para todos los botones principales */
+button{
+  box-shadow:0 8px 18px rgba(23,92,160,.13), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+button:hover{
+  box-shadow:0 10px 24px rgba(23,92,160,.18), 0 3px 8px rgba(15,59,105,.13), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  transform:translateY(-1px);
+}
+button:active{
+  transform:translateY(1px) !important;
+  box-shadow:0 4px 10px rgba(23,92,160,.13), inset 0 2px 4px rgba(15,59,105,.10) !important;
+}
+.primary, #btnSave, #btnConfigDone, #btnClientsDone, #btnDestinationsDone, #btnUnitsDone,
+#btnPayrollDone, #btnNotesDone, #btnHistoryDone, #btnAvailableUnitsDone, #btnCitasEditorDone{
+  box-shadow:0 12px 24px rgba(29,116,216,.24), 0 3px 8px rgba(15,59,105,.14), inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+.danger{
+  box-shadow:0 10px 22px rgba(216,50,86,.17), 0 2px 6px rgba(120,20,40,.10), inset 0 1px 0 rgba(255,255,255,.80) !important;
+}
+#btnOpenCitasEditorFromNew{
+  box-shadow:0 8px 16px rgba(180,118,0,.18), 0 2px 5px rgba(120,74,0,.10), inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+.main-menu-card, .menu-card, [data-menu-card]{
+  box-shadow:0 14px 34px rgba(23,92,160,.13), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+@media(max-width:768px){
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .satellite-svg{ width:35px !important; height:35px !important; }
+  button{ box-shadow:0 7px 16px rgba(23,92,160,.14), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important; }
+}
+</style>
 </head>
 <body>
   <button class="print-btn no-print" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
@@ -4738,6 +6483,36 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 
 
 
+  async function ejecutarResetFirebasePendiente(){
+    if(!citasFirebaseReady()) return false;
+    const base = FIREBASE_DB_URL.replace(/\/$/, "");
+    const results = await Promise.all([
+      fetch(`${base}/citas.json`, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" }),
+      fetch(`${base}/configuracion.json`, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" }),
+      historyFirebaseReady()
+        ? fetch(FIREBASE_HISTORY_ENDPOINT, { method:"PUT", headers:{ "Content-Type":"application/json" }, body:"null" })
+        : Promise.resolve({ ok:true })
+    ]);
+    if(results.some(r => !r.ok)) throw new Error("Firebase no confirmó el reset pendiente");
+    clearResetPending();
+    clearDirty(FIREBASE_DIRTY_CITAS_KEY);
+    clearDirty(FIREBASE_DIRTY_CONFIG_KEY);
+    clearDirty(FIREBASE_DIRTY_HISTORY_KEY);
+    setFirebaseSignal("online", "Firebase limpio");
+    setHistoryFirebaseSignal("online", "Historial limpio");
+    return true;
+  }
+
+  async function sincronizarPendientesLocales(){
+    if(hasResetPending()){
+      await ejecutarResetFirebasePendiente();
+      return;
+    }
+    if(isDirty(FIREBASE_DIRTY_CITAS_KEY)) await syncCitasNow(true);
+    if(isDirty(FIREBASE_DIRTY_CONFIG_KEY)) await syncConfigNow(true);
+    if(isDirty(FIREBASE_DIRTY_HISTORY_KEY)) await syncHistoryNow(true);
+  }
+
   // Sincronización automática de la app con Firebase
   let appSyncBusy = false;
   let lastAutoSyncAt = 0;
@@ -4749,6 +6524,8 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
     if(!citasFirebaseReady()) return;
     appSyncBusy = true;
     try{
+      await sincronizarPendientesLocales();
+      if(hasResetPending()) return;
       await loadCitasFromFirebase();
       await loadConfigFromFirebase();
       lastAutoSyncAt = Date.now();
@@ -4815,7 +6592,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
             <div><span>UNIDAD</span><b>${escapeHTML(d[UNIT_COL] || "-")}</b></div>
             <div><span>OPERADOR</span><b>${escapeHTML(d[OPERADOR_COL] || "-")}</b></div>
             <div><span>MANIOBRA</span><b>${escapeHTML(d[MANIOBRA_COL] || "-")}</b></div>
-            <div><span>HORARIOS</span><b>Carga: ${escapeHTML(d["horario de carga"] || "-")}<br>Cita: ${escapeHTML(d["horario de cita"] || "-")}</b></div>
+            <div><span>HORARIOS</span><b>Carga: ${escapeHTML(d["horario de carga"] || "-")}<br>2ª parada: ${escapeHTML(d[SEGUNDA_PARADA_COL] || "-")}<br>Cita: ${escapeHTML(d["horario de cita"] || "-")}</b></div>
             <div><span>CUSTODIO</span><b>${escapeHTML(d[CUSTODIO_COL] || "-")}</b></div>
             <div><span>OBSERVACIONES</span><b>${escapeHTML(d["observaciones"] || "-")}</b></div>
           </div>
@@ -4993,12 +6770,329 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 #historyFirebaseSignal.firebase-offline .signal-dot{background:#ef4444;}
 </style>
 
+
+<style id="kaman-destinos-paradas-css">
+.kaman-destino-list{display:grid;gap:7px;margin-top:7px;}
+.kaman-destino-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid #c5e0f6;background:#f3faff;border-radius:13px;padding:7px 8px;font-size:12px;font-weight:950;color:#12385f;}
+.kaman-destino-chip button{width:28px!important;height:28px!important;min-height:28px!important;padding:0!important;border-radius:10px!important;font-size:13px!important;box-shadow:none!important;}
+.kaman-stop-field{transition:opacity .15s ease;}
+.kaman-stop-field.kaman-hidden-stop{display:none!important;}
+@media(max-width:768px){.kaman-destino-chip{font-size:12px;padding:6px 8px}.kaman-stop-field input{min-height:42px!important;height:42px!important}}
+</style>
+
+<style id="kaman-notificacion-suave-css">
+#kamanNoticeBackdrop{position:fixed;inset:0;z-index:100000;display:none;align-items:center;justify-content:center;padding:16px;background:rgba(15,23,42,.30);backdrop-filter:blur(2px);}
+#kamanNoticeBackdrop.is-open{display:flex;}
+.kaman-notice-card{width:min(420px,92vw);background:#fff;border:1px solid #bfdbfe;border-radius:20px;box-shadow:0 24px 70px rgba(15,23,42,.25);color:#0f3c68;overflow:hidden;}
+.kaman-notice-head{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#eaf6ff;border-bottom:1px solid #c5e0f6;font-weight:950;font-size:16px;}
+.kaman-notice-body{padding:14px 16px;white-space:pre-line;font-size:13px;font-weight:800;line-height:1.45;color:#12385f;}
+.kaman-notice-actions{display:flex;justify-content:flex-end;padding:10px 12px;background:#f1f9ff;border-top:1px solid #c5e0f6;}
+#kamanNoticeOk{min-height:42px;padding:8px 18px!important;background:#1d74d8!important;color:#fff!important;border-color:#1d74d8!important;}
+@media(max-width:768px){#kamanNoticeBackdrop{align-items:flex-start;padding-top:70px}.kaman-notice-card{width:94vw;border-radius:18px}.kaman-notice-body{font-size:13px}.kaman-notice-actions{display:grid;grid-template-columns:1fr}#kamanNoticeOk{width:100%;min-height:46px}}
+</style>
+
+<style id="kaman-final-buttons-antenna-css">
+/* Ajuste final: botón editar más discreto, guardar más grande */
+#modalBackdrop .modal .actions{
+  align-items:center !important;
+  gap:8px !important;
+}
+#btnOpenCitasEditorFromNew{
+  flex:0 0 auto !important;
+  min-height:34px !important;
+  height:34px !important;
+  padding:6px 10px !important;
+  border-radius:12px !important;
+  font-size:11px !important;
+  font-weight:950 !important;
+  background:#fff7db !important;
+  color:#7a4a00 !important;
+  border-color:#f6c65b !important;
+  box-shadow:0 2px 8px rgba(180,118,0,.12) !important;
+}
+#btnSave{
+  flex:1 1 190px !important;
+  min-height:52px !important;
+  height:52px !important;
+  padding:12px 18px !important;
+  border-radius:16px !important;
+  font-size:16px !important;
+  font-weight:950 !important;
+}
+#btnCancel{
+  flex:0 0 auto !important;
+  min-height:46px !important;
+  height:46px !important;
+}
+.firebase-signal,
+#historyFirebaseSignal{
+  padding:6px 9px !important;
+  min-height:34px !important;
+  gap:7px !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:30px !important;
+  height:30px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.antenna-svg{
+  width:30px;
+  height:30px;
+  overflow:visible;
+}
+.antenna-svg .ant-dish{
+  fill:#eaf6ff;
+  stroke:#0f3c68;
+  stroke-width:3.2;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-mast{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:3;
+  stroke-linejoin:round;
+}
+.antenna-svg .ant-core{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:2.5;
+}
+.antenna-svg .ant-wave{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:3;
+  stroke-linecap:round;
+  opacity:.85;
+  animation:kamanAntennaPulse 1.4s ease-in-out infinite;
+}
+.antenna-svg .ant-wave-2{ animation-delay:.18s; opacity:.65; }
+.firebase-offline .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-core{ fill:#ef4444; }
+.firebase-syncing .antenna-svg .ant-core,
+.firebase-pending .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-syncing .antenna-svg .ant-core,
+#historyFirebaseSignal.firebase-pending .antenna-svg .ant-core{ fill:#f59e0b; }
+.firebase-offline .antenna-svg .ant-wave,
+#historyFirebaseSignal.firebase-offline .antenna-svg .ant-wave{ stroke:#ef4444; animation:none; opacity:.35; }
+@keyframes kamanAntennaPulse{
+  0%,100%{ transform:translateY(0); opacity:.50; }
+  50%{ transform:translateY(-1px); opacity:1; }
+}
+@media(max-width:768px){
+  #modalBackdrop .modal .actions{
+    grid-template-columns:.78fr 1.25fr .78fr !important;
+    padding:8px 10px !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    min-height:38px !important;
+    height:38px !important;
+    padding:5px 7px !important;
+    font-size:10px !important;
+    line-height:1.12 !important;
+    white-space:normal !important;
+  }
+  #btnSave{
+    min-height:54px !important;
+    height:54px !important;
+    font-size:17px !important;
+    padding:12px 14px !important;
+  }
+  #btnCancel{
+    min-height:42px !important;
+    height:42px !important;
+    padding:8px 9px !important;
+    font-size:13px !important;
+  }
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .antenna-svg{
+    width:31px !important;
+    height:31px !important;
+  }
+}
+</style>
+
+
+<style id="kaman-ajuste-botones-final-celular">
+/* Ajuste solicitado: editar citas más chico y Guardar más grande en celular */
+@media (max-width:768px){
+  #modalBackdrop .modal .actions{
+    display:grid !important;
+    grid-template-columns: 1.55fr .95fr !important;
+    grid-template-rows: 38px 48px !important;
+    gap:8px !important;
+    padding:8px 10px 10px !important;
+    align-items:stretch !important;
+  }
+  #btnOpenCitasEditorFromNew{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    width:100% !important;
+    min-height:38px !important;
+    height:38px !important;
+    padding:4px 6px !important;
+    border-radius:14px !important;
+    font-size:10.5px !important;
+    line-height:1.05 !important;
+    white-space:normal !important;
+    text-align:center !important;
+  }
+  #btnSave{
+    grid-column:1 !important;
+    grid-row:1 / span 2 !important;
+    width:100% !important;
+    min-height:94px !important;
+    height:94px !important;
+    padding:10px 12px !important;
+    border-radius:24px !important;
+    font-size:27px !important;
+    line-height:1.05 !important;
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:2px !important;
+  }
+  #btnCancel{
+    grid-column:2 !important;
+    grid-row:2 !important;
+    width:100% !important;
+    min-height:48px !important;
+    height:48px !important;
+    border-radius:18px !important;
+    font-size:14px !important;
+    padding:6px 8px !important;
+  }
+}
+@media (min-width:769px){
+  #btnOpenCitasEditorFromNew{
+    min-height:32px !important;
+    height:32px !important;
+    padding:5px 10px !important;
+    font-size:11px !important;
+  }
+  #btnSave{
+    min-height:58px !important;
+    height:58px !important;
+    font-size:19px !important;
+    padding:13px 24px !important;
+  }
+}
+</style>
+
+<style id="kaman-satelite-sombras-profesional-css">
+/* Satélite profesional para estado de conexión */
+.firebase-signal,
+#historyFirebaseSignal{
+  background:linear-gradient(135deg,#eef9ff,#ffffff) !important;
+  border:1px solid rgba(44,132,210,.32) !important;
+  box-shadow:0 8px 22px rgba(26,91,150,.14), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+.firebase-signal .antenna,
+#historyFirebaseSignal .antenna{
+  width:34px !important;
+  height:34px !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  font-size:0 !important;
+}
+.satellite-svg{
+  width:34px !important;
+  height:34px !important;
+  overflow:visible !important;
+  filter:drop-shadow(0 3px 5px rgba(15,59,105,.22));
+}
+.satellite-svg .sat-orbit{
+  fill:none;
+  stroke:#94c8f1;
+  stroke-width:1.8;
+  stroke-dasharray:4 4;
+  opacity:.72;
+}
+.satellite-svg .sat-panel{
+  fill:#dbeafe;
+  stroke:#0f3c68;
+  stroke-width:2.2;
+}
+.satellite-svg .sat-core{
+  fill:#ffffff;
+  stroke:#0f3c68;
+  stroke-width:2.4;
+}
+.satellite-svg .sat-arm{
+  stroke:#0f3c68;
+  stroke-width:2.5;
+  stroke-linecap:round;
+}
+.satellite-svg .sat-dot{
+  fill:#22c55e;
+  stroke:#0f3c68;
+  stroke-width:1.8;
+}
+.satellite-svg .sat-signal{
+  fill:none;
+  stroke:#2563eb;
+  stroke-width:2.5;
+  stroke-linecap:round;
+  opacity:.9;
+  animation:kamanSatellitePulse 1.45s ease-in-out infinite;
+}
+.satellite-svg .sat-signal-2{ animation-delay:.18s; opacity:.58; }
+.firebase-offline .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-dot{ fill:#ef4444 !important; }
+.firebase-offline .satellite-svg .sat-signal,
+#historyFirebaseSignal.firebase-offline .satellite-svg .sat-signal{ stroke:#ef4444 !important; animation:none !important; opacity:.35 !important; }
+.firebase-syncing .satellite-svg .sat-dot,
+.firebase-pending .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-syncing .satellite-svg .sat-dot,
+#historyFirebaseSignal.firebase-pending .satellite-svg .sat-dot{ fill:#f59e0b !important; }
+@keyframes kamanSatellitePulse{
+  0%,100%{ transform:translate(0,0); opacity:.48; }
+  50%{ transform:translate(1px,-1px); opacity:1; }
+}
+
+/* Sombras profesionales para todos los botones principales */
+button{
+  box-shadow:0 8px 18px rgba(23,92,160,.13), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important;
+}
+button:hover{
+  box-shadow:0 10px 24px rgba(23,92,160,.18), 0 3px 8px rgba(15,59,105,.13), inset 0 1px 0 rgba(255,255,255,.92) !important;
+  transform:translateY(-1px);
+}
+button:active{
+  transform:translateY(1px) !important;
+  box-shadow:0 4px 10px rgba(23,92,160,.13), inset 0 2px 4px rgba(15,59,105,.10) !important;
+}
+.primary, #btnSave, #btnConfigDone, #btnClientsDone, #btnDestinationsDone, #btnUnitsDone,
+#btnPayrollDone, #btnNotesDone, #btnHistoryDone, #btnAvailableUnitsDone, #btnCitasEditorDone{
+  box-shadow:0 12px 24px rgba(29,116,216,.24), 0 3px 8px rgba(15,59,105,.14), inset 0 1px 0 rgba(255,255,255,.28) !important;
+}
+.danger{
+  box-shadow:0 10px 22px rgba(216,50,86,.17), 0 2px 6px rgba(120,20,40,.10), inset 0 1px 0 rgba(255,255,255,.80) !important;
+}
+#btnOpenCitasEditorFromNew{
+  box-shadow:0 8px 16px rgba(180,118,0,.18), 0 2px 5px rgba(120,74,0,.10), inset 0 1px 0 rgba(255,255,255,.78) !important;
+}
+.main-menu-card, .menu-card, [data-menu-card]{
+  box-shadow:0 14px 34px rgba(23,92,160,.13), inset 0 1px 0 rgba(255,255,255,.85) !important;
+}
+@media(max-width:768px){
+  .firebase-signal .antenna,
+  #historyFirebaseSignal .antenna,
+  .satellite-svg{ width:35px !important; height:35px !important; }
+  button{ box-shadow:0 7px 16px rgba(23,92,160,.14), 0 2px 5px rgba(15,59,105,.10), inset 0 1px 0 rgba(255,255,255,.86) !important; }
+}
+</style>
 </head>
 <body>
   <main class="page">
     <div class="actions">
-      <button onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
-      <button class="secondary" onclick="window.close()">Cerrar</button>
+      <button class="secondary" onclick="try{ if(window.opener && window.opener.kamanShowHome){ window.opener.kamanShowHome(); } }catch(e){} window.close();">Cerrar</button>
     </div>
     <div class="header">
       <div>
@@ -5084,6 +7178,8 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
           syncPayrollForCita(restored);
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
           localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
+          setDirty(FIREBASE_DIRTY_CITAS_KEY);
+          setDirty(FIREBASE_DIRTY_HISTORY_KEY);
           render();
           renderHistory();
 
@@ -5095,6 +7191,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
           unmarkCitaRemovedLocal(restored);
           state.rows = sortCitasByDateTime(state.rows.filter(r => r.id !== restored.id).concat([restored]));
           localStorage.setItem(STORAGE_KEY, JSON.stringify(state.rows));
+          setDirty(FIREBASE_DIRTY_CITAS_KEY);
           render();
           renderHistory();
           setStatus("Entrega regresada al listado activo.");
@@ -5134,11 +7231,33 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 
 
 
-  function exportHistoryToExcel(){
+  async function exportHistoryToExcel(){
     const list = sortCitasByDateTime(Array.isArray(state.deliveries) ? state.deliveries : []);
     if(!list.length){
       alert("No hay registros en historial para exportar.");
       return;
+    }
+
+    const opcion = prompt(
+      "Antes de exportar el historial elige una opción:\n\n" +
+      "1 = Descargar Excel y CONSERVAR registros\n" +
+      "2 = Descargar Excel y ELIMINAR todos los registros del historial\n\n" +
+      "Escribe 1 o 2:"
+    );
+    if(opcion === null) return;
+
+    const seleccion = String(opcion).trim().toLowerCase();
+    const eliminarDespues = seleccion === "2" || seleccion === "eliminar" || seleccion === "eliminarlos";
+    const conservar = seleccion === "1" || seleccion === "conservar" || seleccion === "conservarlos";
+
+    if(!eliminarDespues && !conservar){
+      alert("Opción no válida. Escribe 1 para conservar o 2 para eliminar después de exportar.");
+      return;
+    }
+
+    if(eliminarDespues){
+      const ok = confirm("Se descargará el Excel y después se eliminarán TODOS los registros del historial. ¿Confirmas?");
+      if(!ok) return;
     }
 
     const data = list.map((row, idx)=>{
@@ -5150,9 +7269,13 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
         "Destino": d["destino"] || "",
         "Operador": d[OPERADOR_COL] || "",
         "Maniobra": d[MANIOBRA_COL] || "",
+        "Pago operador": d["pago operador"] || d["pago"] || "",
+        "Pago maniobra": d["pago maniobra"] || "",
         "Unidad": d[UNIT_COL] || "",
         "Horario de carga": d["horario de carga"] || "",
         "Horario de cita": d["horario de cita"] || "",
+        "Segunda parada": d["segunda parada"] || "",
+        "Tercera parada": d["tercera parada"] || "",
         "Custodio": d[CUSTODIO_COL] || "",
         "Observaciones": d["observaciones"] || "",
         "Entregada el": row.deliveredAtLocal || "",
@@ -5170,8 +7293,8 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
       const wb = XLSX.utils.book_new();
 
       ws["!cols"] = [
-        {wch:6},{wch:14},{wch:22},{wch:24},{wch:24},{wch:24},{wch:18},
-        {wch:18},{wch:18},{wch:12},{wch:30},{wch:24},{wch:22}
+        {wch:6},{wch:14},{wch:22},{wch:24},{wch:24},{wch:26},{wch:16},{wch:28},{wch:18},
+        {wch:18},{wch:18},{wch:18},{wch:18},{wch:12},{wch:30},{wch:24},{wch:22}
       ];
 
       XLSX.utils.book_append_sheet(wb, ws, "Historial Entregas");
@@ -5181,18 +7304,25 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
       const m = String(hoy.getMonth()+1).padStart(2,"0");
       const d = String(hoy.getDate()).padStart(2,"0");
       XLSX.writeFile(wb, `historial_entregas_${y}-${m}-${d}.xlsx`);
-      setStatus("Historial exportado a Excel.");
+
+      if(eliminarDespues){
+        await withProcessing("Limpiando historial…", "El Excel ya fue generado. Eliminando registros del historial y sincronizando Firebase.", async ()=>{
+          state.deliveries = [];
+          localStorage.setItem(DELIVERIES_KEY, JSON.stringify(state.deliveries));
+          renderHistory();
+          try{ await syncHistoryNow(true); }catch(syncErr){ console.warn(syncErr); scheduleHistoryFirebaseSave(); }
+          setStatus("Historial exportado y eliminado.");
+        });
+      } else {
+        setStatus("Historial exportado a Excel. Registros conservados.");
+      }
     }catch(e){
       console.error(e);
       alert("No se pudo exportar el historial a Excel.");
     }
   }
 
-  const btnExportHistoryExcel = $("#btnExportHistoryExcel");
-  if(btnExportHistoryExcel){
-    btnExportHistoryExcel.addEventListener("click", exportHistoryToExcel);
-  }
-
+  // Exportar historial se maneja con el listener global para evitar doble descarga.
 
 
   function citaDateTimeValue(row){
@@ -5318,6 +7448,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   function closeAvailableUnits(){
     const back = $("#availableUnitsBackdrop");
     if(back){ back.style.display = "none"; back.setAttribute("aria-hidden","true"); }
+    if(window.kamanShowHome) window.kamanShowHome();
   }
 
   const btnAvailableUnits = $("#btnAvailableUnits");
@@ -5419,6 +7550,10 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
 
     try{
       await withProcessing("Reset total…", "Limpiando todo el sistema y confirmando Firebase.", async ()=>{
+      setResetPending();
+      clearDirty(FIREBASE_DIRTY_CITAS_KEY);
+      clearDirty(FIREBASE_DIRTY_CONFIG_KEY);
+      clearDirty(FIREBASE_DIRTY_HISTORY_KEY);
       state.rows = [];
       state.units = [];
       state.workers = [];
@@ -5446,6 +7581,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
             : Promise.resolve({ ok:true })
         ]);
         if(results.some(r => !r.ok)) throw new Error("Firebase no confirmó el reset total");
+        clearResetPending();
 
         setFirebaseSignal("online", "Firebase conectado");
       }
@@ -5533,8 +7669,7 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   setFirebaseSignal("pending", "Firebase verificando...");
   load();
   render();
-  loadCitasFromFirebase();
-  loadConfigFromFirebase();
+  actualizarAppDesdeFirebase(true);
 
   // Voz requiere gesto
   let ran = false;
@@ -5562,11 +7697,152 @@ $("#btnPayrollDone")?.addEventListener("click", closePayroll);
   $("#btnCancelDestination")?.addEventListener("click", closeDestinationForm);
   $("#btnCloseDestinationForm")?.addEventListener("click", closeDestinationForm);
 
+
+  function ensureCitasEditorModal(){
+    if(document.getElementById("citasEditorBackdrop")) return;
+    const div = document.createElement("div");
+    div.className = "modal-backdrop";
+    div.id = "citasEditorBackdrop";
+    div.setAttribute("aria-hidden", "true");
+    div.innerHTML = `
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="citasEditorTitle">
+        <header>
+          <h2 id="citasEditorTitle">✏️ Editar citas registradas</h2>
+          <div style="flex:1"></div>
+          <button type="button" id="btnCloseCitasEditor" class="ghost" title="Cerrar">✖</button>
+        </header>
+        <div class="content" style="grid-template-columns:1fr;gap:10px;">
+          <div class="pill" id="citasEditorCount">0 citas</div>
+          <div id="citasEditorList" class="citas-editor-list"></div>
+        </div>
+        <div class="actions">
+          <button type="button" id="btnCitasEditorDone" class="primary">✅ Listo</button>
+        </div>
+      </div>`;
+    document.body.appendChild(div);
+    div.querySelector("#btnCloseCitasEditor")?.addEventListener("click", closeCitasEditor);
+    div.querySelector("#btnCitasEditorDone")?.addEventListener("click", closeCitasEditor);
+  }
+
+  function closeCitasEditor(){
+    const back = document.getElementById("citasEditorBackdrop");
+    if(back){
+      back.style.display = "none";
+      back.setAttribute("aria-hidden", "true");
+    }
+  }
+
+  function openCitasEditor(){
+    ensureCitasEditorModal();
+    renderCitasEditor();
+    const back = document.getElementById("citasEditorBackdrop");
+    if(back){
+      back.style.display = "flex";
+      back.setAttribute("aria-hidden", "false");
+    }
+  }
+
+  function renderCitasEditor(){
+    ensureCitasEditorModal();
+    const list = document.getElementById("citasEditorList");
+    const count = document.getElementById("citasEditorCount");
+    if(!list) return;
+    const rows = sortCitasByDateTime(state.rows || []);
+    if(count) count.textContent = `${rows.length} cita${rows.length===1?"":"s"} registrada${rows.length===1?"":"s"}`;
+    if(!rows.length){
+      list.innerHTML = `<div class="citas-editor-empty">No hay citas registradas para editar.</div>`;
+      return;
+    }
+    list.innerHTML = "";
+    rows.forEach(row => {
+      const d = row.data || {};
+      const card = document.createElement("div");
+      card.className = "citas-editor-card";
+      const cliente = normalize(d["cliente"]) || "Sin cliente";
+      const destino = normalize(d["destino"]) || "Sin destino";
+      const fecha = normalize(d[DATE_COL]) || "Sin fecha";
+      const carga = normalize(d["horario de carga"]) || "-";
+      const cita = normalize(d["horario de cita"]) || "-";
+      card.innerHTML = `
+        <div class="citas-editor-head">
+          <div>
+            <div class="citas-editor-title">${escapeHTML(cliente)}</div>
+            <div class="citas-editor-dest">${escapeHTML(destino)}</div>
+            <div class="citas-editor-sub">${escapeHTML(fecha)} · Carga ${escapeHTML(carga)} · Cita ${escapeHTML(cita)}</div>
+          </div>
+        </div>
+        <div class="citas-editor-grid">
+          <div class="citas-editor-item"><span class="citas-editor-label">Unidad</span><span class="citas-editor-value">${escapeHTML(d[UNIT_COL] || "-")}</span></div>
+          <div class="citas-editor-item"><span class="citas-editor-label">Operador</span><span class="citas-editor-value">${escapeHTML(d[OPERADOR_COL] || "-")}</span></div>
+          <div class="citas-editor-item"><span class="citas-editor-label">Maniobra</span><span class="citas-editor-value">${escapeHTML(d[MANIOBRA_COL] || "-")}</span></div>
+          <div class="citas-editor-item"><span class="citas-editor-label">Custodio</span><span class="citas-editor-value">${escapeHTML(d[CUSTODIO_COL] || "-")}</span></div>
+        </div>
+        <div class="citas-editor-actions">
+          <button type="button" class="primary" data-act="edit">✏️ Editar</button>
+          <button type="button" class="danger" data-act="del">🗑️ Eliminar</button>
+          <button type="button" data-act="done">✅ Finalizar</button>
+        </div>`;
+      card.querySelector('[data-act="edit"]')?.addEventListener("click", () => {
+        closeCitasEditor();
+        openEdit(row.id);
+      });
+      card.querySelector('[data-act="del"]')?.addEventListener("click", async () => {
+        await deleteRow(row.id);
+        renderCitasEditor();
+      });
+      card.querySelector('[data-act="done"]')?.addEventListener("click", async () => {
+        await moverCitaAHistorial(row);
+        renderCitasEditor();
+      });
+      list.appendChild(card);
+    });
+  }
+
+  function installCitasEditorButton(){
+    if(document.getElementById("btnOpenCitasEditorFromNew")) return;
+    const actions = document.querySelector("#modalBackdrop .modal .actions");
+    if(!actions) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.id = "btnOpenCitasEditorFromNew";
+    btn.innerHTML = "✏️ Editar citas registradas";
+    btn.title = "Editar, eliminar o finalizar citas registradas";
+    btn.addEventListener("click", openCitasEditor);
+    actions.insertBefore(btn, actions.firstChild);
+  }
+
+  window.kamanOpenCitasEditor = openCitasEditor;
+  installCitasEditorButton();
+
   // Notas: sin botón en menú principal; se desactivan recordatorios periódicos para mejorar velocidad.
 
 })();
 </script>
 
 
+
+<script id="kaman-home-menu-js">
+/* ===== Pantalla inicial 4 opciones ===== */
+(function(){
+  function showHome(){ document.body.classList.add('kaman-home-active'); }
+  function showContent(){ document.body.classList.remove('kaman-home-active'); }
+  window.kamanShowHome = showHome;
+  window.kamanShowContent = showContent;
+  document.addEventListener('DOMContentLoaded', function(){
+    showHome();
+    document.getElementById('btnHome')?.addEventListener('click', showHome);
+    document.getElementById('homeMenu')?.addEventListener('click', function(ev){
+      const btn = ev.target.closest('[data-home-action]');
+      if(!btn) return;
+      const action = btn.getAttribute('data-home-action');
+      showContent();
+      if(action === 'new') document.getElementById('btnNew')?.click();
+      else if(action === 'preview'){ document.getElementById('btnPreviewCitas')?.click(); showHome(); }
+      else if(action === 'units') document.getElementById('btnAvailableUnits')?.click();
+      else if(action === 'config') document.getElementById('btnConfig')?.click();
+    });
+  });
+})();
+</script>
 </body>
 </html>
